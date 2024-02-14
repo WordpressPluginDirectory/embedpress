@@ -9,7 +9,7 @@ use Embera\Url;
 (defined('ABSPATH') && defined('EMBEDPRESS_IS_LOADED')) or die("No direct script access allowed.");
 
 /**
- * Entity responsible to support NRKRadio embeds.
+ * Entity responsible to support TikTok embeds.
  *
  * @package     EmbedPress
  * @subpackage  EmbedPress/Providers
@@ -18,12 +18,12 @@ use Embera\Url;
  * @license     GPLv3 or later
  * @since       1.0.0
  */
-class NRKRadio extends ProviderAdapter implements ProviderInterface
+class TikTok extends ProviderAdapter implements ProviderInterface
 {
     /** inline {@inheritdoc} */
-    protected static $hosts = ["radio.nrk.no"];
+    protected static $hosts = ["tiktok.com"];
     /**
-     * Method that verifies if the embed URL belongs to NRKRadio.
+     * Method that verifies if the embed URL belongs to TikTok.
      *
      * @param Url $url
      * @return  boolean
@@ -32,19 +32,34 @@ class NRKRadio extends ProviderAdapter implements ProviderInterface
      */
     public function validateUrl(Url $url)
     {
-        return  (bool) preg_match(
-            "/^https?:\/\/radio\.nrk\.no/i",
-            (string) $url
-        );
+        // TikTok URL pattern
+        $pattern = "/^https:\/\/www\.tiktok\.com\/@[\w.-]+\/video\/[\w.-]+$/i";
+        // Check if the URL matches the pattern
+        return (bool) preg_match($pattern, (string) $url);
     }
 
-    public function validateNRKRadio($url)
+    public function validateTikTok($url)
     {
-        return  (bool) preg_match(
-            "/^https?:\/\/radio\.nrk\.no/i",
-            (string) $url
-        );
+        // TikTok URL pattern
+        $pattern = "/^https:\/\/www\.tiktok\.com\/@[\w.-]+\/video\/[\w.-]+$/i";
+        // Check if the URL matches the pattern
+        return (bool) preg_match($pattern, (string) $url);
     }
+
+    public function getTiktokVideoId($url)
+    {
+        // TikTok URL pattern
+        $pattern = "/^https:\/\/www\.tiktok\.com\/@[\w.-]+\/video\/([\w.-]+)$/i";
+
+        // Check if the URL matches the pattern
+        if (preg_match($pattern, (string) $url, $matches)) {
+            // Extracted video ID
+            return $matches[1];
+        }
+
+        return null;
+    }
+
 
     /**
      * This method fakes an Oembed response.
@@ -56,21 +71,23 @@ class NRKRadio extends ProviderAdapter implements ProviderInterface
     public function fakeResponse()
     {
         $src_url = urldecode($this->url);
-        
+
+
         // Check if the url is already converted to the embed format  
-        if ($this->validateNRKRadio($src_url)) {
-            $iframeSrc = $this->url;
+        if ($this->validateTikTok($src_url)) {
+            $iframeSrc = 'https://tiktok.com/embed/' . $this->getTiktokVideoId($this->url);
         } else {
             return [];
         }
+
 
         $width = isset($this->config['maxwidth']) ? $this->config['maxwidth'] : 600;
         $height = isset($this->config['maxheight']) ? $this->config['maxheight'] : 350;
 
         return [
             'type'          => 'rich',
-            'provider_name' => 'NRK Radio',
-            'provider_url'  => 'https://radio.nrk.no',
+            'provider_name' => 'TikTok',
+            'provider_url'  => 'https://tiktok.com',
             'title'         => 'Unknown title',
             'html'          => '<iframe title=""  width="' . esc_attr($width) . '" height="' . esc_attr($height) . '" src="' . $iframeSrc . '" ></iframe>',
         ];
