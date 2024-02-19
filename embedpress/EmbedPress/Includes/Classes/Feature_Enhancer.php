@@ -802,7 +802,9 @@ class Feature_Enhancer
 			$query = parse_url($embed->url, PHP_URL_QUERY);
 			$url = str_replace('?' . $query, '', $url_full);
 
-			parse_str($query, $params);
+			if ($query !== null) {
+				parse_str($query, $params);
+			}
 
 			// Set the class in the attributes
 			$embed->attributes->class = str_replace('{provider_alias}', 'wistia', $embed->attributes->class);
@@ -954,7 +956,7 @@ class Feature_Enhancer
 			$url = !empty($pars_url['host']) ? $url . '&parent=' . $pars_url['host'] : $url;
 			ob_start();
 			?>
-			<div class="embedpress_wrapper" data-url="<?php echo esc_attr(esc_url($embed_content->url)); ?>">
+			<div class="embedpress_wrapper" data-url="<?php echo esc_url($embed_content->url); ?>">
 				<iframe src="<?php echo esc_url($url); ?>" allowfullscreen="" scrolling="no" frameborder="0" allow="autoplay; fullscreen" title="Twitch" sandbox="allow-modals allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" width="<?php echo esc_attr($width); ?>" height="<?php echo esc_attr($height); ?>" style="max-width: <?php echo esc_attr($width); ?>px; max-height:<?php echo esc_attr($height); ?>px;"></iframe>
 			</div>
 		<?php
@@ -1082,7 +1084,7 @@ class Feature_Enhancer
 					//@TODO; test responsive without static height width, keeping for now backward compatibility
 					?>
 			<div class="ose-vimeo wp-block-embed-vimeo <?php echo $align; ?>">
-				<iframe src="<?php echo $iframeUrl; ?>" allowtransparency="true" frameborder="0" width="640" height="360">
+				<iframe src="<?php echo esc_url($iframeUrl); ?>" allowtransparency="true" frameborder="0" width="640" height="360">
 				</iframe>
 			</div>
 <?php

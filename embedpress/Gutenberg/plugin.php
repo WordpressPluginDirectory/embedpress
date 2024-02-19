@@ -775,7 +775,7 @@ if (!empty($attributes['href'])) {
 
 	<?php
 
-		$embed_code = '<iframe title="' . esc_attr(Helper::get_file_title($attributes['href'])) . '" class="embedpress-embed-document-pdf ' . esc_attr($id) . '" style="' . esc_attr($dimension) . '; max-width:100%; display: inline-block" src="' . esc_attr($src) . '" frameborder="0" oncontextmenu="return false;"></iframe> ';
+		$embed_code = '<iframe title="' . esc_attr(Helper::get_file_title($attributes['href'])) . '" class="embedpress-embed-document-pdf ' . esc_attr($id) . '" style="' . esc_attr($dimension) . '; max-width:100%; display: inline-block" src="' . esc_url($src) . '" frameborder="0" oncontextmenu="return false;"></iframe> ';
 			
 		if ($powered_by) {
 			$embed_code .= sprintf('<p class="embedpress-el-powered">%s</p>', __('Powered By EmbedPress', 'embedpress'));
@@ -868,7 +868,7 @@ function embedpress_calendar_render_block($attributes)
 	<?php
 		if (!empty($url) && !$is_private) {
 			?>
-		<iframe title="<?php echo esc_attr(Helper::get_file_title($url)); ?>" style="<?php echo esc_attr($dimension); ?>; max-width:100%; display: inline-block" src="<?php echo esc_attr($url); ?>"></iframe>
+		<iframe title="<?php echo esc_attr(Helper::get_file_title($url)); ?>" style="<?php echo esc_attr($dimension); ?>; max-width:100%; display: inline-block" src="<?php echo esc_url($url); ?>"></iframe>
 	<?php } else {
 			if (is_embedpress_pro_active()) {
 				echo Embedpress_Google_Helper::shortcode();
