@@ -67,6 +67,30 @@ let epGlobals = {};
         });
     }
 
+    epGlobals.handlePosterImageLoad = function () {
+        var posterImages = document.querySelectorAll(".plyr__poster");
+        posterImages.forEach(function(posterImage) {
+            if (posterImage) {
+                var videoWrappers = document.querySelectorAll("[data-playerid]");
+                videoWrappers.forEach(function(videoWrapper) {
+                    var observer = new MutationObserver(function (mutationsList, observer) {
+                        var posterImageStyle = window.getComputedStyle(posterImage);
+                        if (posterImageStyle.getPropertyValue('background-image') !== 'none') {
+                            setTimeout(function () {
+                                videoWrapper.style.opacity = "1";
+                            }, 200);
+                            observer.disconnect();
+                        }
+                    });
+        
+                    observer.observe(posterImage, { attributes: true, attributeFilter: ['style'] });
+                });
+            }
+        });
+    }
+    
+
+
     // Run on initial load.
     embedPressResponsiveEmbeds();
 
@@ -361,8 +385,8 @@ let epGlobals = {};
                     document.querySelector('#' + perentSel + '-' + ep_client_id + ' .ep-embed-content-wraper').classList.remove('plyr-initialized');
 
                     initPlayer(document.querySelector('#' + perentSel + '-' + ep_client_id + ' .ep-embed-content-wraper'));
-                    
-                    if(eplocalize.is_pro_plugin_active){
+
+                    if (eplocalize.is_pro_plugin_active) {
                         const adIdEl = document.querySelector('#' + perentSel + '-' + ep_client_id + ' [data-ad-id]');
                         adInitialization(adIdEl, adIdEl.getAttribute('data-ad-index'));
                     }
@@ -497,12 +521,12 @@ jQuery(window).on("elementor/frontend/init", function () {
     };
 
     const adsHandler = function ($scope, $) {
-        window.epAdIndex = typeof(window.epAdIndex) === 'undefined' ? 0 : window.epAdIndex + 1;
+        window.epAdIndex = typeof (window.epAdIndex) === 'undefined' ? 0 : window.epAdIndex + 1;
         console.log(window.epAdIndex);
         let classes = $scope[0].className;
         let classJoint = '.' + classes.split(' ').join('.');
         const selectorEl = document.querySelector(classJoint + ' [data-ad-id]');
-        
+
 
         console.log(classJoint);
         if (jQuery('body').hasClass('elementor-editor-active') && eplocalize.is_pro_plugin_active) {
@@ -515,6 +539,7 @@ jQuery(window).on("elementor/frontend/init", function () {
     elementorFrontend.hooks.addAction("frontend/element_ready/embedpress_pdf.default", filterableGalleryHandler);
     elementorFrontend.hooks.addAction("frontend/element_ready/embedpres_document.default", filterableGalleryHandler);
     elementorFrontend.hooks.addAction("frontend/element_ready/embedpres_elementor.default", adsHandler);
+    elementorFrontend.hooks.addAction("frontend/element_ready/embedpres_elementor.default", epGlobals.handlePosterImageLoad);
 });
 
 
@@ -523,3 +548,35 @@ jQuery(window).on("elementor/frontend/init", function () {
 // });
 
 // testHellowWorld();
+
+
+
+function presentationModeForIOS(iframes) {
+    iframes?.forEach(function (iframe) {
+        iframe.onload = function () {
+            var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            var button = iframeDoc?.querySelector('#presentationMode');
+            button?.addEventListener('click', function () {
+                iframe.classList.toggle('presentationModeEnabledIosDevice');
+            });
+            iframeDoc?.addEventListener('keydown', function (event) {
+                if (event.keyCode === 27) {
+                    iframe.classList.remove('presentationModeEnabledIosDevice');
+                }
+            });
+        };
+    });
+}
+
+function isIOSDevice() {
+    return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+if (isIOSDevice()) {
+    var iframes = document.querySelectorAll('.embedpress-embed-document-pdf');
+    presentationModeForIOS(iframes)
+}
+
+
+
+document.addEventListener("DOMContentLoaded", epGlobals.handlePosterImageLoad);

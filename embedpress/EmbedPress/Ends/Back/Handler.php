@@ -38,6 +38,10 @@ class Handler extends EndHandlerAbstract
         if (!empty($_GET['page_type']) && $_GET['page_type'] == 'calendly') {
             add_action('init', [$this, 'handle_calendly_data']);
         }
+
+        if(defined('EMBEDPRESS_SL_ITEM_SLUG') && is_admin(  )){
+            add_action('admin_enqueue_scripts',  [$this, 'enqueueLisenceScripts']);
+        }
     }
 
     public function handle_calendly_data()
@@ -159,6 +163,13 @@ class Handler extends EndHandlerAbstract
                 'plyr.polyfilled',
                 EMBEDPRESS_URL_ASSETS . 'js/plyr.polyfilled.js',
                 [],
+                $this->pluginVersion,
+                false
+            );
+            wp_enqueue_script(
+                'gutenberg-general',
+                EMBEDPRESS_URL_ASSETS . 'js/gutneberg-script.js',
+                ['wp-data'],
                 $this->pluginVersion,
                 false
             );
