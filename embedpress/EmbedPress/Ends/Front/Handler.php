@@ -33,13 +33,9 @@ class Handler extends EndHandlerAbstract
     public static function enqueueStyles()
     {
         wp_enqueue_style(EMBEDPRESS_PLG_NAME, EMBEDPRESS_URL_ASSETS . 'css/embedpress.css');
-
-        add_action('wp_enqueue_scripts', function () {
-            wp_enqueue_style('plyr', EMBEDPRESS_URL_ASSETS . 'css/plyr.css');
-        }, 11); // Priority of 11 ensures it is enqueued just before the closing </head> tag
+        wp_enqueue_style('slick', EMBEDPRESS_URL_ASSETS . 'css/slick.min.css', time());
+        wp_enqueue_style('plyr', EMBEDPRESS_URL_ASSETS . 'css/plyr.css');
     }
-
-
 
     public function enqueueScripts()
     {
@@ -80,6 +76,14 @@ class Handler extends EndHandlerAbstract
                 EMBEDPRESS_PLUGIN_VERSION,
                 true
             );
+
+            wp_enqueue_script(
+                'slick',
+                EMBEDPRESS_URL_ASSETS . 'js/slick.min.js',
+                ['jquery'],
+                $this->pluginVersion,
+                false
+            );
         }
 
         $dependencies = ['jquery'];
@@ -119,9 +123,12 @@ class Handler extends EndHandlerAbstract
             );
         }
 
+
+
         wp_localize_script('embedpress-front', 'eplocalize', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
             'is_pro_plugin_active' => defined('EMBEDPRESS_SL_ITEM_SLUG'),
+            'nonce' => wp_create_nonce( 'ep_nonce' ),
         ));
     }
 

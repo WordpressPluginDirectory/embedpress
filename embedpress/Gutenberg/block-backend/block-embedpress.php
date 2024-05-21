@@ -69,9 +69,42 @@ if(!function_exists('lock_content_form_handler')){
 function embedpress_render_block($attributes)
 {
 
+
 	$client_id = !empty($attributes['clientId']) ? md5($attributes['clientId']) : '';
 	$block_id = !empty($attributes['clientId']) ? $attributes['clientId'] : '';
 	$custom_player = !empty($attributes['customPlayer']) ? $attributes['customPlayer'] : 0;
+	$instaLayout = !empty($attributes['instaLayout']) ? $attributes['instaLayout'] : 'insta-grid';
+
+	$_carousel_options = '';
+	$_carousel_id = '';
+	if(!empty($attributes['instaLayout']) && $attributes['instaLayout'] === 'insta-carousel'){
+		$_carousel_id = 'data-carouselid=' . esc_attr($client_id) . '';
+
+		$layout = $attributes['instaLayout'];
+		$slidesShow = !empty($attributes['slidesShow']) ? $attributes['slidesShow'] : 5;
+		$carouselAutoplay = !empty($attributes['carouselAutoplay']) ? $attributes['carouselAutoplay'] : 0;
+		$autoplaySpeed = !empty($attributes['autoplaySpeed']) ? $attributes['autoplaySpeed'] : 3000;
+		$transitionSpeed = !empty($attributes['transitionSpeed']) ? $attributes['transitionSpeed'] : 1000;
+		$carouselLoop = !empty($attributes['carouselLoop']) ? $attributes['carouselLoop'] : 0;
+		$carouselArrows = !empty($attributes['carouselArrows']) ? $attributes['carouselArrows'] : 0;
+		$spacing = !empty($attributes['carouselSpacing']) ? $attributes['carouselSpacing'] : 0;
+		
+		// print_r($attributes); 
+		
+		$carousel_options = [
+			'layout' => $layout,
+			'slideshow' => $slidesShow,
+			'autoplay' => $carouselAutoplay,
+			'autoplayspeed' => $autoplaySpeed,
+			'transitionspeed' => $transitionSpeed,
+			'loop' => $carouselLoop,
+			'arrows' => $carouselArrows,
+			'spacing' => $spacing
+		];
+
+		$carousel_options_string = json_encode($carousel_options);
+		$_carousel_options = 'data-carousel-options='. htmlentities($carousel_options_string, ENT_QUOTES) .'';
+	}
 
 	$cEmbedType = !empty($attributes['cEmbedType']) ? ' '.$attributes['cEmbedType'] : '';
 
@@ -81,7 +114,6 @@ function embedpress_render_block($attributes)
 	if (!empty($custom_player)) {
 
 		$is_self_hosted = Helper::check_media_format($attributes['url']);
-
 
 		$_custom_player = 'data-playerid="' . esc_attr($client_id) . '"';
 		$player_preset = !empty($attributes['playerPreset']) ? $attributes['playerPreset'] : 'preset-default';
@@ -189,7 +221,7 @@ function embedpress_render_block($attributes)
 
 		if(!empty($attributes['adManager'])) {
 			$ad = base64_encode(json_encode($attributes));
-			$adsAtts = "data-ad-id=$client_id data-ad-attrs=$ad class=ad-mask";
+			$adsAtts = "data-sponsored-id=$client_id data-sponsored-attrs=$ad class=ad-mask";
 		}
 
 		ob_start();
@@ -201,8 +233,19 @@ function embedpress_render_block($attributes)
 			?>
 			<div class="wp-block-embed__wrapper <?php if(!empty($attributes['contentShare'])) echo esc_attr( 'position-'.$share_position.'-wraper'); ?>  <?php if($attributes['videosize'] == 'responsive') echo esc_attr( 'ep-video-responsive' ); ?>">
 				<div id="ep-gutenberg-content-<?php echo esc_attr( $client_id )?>" class="ep-gutenberg-content">
-					<div <?php echo esc_attr( $adsAtts ); ?> >
-						<div  class="ep-embed-content-wraper <?php !empty($custom_player) ? esc_attr_e($player_preset) : ''; ?>" <?php echo $_custom_player; ?> <?php echo $_player_options; ?>>
+					<div 
+						<?php echo esc_attr( $adsAtts ); ?> >
+						<div  class="ep-embed-content-wraper <?php 
+							if (!empty($custom_player)) {
+								echo esc_attr($player_preset);
+							} 
+							echo esc_attr($instaLayout);
+						?>" 
+						<?php echo esc_attr($_custom_player); ?> 
+						<?php echo esc_attr($_player_options); ?> 
+						<?php echo esc_attr( $_carousel_id ); ?>
+						<?php echo esc_attr($_carousel_options); ?>
+					>
 							<?php
 								$hash_pass = hash('sha256', wp_salt(32) . md5($attributes['contentPassword']));
 								$password_correct = isset($_COOKIE['password_correct_'.$client_id]) ? $_COOKIE['password_correct_'.$client_id] : '';
@@ -256,7 +299,7 @@ function embedpress_render_block_style($attributes)
 	$player_color = !empty($attributes['playerColor']) ? $attributes['playerColor'] : '';
 	$player_pip = !empty($attributes['playerPip']) ? 'block' : 'none';
 	$logoX = !empty($attributes['logoX']) ? $attributes['logoX'] : 5;
-	$logoY = !empty($attributes['logoY']) ? $attributes['logoX'] : 10;
+	$logoY = !empty($attributes['logoY']) ? $attributes['logoY'] : 10;
 	$logoOpacity = !empty($attributes['logoOpacity']) ? $attributes['logoOpacity'] : '1';
 	$player_pip = !empty($attributes['playerPip']) ? 'block' : 'none';
 
