@@ -84,8 +84,7 @@ class Handler extends EndHandlerAbstract
                     delete_transient('instagram_user_info_' . $user_id);
                     delete_transient('instagram_posts_' . $user_id);
                     update_option('ep_instagram_feed_data', $feed_data);
-                }
-                else{
+                } else {
                     $feed_data['error'] = "Access token Invalid or expired.";
                 }
 
@@ -440,13 +439,13 @@ class Handler extends EndHandlerAbstract
                 false
             );
 
-            wp_enqueue_style('plyr', EMBEDPRESS_URL_ASSETS . 'css/plyr.css', $this->pluginVersion, true);
+            wp_enqueue_style('plyr', EMBEDPRESS_URL_ASSETS . 'css/plyr.css', array(), $this->pluginVersion);
+            wp_enqueue_style($this->pluginName, EMBEDPRESS_URL_ASSETS . 'css/embedpress.css', array(), $this->pluginVersion);
 
-            wp_enqueue_style($this->pluginName, EMBEDPRESS_URL_ASSETS . 'css/embedpress.css', $this->pluginVersion, true);
 
             wp_enqueue_script(
-                'slick',
-                EMBEDPRESS_URL_ASSETS . 'js/slick.min.js',
+                'cg-carousel',
+                EMBEDPRESS_URL_ASSETS . 'js/carousel.min.js',
                 ['jquery'],
                 $this->pluginVersion,
                 false
@@ -454,12 +453,12 @@ class Handler extends EndHandlerAbstract
             wp_enqueue_script(
                 'init-carousel',
                 EMBEDPRESS_URL_ASSETS . 'js/initCarousel.js',
-                ['jquery', 'slick'],
+                ['jquery', 'cg-carousel'],
                 $this->pluginVersion,
                 false
             );
 
-            wp_enqueue_style('slick', EMBEDPRESS_URL_ASSETS . 'css/slick.min.css', $this->pluginVersion, true);
+            wp_enqueue_style('cg-carousel', EMBEDPRESS_URL_ASSETS . 'css/carousel.min.css', $this->pluginVersion, true);
 
             wp_enqueue_style($this->pluginName, EMBEDPRESS_URL_ASSETS . 'css/embedpress.css', $this->pluginVersion, true);
         }
