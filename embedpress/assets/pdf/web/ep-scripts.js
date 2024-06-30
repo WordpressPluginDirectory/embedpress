@@ -34,12 +34,14 @@ const getParamObj = (hash) => {
             copy_text: hashParams.get('copy_text'),
             add_text: hashParams.get('add_text'),
             draw: hashParams.get('draw'),
+            add_image: hashParams.get('add_image'),
             position: hashParams.get('position'),
             download: hashParams.get('download'),
             toolbar: hashParams.get('toolbar'),
-            doc_details: hashParams.get('doc_details'),
-            doc_rotation: hashParams.get('doc_rotation'),
+            doc_details: hashParams.get('pdf_details'),
+            doc_rotation: hashParams.get('pdf_rotation'),
         };
+        
 
 
         if (hashParams.get('download') !== 'true' && hashParams.get('download') !== 'yes') {
@@ -108,7 +110,7 @@ const pdfIframeStyle = (data) => {
     let settingsPos = '';
 
     if (data.toolbar === false || data.toolbar == 'false') {
-        data.presentation = false; data.download = true; data.copy_text = true; data.add_text = true; data.draw = true, data.doc_details = false; data.doc_rotation = false;
+        data.presentation = false; data.download = true; data.copy_text = true; data.add_text = true; data.draw = true, data.doc_details = false; data.doc_rotation = false, data.add_image = false;
     }
 
     let position = 'top';
@@ -123,10 +125,10 @@ const pdfIframeStyle = (data) => {
         copy_text = 'text';
     }
 
-    // console.log({data});
 
     let doc_details = isDisplay(data.doc_details);
     let doc_rotation = isDisplay(data.doc_rotation);
+    let add_image = isDisplay(data.add_image);
 
     const otherhead = document.getElementsByTagName("head")[0];
 
@@ -223,11 +225,14 @@ const pdfIframeStyle = (data) => {
         #secondaryOpenFile, #toolbarViewerRight #openFile{
             display: none!important;
         }
-        #secondaryDownload, #secondaryPrint, #toolbarViewerRight #print, #toolbarViewerRight #download{
+        #secondaryDownload, #secondaryPrint, #print, #download{
             display: ${download}!important;
         }
         #pageRotateCw{
             display: ${doc_rotation}!important;
+        }
+        #editorStamp{
+            display: ${add_image}!important;
         }
         #pageRotateCcw{
             display: ${doc_rotation}!important;
@@ -247,12 +252,6 @@ const pdfIframeStyle = (data) => {
         }
         #editorInk{
             display: ${draw}!important;
-        }
-        
-        @media all and (max-width:360px) {
-            #toolbarViewerRight #editorModeButtons, #toolbarViewerRight #print,  #toolbarViewerRight #download {
-                display: none!important;
-            }
         }
 
         ${pdfCustomColor}
@@ -286,7 +285,10 @@ pdfIframeStyle(data);
 setThemeMode(data.themeMode);
 
 
-document.getElementById("presentationMode")?.addEventListener("click", function () {
+
+document.querySelector(".presentationMode")?.addEventListener("click", function () {
+
+    console.log("presentation mode clicked");
     var mainContainer = document.getElementById("mainContainer");
     if (mainContainer && !document.fullscreenElement) {
         mainContainer.requestFullscreen().catch(err => {
@@ -299,15 +301,10 @@ document.getElementById("presentationMode")?.addEventListener("click", function 
     }
 });
 
-// // Check if the user agent contains "iPhone", "iPad", or "iPod"
-// function isIOS() {
-//     return /iPhone|iPad|iPod/i.test(navigator.userAgent);
-// }
-
-// if (isIOS()) {
-//     document.querySelector(".presentationForAllDevice")?.remove();
-// }
-// else{
-//     document.querySelector(".presentationForIosDevice")?.remove();
-// }
-
+document.getElementById("viewBookmark")?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const url = e.target.getAttribute('href');
+    if (url !== null) {
+        alert(`Current Page: ${url}`);
+    }
+});

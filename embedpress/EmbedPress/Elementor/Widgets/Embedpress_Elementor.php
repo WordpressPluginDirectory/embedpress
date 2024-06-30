@@ -45,24 +45,49 @@ class Embedpress_Elementor extends Widget_Base
 		return 'icon-embedpress';
 	}
 
-	public function get_style_depends()
-	{
-		return [
-			'plyr',
-			'cg-carousel'
-		];
+	public function get_style_depends() {
+		$handler_keys = get_option('enabled_elementor_scripts', []);
+		
+		$handles = [];
+	
+		if (isset($handler_keys['enabled_custom_player']) && $handler_keys['enabled_custom_player'] === 'yes') {
+			$handles[] = 'plyr';
+		}
+		if (isset($handler_keys['enabled_instafeed']) && $handler_keys['enabled_instafeed'] === 'yes') {
+			$handles[] = 'cg-carousel';
+		}
+	
+		$handles[] = 'embedpress-elementor-css';
+		$handles[] = 'embedpress-style';
+
+	
+		return $handles;
 	}
+	
+	
 
 	public function get_script_depends()
 	{
-		return [
-			'plyr.polyfilled',
-			'initplyr',
-			'vimeo-player',
-			'embedpress-front',
-			'embedpress-ads',
-			'cg-carousel',
-		];
+		$handler_keys = get_option('enabled_elementor_scripts', []);
+		
+		$handles = [];
+	
+		if (isset($handler_keys['enabled_custom_player']) && $handler_keys['enabled_custom_player'] === 'yes') {
+			$handles[] = 'plyr.polyfilled';
+			$handles[] = 'initplyr';
+			$handles[] = 'vimeo-player';	
+		}
+		$handles[] = 'embedpress-front';
+		
+		if (isset($handler_keys['enabled_ads']) && $handler_keys['enabled_ads'] === 'yes') {
+			$handles[] = 'embedpress-ads';
+		}
+
+		if (isset($handler_keys['enabled_instafeed']) && $handler_keys['enabled_instafeed'] === 'yes') {
+			$handles[] = 'cg-carousel';
+		}
+
+		return $handles;
 	}
 
 
@@ -105,6 +130,8 @@ class Embedpress_Elementor extends Widget_Base
 			'google drawings'
 		];
 	}
+
+	
 
 	protected function register_controls()
 	{
@@ -3391,7 +3418,7 @@ class Embedpress_Elementor extends Widget_Base
 				],
 				'devices' => ['desktop', 'tablet', 'mobile'],
 				'default' => [
-					'size' => 600,
+					'size' => Helper::get_options_value('enableEmbedResizeWidth'),
 					'unit' => 'px',
 				],
 				'desktop_default' => [
@@ -3408,7 +3435,7 @@ class Embedpress_Elementor extends Widget_Base
 				],
 				'selectors' => [
 					'{{WRAPPER}} .embedpress-elements-wrapper .ose-embedpress-responsive>iframe,{{WRAPPER}} .embedpress-elements-wrapper .ose-embedpress-responsive, {{WRAPPER}} .ad-youtube-video > iframe, 
-					{{WRAPPER}} .plyr--video' => 'width: {{size}}{{UNIT}}!important; max-width: 100%!important;',
+					{{WRAPPER}} .plyr--video, {{WRAPPER}} .ose-giphy img' => 'width: {{size}}{{UNIT}}!important; max-width: 100%!important;',
 				],
 			]
 		);
@@ -3432,7 +3459,7 @@ class Embedpress_Elementor extends Widget_Base
 					'unit' => 'px',
 				],
 				'default' => [
-					'size' => 400,
+					'size' => Helper::get_options_value('enableEmbedResizeHeight'),
 					'unit' => 'px',
 				],
 				'tablet_default' => [
@@ -3445,7 +3472,7 @@ class Embedpress_Elementor extends Widget_Base
 				],
 				'selectors' => [
 					'{{WRAPPER}} .embedpress-elements-wrapper .ose-embedpress-responsive iframe, {{WRAPPER}} .embedpress-elements-wrapper .ose-embedpress-responsive,{{WRAPPER}} .ad-youtube-video > iframe,
-					{{WRAPPER}} .plyr--video' => 'height: {{size}}{{UNIT}}!important;max-height: 100%!important',
+					{{WRAPPER}} .plyr--video, {{WRAPPER}} .ose-giphy img' => 'height: {{size}}{{UNIT}}!important;max-height: 100%!important',
 				],
 				'condition' => [
 					'embedpress_pro_embeded_source!' => 'instafeed'
@@ -3605,7 +3632,8 @@ class Embedpress_Elementor extends Widget_Base
 			}
 
 			$playerOptionsString = json_encode($playerOptions);
-			$_player_options = 'data-options=\'' . htmlentities($playerOptionsString, ENT_QUOTES) . '\'';
+			$_player_options = 'data-options=' . htmlentities($playerOptionsString, ENT_QUOTES);
+
 		}
 
 		return $_player_options;
@@ -3685,8 +3713,10 @@ class Embedpress_Elementor extends Widget_Base
 
 	protected function render()
 	{
-		add_filter('embedpress_should_modify_spotify', '__return_false');
 		$settings      = $this->get_settings_for_display();
+		Helper::get_enable_settings_data_for_scripts($settings);
+
+		add_filter('embedpress_should_modify_spotify', '__return_false');
 		$embed_link = isset($settings['embedpress_embeded_link']) ? $settings['embedpress_embeded_link'] : '';
 
 
@@ -3802,7 +3832,7 @@ class Embedpress_Elementor extends Widget_Base
 
 		$data_playerid = '';
 		if(!empty($settings['embedpress_custom_player'])){
-			$data_playerid = 'data-playerid="'.esc_attr($this->get_id()).'"';
+			$data_playerid = 'data-playerid='.esc_attr($this->get_id());
 		}
 
 		$data_carouselid = '';
@@ -3824,6 +3854,12 @@ class Embedpress_Elementor extends Widget_Base
 		if (!empty($settings['emberpress_custom_player']) && $settings['emberpress_custom_player'] === 'yes') {
 			$data_player_id = "data-playerid=" . esc_attr($this->get_id());
 		}
+		
+		$hosted_format = '';
+		if (!empty($settings['emberpress_custom_player'])) {			
+			$self_hosted = Helper::check_media_format($settings['embedpress_embeded_link']);
+			$hosted_format =  isset($self_hosted['format']) ? $self_hosted['format'] : '';
+		}
 
 		?>
 
@@ -3837,7 +3873,7 @@ class Embedpress_Elementor extends Widget_Base
 					<?php
 				} else { ?>
 					<div id="ep-elementor-content-<?php echo esc_attr($client_id) ?>" class="ep-elementor-content <?php if (!empty($settings['embedpress_content_share'])) : echo esc_attr('position-' . $settings['embedpress_content_share_position'] . '-wraper'); endif; ?> <?php echo esc_attr($content_share_class . ' ' . $share_position_class . ' ' . $content_protection_class); echo esc_attr(' source-' . $source); ?>">
-						<div id="<?php echo esc_attr($this->get_id()); ?>" class="ep-embed-content-wraper <?php echo esc_attr($settings['custom_payer_preset']); ?><?php echo esc_attr($this->get_instafeed_layout($settings)); ?>" <?php echo $data_playerid; ?> <?php echo $data_carouselid; ?> <?php echo $this->get_custom_player_options($settings); ?> <?php echo $this->get_instafeed_carousel_options($settings); ?>>
+						<div id="<?php echo esc_attr($this->get_id()); ?>" class="ep-embed-content-wraper <?php echo esc_attr($settings['custom_payer_preset']); ?><?php echo esc_attr($this->get_instafeed_layout($settings)); ?> <?php echo esc_attr($hosted_format); ?>" <?php echo $data_playerid; ?> <?php echo $data_carouselid; ?> <?php echo $this->get_custom_player_options($settings); ?> <?php echo $this->get_instafeed_carousel_options($settings); ?>>
 							<div id="ep-elementor-content-<?php echo esc_attr($client_id) ?>" class="ep-elementor-content
 							<?php if (!empty($settings['embedpress_content_share'])) : echo esc_attr('position-' . $settings['embedpress_content_share_position'] . '-wraper'); endif; ?> 
 							<?php echo esc_attr($content_share_class . ' ' . $share_position_class . ' ' . $content_protection_class); echo esc_attr(' source-' . $source); ?>">

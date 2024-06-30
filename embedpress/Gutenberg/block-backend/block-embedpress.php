@@ -64,25 +64,42 @@ if(!function_exists('lock_content_form_handler')){
 	}
 }
 
-function embedpress_block_scripts() {
+function embedpress_block_scripts($attributes) {
 
-    $script_handles = [
-        'plyr.polyfilled',
-        'initplyr',
-        'vimeo-player',
-        'embedpress-front',
-        'embedpress-ads',
-		'cg-carousel',
-    ];
+	$script_handles = [];
 
-	$style_handles = [
-		'plyr',
-		'cg-carousel'
-	];
+	if(!empty($attributes['customPlayer'])){
+		$script_handles[] = 'plyr.polyfilled';
+		$script_handles[] = 'initplyr';
+		$script_handles[] = 'vimeo-player';
+	}
+	
+	$script_handles[] = 'embedpress-front';
+
+	if(!empty($attributes['adManager'])){
+		$script_handles[] = 'embedpress-ads';
+	}
+
+	if(!empty($attributes['instaLayout']) && $attributes['instaLayout'] == 'insta-carousel'){
+		$script_handles[] = 'cg-carousel';
+	}
 
     foreach ($script_handles as $handle) {
         wp_enqueue_script($handle);
     }
+
+	$style_handles = [];
+
+	if(!empty($attributes['customPlayer'])){
+		$style_handles[] = 'plyr';
+	}
+
+	if(!empty($attributes['instaLayout']) && $attributes['instaLayout'] == 'insta-carousel'){
+		$style_handles[] = 'cg-carousel';
+	}
+
+	$style_handles[] = 'embedpress_blocks-cgb-style-css';
+	$style_handles[] = 'embedpress-style';
 
     foreach ($style_handles as $handle) {
         wp_enqueue_style($handle);
@@ -92,13 +109,13 @@ function embedpress_block_scripts() {
 function embedpress_render_block($attributes)
 {
 
-	embedpress_block_scripts();
+	embedpress_block_scripts($attributes);
 
 
 	$client_id = !empty($attributes['clientId']) ? md5($attributes['clientId']) : '';
 	$block_id = !empty($attributes['clientId']) ? $attributes['clientId'] : '';
 	$custom_player = !empty($attributes['customPlayer']) ? $attributes['customPlayer'] : 0;
-	$instaLayout = !empty($attributes['instaLayout']) ? $attributes['instaLayout'] : 'insta-grid';
+	$instaLayout = !empty($attributes['instaLayout']) ? ' '.$attributes['instaLayout'] : ' insta-grid';
 
 	$_carousel_options = '';
 	$_carousel_id = '';
@@ -140,7 +157,7 @@ function embedpress_render_block($attributes)
 
 		$is_self_hosted = Helper::check_media_format($attributes['url']);
 
-		$_custom_player = 'data-playerid="' . esc_attr($client_id) . '"';
+		$_custom_player = 'data-playerid=' . esc_attr($client_id);
 		$player_preset = !empty($attributes['playerPreset']) ? $attributes['playerPreset'] : 'preset-default';
 		$player_color = !empty($attributes['playerColor']) ? $attributes['playerColor'] : '';
 		$poster_thumbnail = !empty($attributes['posterThumbnail']) ? $attributes['posterThumbnail'] : '';
@@ -200,7 +217,7 @@ function embedpress_render_block($attributes)
 		}
 
 		$playerOptionsString = json_encode($playerOptions);
-		$_player_options = 'data-options=\'' . htmlentities($playerOptionsString, ENT_QUOTES) . '\'';
+		$_player_options = 'data-options='. htmlentities($playerOptionsString, ENT_QUOTES);
 	}
 
 	$pass_hash_key = isset($attributes['contentPassword']) ? md5($attributes['contentPassword']): '';
@@ -249,6 +266,12 @@ function embedpress_render_block($attributes)
 			$adsAtts = "data-sponsored-id=$client_id data-sponsored-attrs=$ad class=ad-mask";
 		}
 
+		$hosted_format = '';
+		if (!empty($custom_player)) {			
+			$self_hosted = Helper::check_media_format($attributes['url']);
+			$hosted_format = isset($self_hosted['format']) ? $self_hosted['format'] : '';
+		}
+
 		ob_start();
 		?>
 		<div class="embedpress-gutenberg-wrapper <?php echo esc_attr( $alignment.' '.$content_share_class.' '.$share_position_class.' '.$content_protection_class); echo esc_attr( $cEmbedType ); ?>" id="<?php echo esc_attr($block_id); ?>">
@@ -265,7 +288,7 @@ function embedpress_render_block($attributes)
 								echo esc_attr($player_preset);
 							} 
 							echo esc_attr($instaLayout);
-						?>" 
+						?> <?php echo esc_attr($hosted_format); ?>" 
 						<?php echo esc_attr($_custom_player); ?> 
 						<?php echo esc_attr($_player_options); ?> 
 						<?php echo esc_attr( $_carousel_id ); ?>
@@ -470,6 +493,14 @@ function embedpress_render_block_style($attributes)
 			height: ' . esc_attr($attributes['height']) . 'px !important;
 			max-width: 100%;
 		  }
+		.ose-giphy' . esc_attr($uniqid) . ' img{
+			position: relative;
+			width: ' . esc_attr($attributes['width']) . 'px !important;
+			height: ' . esc_attr($attributes['height']) . 'px !important;
+			max-width: 100%;
+		  }
+
+
 
 	</style>';
 

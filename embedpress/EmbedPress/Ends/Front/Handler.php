@@ -34,7 +34,7 @@ class Handler extends EndHandlerAbstract
 
     public static function enqueueStyles()
     {
-        wp_enqueue_style(EMBEDPRESS_PLG_NAME, EMBEDPRESS_URL_ASSETS . 'css/embedpress.css');
+        wp_register_style('embedpress-style', EMBEDPRESS_URL_ASSETS . 'css/embedpress.css');
     }
 
     public function enqueueScripts()
@@ -118,6 +118,35 @@ class Handler extends EndHandlerAbstract
             'init-carousel',
             EMBEDPRESS_URL_ASSETS . 'js/initCarousel.js',
             ['jquery', 'cg-carousel'],
+            EMBEDPRESS_PLUGIN_VERSION,
+            true
+        );
+
+        wp_register_script(
+            'html2canvass',
+            EMBEDPRESS_URL_ASSETS . 'pdf-flip-book/js/html2canvas.min.js',
+            ['jquery'],
+            EMBEDPRESS_PLUGIN_VERSION,
+            true
+        );
+        wp_register_script(
+            'threes',
+            EMBEDPRESS_URL_ASSETS . 'pdf-flip-book/js/three.min.js',
+            ['jquery'],
+            EMBEDPRESS_PLUGIN_VERSION,
+            true
+        );
+        wp_register_script(
+            'pdfs',
+            EMBEDPRESS_URL_ASSETS . 'pdf-flip-book/js/pdf.min.js',
+            ['jquery'],
+            EMBEDPRESS_PLUGIN_VERSION,
+            true
+        );
+        wp_register_script(
+            '3dflipbooks',
+            EMBEDPRESS_URL_ASSETS . 'pdf-flip-book/js/3dflipbook.min.js',
+            ['jquery'],
             EMBEDPRESS_PLUGIN_VERSION,
             true
         );

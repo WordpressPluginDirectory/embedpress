@@ -33,7 +33,6 @@ class Helper
 
 		add_action('wp_ajax_loadmore_data_handler', [$this, 'loadmore_data_handler']);
 		add_action('wp_ajax_nopriv_loadmore_data_handler', [$this, 'loadmore_data_handler']);
-
 	}
 
 	public static function parse_query($str, $urlEncoding = true)
@@ -128,10 +127,23 @@ class Helper
 			Shortcode::get_embera_instance();
 			$collectios = Shortcode::get_collection();
 			$provider = $collectios->findProviders($source_url);
+
 			if (!empty($provider[$source_url])) {
 				$source_name = $provider[$source_url]->getProviderName();
 			} else {
-				$source_name = 'Unknown Source';
+				$host = parse_url($source_url, PHP_URL_HOST);
+				if ($host) {
+					$parts = explode('.', $host);
+					if (count($parts) > 1) {
+						$source_name = $parts[1];
+					} else {
+						// Handle the case where the host doesn't have at least two parts
+						$source_name = $host;
+					}
+				} else {
+					// Handle the case where parse_url fails
+					$source_name = 'unknown';
+				}
 			}
 		}
 
@@ -1009,7 +1021,7 @@ class Helper
 
 					<?php if (!empty($adSkipButton) && !empty($showSkipButton)) : ?>
 						<button title="Skip Ad" class="skip-ad-button" style="display: none;">
-							<?php echo esc_html__('Skip Ads', 'embedpress'); ?>
+							<?php echo esc_html__('Skip Ad', 'embedpress'); ?>
 						</button>
 					<?php endif; ?>
 
@@ -1055,6 +1067,12 @@ class Helper
 				position: relative;
 				display: inline-block !important;
 				max-width: 100%;
+				width: 100%;
+			}
+
+			.embedpress-document-embed div[data-sponsored-id],
+			.embedpress-document-embed .main-ad-template.video {
+				width: 100%;
 			}
 
 			.ep-percentage-width div[data-sponsored-id] {
@@ -1129,6 +1147,7 @@ class Helper
 				align-items: center;
 				justify-content: center;
 				cursor: pointer;
+				padding: 0;
 
 			}
 
@@ -1264,7 +1283,29 @@ class Helper
 			return $posts['data'];
 		}
 	}
+
+	public static function get_enable_settings_data_for_scripts($settings)
+	{
+		$settings_data = [
+			'enabled_ads' => isset($settings['adManager']) && $settings['adManager'] === 'yes' ? 'yes' : '',
+
+			'enabled_custom_player' => isset($settings['emberpress_custom_player']) && $settings['emberpress_custom_player'] === 'yes' ? 'yes' : '',
+
+			'enabled_instafeed' => isset($settings['embedpress_pro_embeded_source']) && $settings['embedpress_pro_embeded_source'] === 'instafeed' ? 'yes' : '',
+
+			'enabled_docs_custom_viewer' => isset($settings['embedpress_document_viewer']) && $settings['embedpress_document_viewer'] === 'custom' ? 'yes' : '',
+		];
+
+		update_option('enabled_elementor_scripts', $settings_data);
+	}
+
+	public static function get_options_value($key)
+	{
+		$g_settings = get_option(EMBEDPRESS_PLG_NAME);
+
+		if (isset($g_settings[$key])) {
+			return $g_settings[$key];
+		}
+		return '';
+	}
 }
-
-
-?>

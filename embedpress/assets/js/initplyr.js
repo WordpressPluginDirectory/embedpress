@@ -54,14 +54,25 @@ function initPlayer(wrapper) {
   const playerId = wrapper.getAttribute('data-playerid');
 
   // Get the options for the player from the wrapper's data attribute
-  let options = document.querySelector(`[data-playerid="${playerId}"]`)?.getAttribute('data-options');
-  
-  if(!options) {
+  let options = document.querySelector(`[data-playerid='${playerId}']`)?.getAttribute('data-options');
+
+  if (!options) {
     return false;
   }
 
   // Parse the options string into a JSON object
-  options = JSON.parse(options);  
+  if (typeof options === 'string') {
+    try {
+      options = JSON.parse(options);
+    } catch (e) {
+      console.error('Invalid JSON format:', e);
+      return;
+    }
+  } else {
+    console.error('Options is not a string');
+    return;
+  }
+
 
   // Create DOM elements from the icon strings
   const pipPlayIconElement = document.createElement('div');
@@ -82,25 +93,28 @@ function initPlayer(wrapper) {
   if (playerId && !wrapper.classList.contains('plyr-initialized')) {
 
 
-    let selector = `[data-playerid="${playerId}"] .ose-embedpress-responsive`;
+    let selector = `[data-playerid='${playerId}'] .ose-embedpress-responsive`;
 
     if (options.self_hosted && options.hosted_format === 'video') {
-      selector = `[data-playerid="${playerId}"] .ose-embedpress-responsive video`;
+      selector = `[data-playerid='${playerId}'] .ose-embedpress-responsive video`;
     }
     else if (options.self_hosted && options.hosted_format === 'audio') {
-      selector = `[data-playerid="${playerId}"] .ose-embedpress-responsive audio`;
+      selector = `[data-playerid='${playerId}'] .ose-embedpress-responsive audio`;
+      wrapper.style.opacity = "1";
     }
 
 
     // Set the main color of the player
-    document.querySelector(`[data-playerid="${playerId}"]`).style.setProperty('--plyr-color-main', options.player_color);
-    document.querySelector(`[data-playerid="${playerId}"].custom-player-preset-1, [data-playerid="${playerId}"].custom-player-preset-3, [data-playerid="${playerId}"].custom-player-preset-4`)?.style.setProperty('--plyr-range-fill-background', '#ffffff');
+    document.querySelector(`[data-playerid='${playerId}']`).style.setProperty('--plyr-color-main', options.player_color);
+    document.querySelector(`[data-playerid='${playerId}'].custom-player-preset-1, [data-playerid='${playerId}'].custom-player-preset-3, [data-playerid='${playerId}'].custom-player-preset-4`)?.style.setProperty('--plyr-range-fill-background', '#ffffff');
 
     // Set the poster thumbnail for the player
-    if (document.querySelector(`[data-playerid="${playerId}"] iframe`)) {
-      document.querySelector(`[data-playerid="${playerId}"] iframe`).setAttribute('data-poster', options.poster_thumbnail);
+    if (document.querySelector(`[data-playerid='${playerId}'] iframe`)) {
+      document.querySelector(`[data-playerid='${playerId}'] iframe`).setAttribute('data-poster', options.poster_thumbnail);
     }
-
+    if (document.querySelector(`[data-playerid='${playerId}'] video`)) {
+      document.querySelector(`[data-playerid='${playerId}'] video`).setAttribute('data-poster', options.poster_thumbnail);
+    }
 
     // Define the controls to be displayed
     const controls = [
@@ -158,10 +172,23 @@ function initPlayer(wrapper) {
 
     playerInit[playerId] = player;
 
-    
+
 
     // Mark the wrapper as initialized
     wrapper.classList.add('plyr-initialized');
+
+    const posterElement = wrapper.querySelector('.plyr__poster');
+
+    if (posterElement) {
+      const interval = setInterval(() => {
+        if (posterElement && posterElement.style.backgroundImage) {
+          wrapper.style.opacity = '1';
+          clearInterval(interval);
+        }
+      }, 200);
+
+    }
+
   }
 
   // Check for the existence of the player's pip button at regular intervals
@@ -198,8 +225,6 @@ function initPlayer(wrapper) {
           const pipPlay = document.querySelector(`[data-playerid="${playerId}"] .plyr__video-wrapper .pip-play`);
           const pipPause = document.querySelector(`[data-playerid="${playerId}"] .plyr__video-wrapper .pip-pause`);
           const pipClose = document.querySelector(`[data-playerid="${playerId}"] .plyr__video-wrapper .pip-close`);
-
-          console.log(pipClose);
 
           pipClose.addEventListener('click', () => {
             iframeSelector.classList.remove('pip-mode');
