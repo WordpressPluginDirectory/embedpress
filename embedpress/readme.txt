@@ -1,12 +1,12 @@
-=== EmbedPress – Embed PDF, PDF 3D FlipBook, Google Docs, Vimeo, Wistia, Embed YouTube Videos, Audios, Maps & Embed Any Documents in Gutenberg & Elementor ===
+=== EmbedPress – Embed PDF, 3D Flipbook, Social Feeds, Google Docs, Vimeo, Wistia, YouTube Videos, Audios, Google Maps in Gutenberg Block & Elementor ===
 Contributors: EmbedPress, asif2bd, re_enter_rupok, wpdevteam, seakashdiu, alimuzzamanalim
 Author: WPDeveloper
 Author URI: https://wpdeveloper.com
-Tags: embed, embed YouTube, Gutenberg embed, embed PDF, embed Google Docs, Social Feeds
+Tags: embed, embed YouTube, PDF viewer, Gutenberg embed, embed PDF, embed Google Docs, Social Feeds
 Requires at least: 4.6
 Tested up to: 6.6
 Requires PHP: 5.6
-Stable tag: 4.0.8
+Stable tag: 4.0.11
 License: GPLv3 or later
 License URI: https://opensource.org/licenses/GPL-3.0
 
@@ -267,7 +267,11 @@ If you like EmbedPress, then consider checking out our other WordPress Plugins:
 
 💰 [Better Payment](https://wordpress.org/plugins/better-payment/) – Create stunning payment forms and manage payments for donations, membership, and products seamlessly.
 
+== Acknowledgements ==
 
+This plugin incorporates code from the following sources:
+- [PDF.js by Mozilla](https://github.com/mozilla/pdf.js/): Used for rendering PDF documents.
+- [PDF Flipbook WordPress by iberezansky](https://3dflipbook.net/): Used for creating the 3D flipbook effect.
 
 == Installation ==
 
@@ -331,6 +335,19 @@ With EmbedPress you can easily create PDF flipbooks. First, upload PDF into your
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+
+= [4.0.11] – 2024-08-22 =  
+- Added: Advanced layouts for Youtube Embed.
+- Few minor bug fixes and improvements.
+
+= [4.0.10] – 2024-08-12 =  
+- Improved: Security Enhancement reported by PatchStack.
+- Few minor bug fixes & improvements.
+
+= [4.0.9] – 2024-08-8 =  
+- Improved: Added lazy load option for PDF embeds.
+- Enhanced: Security improvements reported by Patchstack (Kinorth).
+- Fixed: few minor bugs and overall performance enhancements.
 
 = [4.0.8] – 2024-07-31 =  
 - Hotfix: PDF stopped loading. 
