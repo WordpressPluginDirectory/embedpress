@@ -294,7 +294,20 @@ class Embedpress_Elementor extends Widget_Base
 			]
 		);
 
-
+		$this->add_control(
+			'embedpress_audio_video_auto_pause',
+			[
+				'label'        => __('Auto Pause', 'embedpress'),
+				'description'        => __('Set it to "Yes" to display related videos from all channels. Otherwise, related videos will show from the same channel.', 'embedpress'),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_block'  => false,
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'condition' => [
+					'embedpress_pro_embeded_source' => ['selfhosted_video', 'selfhosted_audio']
+				],
+			]
+		);
 
 		$this->add_control(
 			'spotify_theme',
@@ -659,7 +672,7 @@ class Embedpress_Elementor extends Widget_Base
 		);
 
 
-
+		
 
 
 		do_action('extend_customplayer_controls', $this, '_', $this->pro_text, $this->pro_class);
@@ -3919,6 +3932,11 @@ class Embedpress_Elementor extends Widget_Base
 			$hosted_format =  isset($self_hosted['format']) ? $self_hosted['format'] : '';
 		}
 
+		$autoPause = '';
+		if(!empty($settings['embedpress_audio_video_auto_pause'])){
+			$autoPause = ' enabled-auto-pause';
+		}
+
 		?>
 
 		<div class="embedpress-elements-wrapper <?php echo !empty($settings['embedpress_elementor_aspect_ratio']) ? 'embedpress-fit-aspect-ratio' : '';
@@ -3936,7 +3954,8 @@ class Embedpress_Elementor extends Widget_Base
 						endif; 
 					?> 
 					<?php echo esc_attr($content_share_class . ' ' . $share_position_class . ' ' . $content_protection_class); ?> 
-					<?php echo esc_attr('source-' . $source); ?>">
+					<?php echo esc_attr('source-' . $source); ?>
+					<?php echo esc_attr($autoPause); ?>">
 
 					<div id="<?php echo esc_attr($this->get_id()); ?>" 
 						class="ep-embed-content-wrapper 
