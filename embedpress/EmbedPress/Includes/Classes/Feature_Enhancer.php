@@ -271,6 +271,8 @@ class Feature_Enhancer
 
 	public function gutenberg_embed($embedHTML, $attributes)
 	{
+		$attributes = Helper::removeQuote($attributes);
+
 		if (!empty($attributes['url'])) {
 			$youtube = new Youtube($attributes['url']);
 
@@ -285,6 +287,8 @@ class Feature_Enhancer
 					'ispagination' => isset($attributes['ispagination']) ? $attributes['ispagination'] : 0,
 					'gapbetweenvideos' => isset($attributes['gapbetweenvideos']) ? $attributes['gapbetweenvideos'] : 30,
 				];
+
+				$atts = Helper::removeQuote($atts);
 
 				$urlInfo = Shortcode::parseContent($attributes['url'], true, $atts);
 
@@ -307,12 +311,15 @@ class Feature_Enhancer
 					'closedcaptions'   => !empty($attributes['closedcaptions']) ? 1 : 0,
 					'modestbranding'   => !empty($attributes['modestbranding']) ? $attributes['modestbranding'] : '',
 					'relatedvideos'   => !empty($attributes['relatedvideos']) ? 1 : 0,
+
 					'customlogo'   => !empty($attributes['customlogo']) ? $attributes['customlogo'] : '',
 					'logoX' => !empty($attributes['logoX']) ? $attributes['logoX'] : 5,
 					'logoY' => !empty($attributes['logoY']) ? $attributes['logoY'] : 10,
 					'customlogoUrl' => !empty($attributes['customlogoUrl']) ? $attributes['customlogoUrl'] : '',
 					'logoOpacity' => !empty($attributes['logoOpacity']) ? $attributes['logoOpacity'] : 0.6,
 				];
+				
+				$atts = Helper::removeQuote($atts);
 
 				$urlInfo = Shortcode::parseContent($attributes['url'], true, $atts);
 
@@ -411,6 +418,7 @@ class Feature_Enhancer
 		}
 
 		if (!empty($attributes['url']) && $this->vimeoValidateUrl($attributes['url'])) {
+
 			$atts = [
 				'url'	=> $attributes['url'],
 				'vstarttime'    => !empty($attributes['vstarttime']) ? $attributes['vstarttime'] : '',
@@ -427,6 +435,8 @@ class Feature_Enhancer
 				'customlogoUrl' => !empty($attributes['customlogoUrl']) ? $attributes['customlogoUrl'] : '',
 				'logoOpacity' => !empty($attributes['logoOpacity']) ? $attributes['logoOpacity'] : 0.6,
 			];
+
+			$atts = Helper::removeQuote($atts);
 
 			$urlInfo = Shortcode::parseContent($attributes['url'], true, $atts);
 
@@ -818,7 +828,8 @@ class Feature_Enhancer
 				}
 
 				if (empty($attributes['data-vstarttime']) && isset($options['start_time'])) {
-					$url_modified .= '#t=' . $options['start_time'];
+					$start_time = sanitize_text_field($options['start_time']);
+					$url_modified .= '#t=' . $start_time;
 				}
 			}
 
@@ -868,7 +879,7 @@ class Feature_Enhancer
 			$embedOptions->autoPlay = (isset($options['autoplay']) && (bool) $options['autoplay'] === true);
 
 			if (!empty($options['start_time'])) {
-				$embedOptions->time = isset($options['start_time']) ? $options['start_time'] : 0;
+				// $embedOptions->time = isset($options['start_time']) ? $options['start_time'] : 0;
 			}
 
 			if (isset($options['player_color'])) {

@@ -642,7 +642,33 @@ jQuery(document).ready(function ($) {
         copyToClipboard(linkToCopy);
         alert('Link copied to clipboard: ' + linkToCopy);
     });
+
+
+    $(document).on('click', '.popup-video-wrap, .close-video_btn', function (e) {
+        e.preventDefault();
+
+        // Remove the popup-video element
+        $('.popup-video').remove();
+        $('.popup-video-wrap').removeClass('popup-active');
+
+    });
+
+    $('.video-play_btn').click(function (e) {
+        $('.popup-video-wrap').append(`
+                <div class="popup-video">
+                    <button class="close-video_btn">
+                        <a href="#" class="close-btn"></a>
+                    </button>
+                   <iframe src="https://www.youtube.com/embed/fvYKLkEnJbI?autoplay=1" 
+                        title="YouTube video player" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+
+                </div>
+            `);
+    });
+
 });
-
-
 

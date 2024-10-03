@@ -65,7 +65,7 @@ $enableEmbedResizeWidth = isset($g_settings['enableEmbedResizeWidth']) ? intval(
 							} ?>
 							</div>
 						</div>
-						<div class="form__group">
+						<div class="form__group<?php echo !is_embedpress_pro_active() ? ' pdf_custom_color_settings' : ''; ?>">
 							<p class="form__label"><?php echo esc_html__('PDF Custom Color', 'embedpress'); ?></p>
 							<div class="form__control__wrap">
 								<label class="input__switch switch__text">
@@ -121,7 +121,7 @@ $enableEmbedResizeWidth = isset($g_settings['enableEmbedResizeWidth']) ? intval(
 			<div class="gradient-color">
 				<img class="embedpress-banner" src="<?php echo esc_url('https://embedpress.com/wp-content/uploads/2023/10/Mega-Page.gif'); ?>"
 					alt="">
-
+                    <h3 class="cart-title">Upgrade To <span>Pro</span></h3>
 					<ul class="feature-list">
 						<li><img src="<?php echo esc_url(EMBEDPRESS_SETTINGS_ASSETS_URL . 'img/check2.svg'); ?>" alt=""><?php echo esc_html__('Social Share', 'embedpress'); ?></li>
 						<li><img src="<?php echo esc_url(EMBEDPRESS_SETTINGS_ASSETS_URL . 'img/check2.svg'); ?>" alt=""><?php echo esc_html__('Lazy Loading', 'embedpress'); ?></li>
