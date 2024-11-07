@@ -2,15 +2,15 @@
 Contributors: EmbedPress, asif2bd, re_enter_rupok, wpdevteam, seakashdiu, alimuzzamanalim
 Author: WPDeveloper
 Author URI: https://wpdeveloper.com
-Tags: embed, embed YouTube, PDF viewer, Gutenberg embed, embed PDF, embed Google Docs, Social Feeds
+Tags: embed, embed YouTube, embed PDF, Google Docs, Social Feeds
 Requires at least: 4.6
 Tested up to: 6.6
 Requires PHP: 5.6
-Stable tag: 4.1.1
+Stable tag: 4.1.2
 License: GPLv3 or later
 License URI: https://opensource.org/licenses/GPL-3.0
 
-EmbedPress lets you embed videos, images, posts, upload PDFs, embed PDF 3D flipbook & other content on WordPress sites without coding & enhance storytelling.
+EmbedPress lets you embed videos, pages, social feeds, embed PDF 3D flipbooks & other content on WordPress without coding & enhance storytelling.
 
 == Description ==
 
@@ -341,6 +341,12 @@ With EmbedPress you can easily create PDF flipbooks. First, upload PDF into your
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+
+= [4.1.2] – 2024-11-07 =  
+- Fixed: Shortcode issues with Beaver Builder.
+- Fixed: Undefined error in Gutenberg Editor.
+- Fixed: Facebook embedding issues.
+- Few minor bug fixes & improvements.
 
 = [4.1.1] – 2024-10-23 =  
 - Added: Spreaker embedding support.

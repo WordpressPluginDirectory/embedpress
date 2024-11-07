@@ -61,6 +61,27 @@ class Shortcode
     private static $ombed_attributes;
     public static $attributes_data;
 
+    public static function shortcode_scripts()
+    {
+        $dependencies = ['jquery'];
+
+        wp_enqueue_style(
+            'embedpress-style',
+            EMBEDPRESS_URL_ASSETS . 'css/embedpress.css',
+            EMBEDPRESS_PLUGIN_VERSION,
+            true
+        );
+
+
+        // Enqueue script for MentionNode
+        wp_enqueue_script(
+            'embedpress-front',
+            EMBEDPRESS_URL_ASSETS . 'js/front.js',
+            $dependencies,
+            EMBEDPRESS_PLUGIN_VERSION,
+            true
+        );
+    }
 
     /**
      * Register the plugin's shortcode into WordPress.
@@ -121,7 +142,6 @@ class Shortcode
                 $embed->embed = '<div class="ep-embed-content-wraper insta-grid">' . $embed->embed . '</div>';
             };
         }
-
 
         return is_object($embed) ? $embed->embed : $embed;
     }
@@ -950,6 +970,9 @@ KAMAL;
             'doc_rotation' => isset($attributes['doc_rotation']) ? esc_attr($attributes['doc_rotation']) : 'true',
             'add_image' => isset($attributes['add_image']) ? esc_attr($attributes['add_image']) : 'true',
             'doc_details' => isset($attributes['doc_details']) ? esc_attr($attributes['doc_details']) : 'true',
+            'selection_tool' => isset($attributes['selection_tool']) ? esc_attr($attributes['selection_tool']) : '0',
+            'scrolling' => isset($attributes['scrolling']) ? esc_attr($attributes['scrolling']) : '-1',
+            'spreads' => isset($attributes['spreads']) ? esc_attr($attributes['spreads']) : '-1',
 
         );
 

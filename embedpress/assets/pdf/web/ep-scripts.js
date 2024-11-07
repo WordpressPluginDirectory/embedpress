@@ -41,8 +41,11 @@ const getParamObj = (hash) => {
             toolbar: hashParams.get('toolbar'),
             doc_details: hashParams.get('pdf_details'),
             doc_rotation: hashParams.get('pdf_rotation'),
+            selection_tool: hashParams.get('selection_tool'),
+            scrolling: hashParams.get('scrolling'),
+            spreads: hashParams.get('spreads'),
+            is_pro_active: hashParams.get('is_pro_active'),
         };
-
 
 
         if (hashParams.get('download') !== 'true' && hashParams.get('download') !== 'yes') {
@@ -139,8 +142,6 @@ const pdfIframeStyle = (data) => {
     let pdfCustomColor = '';
 
 
-
-    console.log(data);
 
     if (data.themeMode == 'custom') {
         if (!data.customColor) {
@@ -294,7 +295,6 @@ setThemeMode(data.themeMode);
 
 document.querySelector(".presentationMode")?.addEventListener("click", function () {
 
-    console.log("presentation mode clicked");
     var mainContainer = document.getElementById("mainContainer");
     if (mainContainer && !document.fullscreenElement) {
         mainContainer.requestFullscreen().catch(err => {
