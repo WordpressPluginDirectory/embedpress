@@ -181,7 +181,7 @@ class Embedpress_Elementor extends Widget_Base
 					'default'     => __('Default', 'embedpress'),
 					'youtube'     => __('YouTube', 'embedpress'),
 					'vimeo'       => __('Vimeo', 'embedpress'),
-					'instagram_feed'  => __('Instagram Feed', 'embedpress'),
+					'instafeed'  => __('Instagram Feed', 'embedpress'),
 					'twitch'      => __('Twitch', 'embedpress'),
 					'soundcloud'  => __('SoundCloud', 'embedpress'),
 					'dailymotion' => __('Dailymotion', 'embedpress'),
@@ -4057,6 +4057,12 @@ class Embedpress_Elementor extends Widget_Base
 
 
 		if(!apply_filters('embedpress/is_allow_rander', false) && ($settings['instaLayout'] === 'insta-masonry' || $settings['instaLayout'] === 'insta-carousel' || $settings['instafeedFeedType'] === 'hashtag_type')){
+			echo '<div class="pro__alert__wrap" style="display: block;">
+					<div class="pro__alert__card">
+							<h2>Opps...</h2>
+							<p>You need to upgrade to the <a style="font-weight: bold; color: #5B4E96; text-decoration: underline" href="https://wpdeveloper.com/in/upgrade-embedpress" target="_blank">Premium</a> Version to use this feature</p>
+					</div>
+				</div>';
 			return '';
 		}
 		
