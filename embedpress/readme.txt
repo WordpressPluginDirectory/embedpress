@@ -6,7 +6,7 @@ Tags: embed, embed YouTube, embed PDF, Google Docs, Social Feeds
 Requires at least: 4.6
 Tested up to: 6.7
 Requires PHP: 5.6
-Stable tag: 4.1.6
+Stable tag: 4.1.7
 License: GPLv3 or later
 License URI: https://opensource.org/licenses/GPL-3.0
 
@@ -278,6 +278,7 @@ This plugin incorporates code from the following sources:
 - [PDF Flipbook WordPress by iberezansky](https://3dflipbook.net/): Used for creating the 3D flipbook effect.
 - [Plyr](https://github.com/sampotts/plyr) : Used for displaying video/audio player
 - [Glider](http://nickpiscitelli.github.io/Glider.js) : Used for making Carousel layout
+- [PublicAlbum](publicalbum.org) : Used for creating a Google Photos gallery player
 
 == Installation ==
 
@@ -341,6 +342,11 @@ With EmbedPress you can easily create PDF flipbooks. First, upload PDF into your
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+
+= [4.1.7] – 2025-01-06 =
+- Added: Google Photos embedding support
+- Fixed: YouTube pagination wasn’t working properly.
+- Few minor bug fixes & improvements.
 
 = [4.1.6] – 2024-12-22 =
 - Fixed: Composer dependency related issues.
