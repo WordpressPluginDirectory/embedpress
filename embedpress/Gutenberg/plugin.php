@@ -71,6 +71,23 @@ if (!function_exists('get_branding_value')) {
  * @since 1.0.0
  */
 
+function get_user_roles()
+{
+	global $wp_roles; // Access global roles object
+	$user_roles = [];
+	
+	if (isset($wp_roles->roles) && is_array($wp_roles->roles)) {
+		foreach ($wp_roles->roles as $role_key => $role_data) {
+			$user_roles[] = [
+				'value' => $role_key,       // Machine-readable key
+				'label' => $role_data['name'], // Human-readable name
+			];
+		}
+	}
+
+	return $user_roles;
+}
+
 function embedpress_blocks_cgb_editor_assets()
 { // phpcs:ignore
 	// Scripts.
@@ -144,6 +161,7 @@ function embedpress_blocks_cgb_editor_assets()
 		'wistia_brand_logo_url' => get_branding_value('logo_url', 'wistia'),
 		'twitch_brand_logo_url' => get_branding_value('logo_url', 'twitch'),
 		'dailymotion_brand_logo_url' => get_branding_value('logo_url', 'dailymotion'),
+		'user_roles' => get_user_roles()
 
 	));
 
@@ -230,6 +248,18 @@ function embedpress_gutenberg_register_all_block()
 							'lockContent' => [
 								'type' => 'boolean',
 								'default' => false
+							],
+							'protectionType' => [
+								'type' => 'string',
+								'default' => 'password'
+							],	
+							'userRole' => [
+								'type' => 'array',
+								'default' => []
+							],
+							'protectionMessage' => [
+								'type' => 'string',
+								'default' => 'You do not have access to this content. Only users with the following roles can view it: [user_roles]'
 							],
 							'lockHeading' => [
 								'type' => 'string',
@@ -728,6 +758,18 @@ function embedpress_gutenberg_register_all_block()
 								'type' => 'boolean',
 								'default' => false
 							],
+							'protectionType' => [
+								'type' => 'string',
+								'default' => 'password'
+							],	
+							'userRole' => [
+								'type' => 'array',
+								'default' => []
+							],
+							'protectionMessage' => [
+								'type' => 'string',
+								'default' => 'You do not have access to this content. Only users with the following roles can view it: [user_roles]'
+							],
 							'lockHeading' => [
 								'type' => 'string',
 								'default' => 'Content Locked'
@@ -1057,7 +1099,7 @@ function getParamData($attributes)
 	$urlParamData = array(
 		'themeMode' =>  !empty($attributes['themeMode']) ? $attributes['themeMode'] : 'default',
 		'toolbar' =>  !empty($attributes['toolbar']) ? 'true' : 'false',
-		'position' =>  $attributes['position'],
+		'position' =>  $attributes['position'] ?? 'top',
 		'presentation' =>  !empty($attributes['presentation']) ? 'true' : 'false',
 		'lazyLoad' =>  !empty($attributes['lazyLoad']) ? 'true' : 'false',
 		'download' =>  !empty($attributes['download']) ? 'true' : 'false',
@@ -1113,6 +1155,22 @@ function embedpress_pdf_block_scripts($attributes)
 		wp_enqueue_style($handle);
 	}
 }
+
+if (!function_exists('has_content_allowed_roles')) {
+    function has_content_allowed_roles($allowed_roles = []) {
+
+        if ((count($allowed_roles) === 1 && empty($allowed_roles[0]))) {
+            return true;
+        }
+
+        $current_user = wp_get_current_user();
+        $user_roles = $current_user->roles;
+
+        return !empty(array_intersect($user_roles, $allowed_roles));
+    }
+}
+
+
 
 function embedpress_pdf_render_block($attributes)
 {
@@ -1186,6 +1244,7 @@ function embedpress_pdf_render_block($attributes)
 				$url = !empty($attributes['href']) ? $attributes['href'] : '';
 
 				$embed_code = '<iframe title="' . esc_attr(Helper::get_file_title($attributes['href'])) . '" class="embedpress-embed-document-pdf ' . esc_attr($id) . '" style="' . esc_attr($dimension) . '; max-width:100%; display: inline-block" src="' . esc_url($src) . '" frameborder="0" oncontextmenu="return false;"></iframe> ';
+				
 				if (isset($attributes['viewerStyle']) && $attributes['viewerStyle'] === 'flip-book') {
 					$src = urlencode($url) . getParamData($attributes);
 					$embed_code = '<iframe title="' . esc_attr(Helper::get_file_title($attributes['href'])) . '" class="embedpress-embed-document-pdf ' . esc_attr($id) . '" style="' . esc_attr($dimension) . '; max-width:100%; display: inline-block" src="' . esc_url(EMBEDPRESS_URL_ASSETS . 'pdf-flip-book/viewer.html?file=' . $src) . '" frameborder="0" oncontextmenu="return false;"></iframe> ';
@@ -1213,7 +1272,14 @@ function embedpress_pdf_render_block($attributes)
 					<?php
 							do_action('embedpress_pdf_gutenberg_after_embed',  $client_id, 'pdf', $attributes, $pdf_url);
 							$embed = $embed_code;
-							if (empty($attributes['lockContent']) || empty($attributes['contentPassword']) || (!empty(Helper::is_password_correct($client_id)) && ($hash_pass === $password_correct))) {
+							
+							if (
+								!apply_filters('embedpress/is_allow_rander', false) ||
+								empty($attributes['lockContent']) || 
+								($attributes['protectionType'] == 'password' && empty($attributes['contentPassword'])) || 
+								($attributes['protectionType'] == 'password' &&  (!empty(Helper::is_password_correct($client_id))) && ($hash_pass === $password_correct)) ||
+								($attributes['protectionType'] == 'user-role' && has_content_allowed_roles($attributes['userRole']))
+							) {
 
 								$custom_thumbnail = isset($attributes['customThumbnail']) ? $attributes['customThumbnail'] : '';
 
@@ -1237,9 +1303,14 @@ function embedpress_pdf_render_block($attributes)
 									$embed .= Helper::embed_content_share($content_id, $attributes);
 								}
 								echo '<div class="ep-embed-content-wraper">';
-								do_action('embedpress/display_password_form', $client_id, $embed, $pass_hash_key, $attributes);
+								if ($attributes['protectionType'] == 'password') {
+									do_action('embedpress/display_password_form', $client_id, $embed, $pass_hash_key, $attributes);
+								} else {
+									do_action('embedpress/content_protection_content', $client_id, $attributes['protectionMessage'],  $attributes['userRole']);
+								}
 								echo '</div>';
 							}
+							
 							?>
 
 					<?php
