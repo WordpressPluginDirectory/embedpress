@@ -136,7 +136,7 @@ class Embedpress_Elementor extends Widget_Base
 	protected function register_controls()
 	{
 		$class = 'embedpress-pro-control not-active';
-        $text =  '<sup class="embedpress-pro-label" style="color:red">' . __('(pro)', 'embedpress') . '</sup>';
+        $text =  '<sup class="embedpress-pro-label" style="color:red">' . __('(Pro)', 'embedpress') . '</sup>';
 		$label = '(pro)';
         $this->pro_class = apply_filters('embedpress/pro_class', $class);
         $this->pro_label = apply_filters('embedpress/pro_label', $label);
@@ -2766,6 +2766,7 @@ class Embedpress_Elementor extends Widget_Base
 					'insta-grid' => esc_html__( 'Grid', 'embedpress' ),
 					'insta-masonry' => sprintf(__('Masonry%s', 'embedpress'), $this->pro_label),
 					'insta-carousel' => sprintf(__('Carousel%s', 'embedpress'), $this->pro_label),
+					'insta-justify' => sprintf(__('Justify%s', 'embedpress'), $this->pro_label),
 				],
 				'default' => 'insta-grid',
 				'condition'   => $condition,
@@ -3749,9 +3750,10 @@ class Embedpress_Elementor extends Widget_Base
 				'type' => \Elementor\Controls_Manager::SELECT,
 				'options' => [
 					'carousel' => __('Carousel', 'embedpress'),
-					'gallery-player' => __('Gallery Player', 'embedpress') . ' ' . __($this->pro_text, 'embedpress'),
-					'gallery-grid' => __('Grid', 'embedpress') . ' ' . __($this->pro_text .' (Coming Soon)', 'embedpress'),
-					'gallery-masonary' => __('Masonary', 'embedpress') . ' ' . __($this->pro_text . ' (Coming Soon)', 'embedpress'),
+					'gallery-player' => __('Gallery Player', 'embedpress'),
+					'gallery-grid' => __('Grid', 'embedpress') . ' ' . __($this->pro_text , 'embedpress'),
+					'gallery-masonary' => __('Masonry', 'embedpress') . ' ' . __($this->pro_text, 'embedpress'),
+					'gallery-justify' => __('Justify', 'embedpress') . ' ' . __($this->pro_text, 'embedpress'),
 				],
 				'default' => 'carousel',
 			]
@@ -3765,7 +3767,7 @@ class Embedpress_Elementor extends Widget_Base
 						esc_html__( 'Only Available in Pro Version!', 'essential-addons-for-elementor-lite' ) ),
 					'type'      => Controls_Manager::RAW_HTML,
 					'condition' => [
-						'mode' => [ 'gallery-player', 'gallery-grid', 'gallery-masonary'],
+						'mode' => ['gallery-grid', 'gallery-masonary', 'gallery-justify'],
 					],
 				]
 			);
@@ -3932,9 +3934,6 @@ class Embedpress_Elementor extends Widget_Base
 					{{WRAPPER}} .ose-giphy img,
 					{{WRAPPER}} .jx-gallery-player-widget' => 'width: {{size}}{{UNIT}}!important; max-width: 100%!important;',
 				],
-				'condition' => [
-					'embedpress_pro_embeded_source!' => 'google_photos',
-				],
 			]
 		);
 
@@ -3976,88 +3975,11 @@ class Embedpress_Elementor extends Widget_Base
 				],
 				'condition' => [
 					'embedpress_pro_embeded_source!' => 'instafeed',
-					'embedpress_pro_embeded_source!' => 'google_photos',
+					'mode!' => ['gallery-masonary', 'gallery-grid', 'gallery-justify'],
 				],
 			]
 		);
-		$this->add_responsive_control(
-			'google_photos_width',
-			[
-				'label' => __('Width', 'embedpress'),
-				'type' => Controls_Manager::SLIDER,
-				'size_units' => ['px'],
-				'range' => [
-					'px' => [
-						'min' => 0,
-						'max' => 1500,
-						'step' => 1,
-					],
-				],
-				'devices' => ['desktop', 'tablet', 'mobile'],
-				'default' => [
-                    'size' => !empty($value = intval(Helper::get_options_value('enableEmbedResizeWidth'))) ? $value : 600,
-					'unit' => 'px',
-				],
-				'desktop_default' => [
-					'size' => 600,
-					'unit' => 'px',
-				],
-				'tablet_default' => [
-					'size' => 600,
-					'unit' => 'px',
-				],
-				'mobile_default' => [
-					'size' => 600,
-					'unit' => 'px',
-				],
-				'selectors' => [
-					'{{WRAPPER}} .embedpress-elements-wrapper .ose-google-photos iframe,
-					{{WRAPPER}} .ose-google-photos,
-					{{WRAPPER}} .jx-gallery-player-widget' => 'width: {{size}}{{UNIT}}!important; max-width: 100%!important;',
-				],
-				'condition' => [
-					'embedpress_pro_embeded_source' => 'google_photos'
-				],
-				
-			]
-		);
-
-		$this->add_responsive_control(
-			'google_photos_height',
-			[
-				'label' => __('Height', 'embedpress'),
-				'type' => Controls_Manager::SLIDER,
-				'size_units' => ['px', '%'],
-				'range' => [
-					'px' => [
-						'min' => 0,
-						'max' => 1500,
-						'step' => 1,
-					],
-				],
-				'devices' => ['desktop', 'tablet', 'mobile'],
-				'desktop_default' => [
-					'size' => 400,
-					'unit' => 'px',
-				],
-				'default' => [
-                    'size' => !empty($value = intval(Helper::get_options_value('enableEmbedResizeHeight'))) ? $value : 600,
-					'unit' => 'px',
-				],
-				'tablet_default' => [
-					'size' => 400,
-					'unit' => 'px',
-				],
-				'mobile_default' => [
-					'size' => 400,
-					'unit' => 'px',
-				],
-				
-				'condition' => [
-					'embedpress_pro_embeded_source' => 'google_photos'
-				],
-			]
-		);
+		
 		$this->add_control(
 			'width_height_important_note',
 			[
@@ -4298,7 +4220,7 @@ class Embedpress_Elementor extends Widget_Base
 		add_filter('embedpress_should_modify_spotify', '__return_false');
 		$embed_link = isset($settings['embedpress_embeded_link']) ? $settings['embedpress_embeded_link'] : '';
 
-		if(!apply_filters('embedpress/is_allow_rander', false) && ($settings['mode'] === 'gallery-player')){
+		if(!apply_filters('embedpress/is_allow_rander', false) && ($settings['mode'] === 'gallery-grid' || $settings['mode'] === 'gallery-masonary' || $settings['mode'] === 'gallery-justify')){
 			echo '<div class="pro__alert__wrap" style="display: block;">
 					<div class="pro__alert__card">
 							<h2>Opps...</h2>
@@ -4517,6 +4439,7 @@ class Embedpress_Elementor extends Widget_Base
 						class="ep-embed-content-wrapper 
 						<?php echo isset($settings['custom_player_preset']) ? esc_attr($settings['custom_player_preset']) : ''; ?> 
 						<?php echo esc_attr($this->get_instafeed_layout($settings)); ?> 
+						<?php echo esc_attr('ep-google-photos-'.$settings['mode']); ?>
 						<?php echo esc_attr($hosted_format); ?>" 
 						<?php echo $data_playerid; ?>
 						<?php echo $data_carouselid; ?>

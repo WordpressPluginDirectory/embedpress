@@ -19,7 +19,8 @@ use EmbedPress\Includes\Traits\Shared;
  * @license     GPLv3 or later
  * @since       1.0.0
  */
-class Core {
+class Core
+{
     use Shared;
 
     /**
@@ -70,16 +71,16 @@ class Core {
      * @since   1.0.0
      *
      */
-    public function __construct () {
+    public function __construct()
+    {
         $this->pluginName = EMBEDPRESS_PLG_NAME;
         $this->pluginVersion = EMBEDPRESS_VERSION;
 
         $this->loaderInstance = new Loader();
 
-        add_action('admin_notices',[$this,'embedpress_admin_notice']);
+        add_action('admin_notices', [$this, 'embedpress_admin_notice']);
 
         add_filter('upload_mimes', [$this, 'extended_mime_types']);
-
     }
 
     /**
@@ -89,7 +90,8 @@ class Core {
      * @since   1.0.0
      *
      */
-    public function getPluginName () {
+    public function getPluginName()
+    {
         return $this->pluginName;
     }
 
@@ -100,7 +102,8 @@ class Core {
      * @since   1.0.0
      *
      */
-    public function getPluginVersion () {
+    public function getPluginVersion()
+    {
         return $this->pluginVersion;
     }
 
@@ -111,7 +114,8 @@ class Core {
      * @since   1.0.0
      *
      */
-    public function getLoader () {
+    public function getLoader()
+    {
         return $this->loaderInstance;
     }
 
@@ -122,32 +126,38 @@ class Core {
      * @since   1.0.0
      *
      */
-    public function initialize () {
+    public function initialize()
+    {
         global $wp_actions;
         add_filter('oembed_providers', [$this, 'addOEmbedProviders']);
         add_action('rest_api_init', [$this, 'registerOEmbedRestRoutes']);
+        add_action('rest_api_init', [$this, 'register_feedback_email_endpoint']);
+
 
         $this->start_plugin_tracking();
 
         if (is_admin()) {
-        	new EmbedpressSettings();
+            new EmbedpressSettings();
             $plgSettings = self::getSettings();
 
 
-            add_action( 'init', [ $this, 'admin_notice' ] );
+            add_action('init', [$this, 'admin_notice']);
 
-            add_filter('plugin_action_links_embedpress/embedpress.php', ['\\EmbedPress\\Core', 'handleActionLinks'], 10,
-                2);
+            add_filter(
+                'plugin_action_links_embedpress/embedpress.php',
+                ['\\EmbedPress\\Core', 'handleActionLinks'],
+                10,
+                2
+            );
 
             add_action('admin_enqueue_scripts', ['\\EmbedPress\\Ends\\Back\\Handler', 'enqueueStyles']);
             add_action('wp_ajax_embedpress_notice_dismiss', ['\\EmbedPress\\Ends\\Back\\Handler', 'embedpress_notice_dismiss']);
 
             $plgHandlerAdminInstance = new EndHandlerAdmin($this->getPluginName(), $this->getPluginVersion());
 
-            if ( $plgSettings->enablePluginInAdmin ) {
+            if ($plgSettings->enablePluginInAdmin) {
                 $this->loaderInstance->add_action('admin_enqueue_scripts', $plgHandlerAdminInstance, 'enqueueScripts');
             }
-            
         } else {
             $plgHandlerPublicInstance = new EndHandlerPublic($this->getPluginName(), $this->getPluginVersion());
 
@@ -161,10 +171,11 @@ class Core {
         add_filter('pp_embed_parsed_content', ['\\EmbedPress\\AMP\\EmbedHandler', 'processParsedContent'], 10, 3);
 
         // Add support for our embeds on Beaver Builder. Without this it only run the native embeds.
-        add_filter('fl_builder_before_render_shortcodes',
-            ['\\EmbedPress\\ThirdParty\\BeaverBuilder', 'before_render_shortcodes']);
+        add_filter(
+            'fl_builder_before_render_shortcodes',
+            ['\\EmbedPress\\ThirdParty\\BeaverBuilder', 'before_render_shortcodes']
+        );
         $this->loaderInstance->run();
-
     }
 
     /**
@@ -172,17 +183,18 @@ class Core {
      *
      * @return mixed
      */
-    public function addOEmbedProviders ($providers) {
+    public function addOEmbedProviders($providers)
+    {
         $newProviders = [
             // Viddler
             '#https?://(.+\.)?viddler\.com/v/.+#i' => 'viddler',
 
             // Deviantart.com (http://www.deviantart.com)
-//            '#https?://(.+\.)?deviantart\.com/art/.+#i' => 'devianart',
-//            '#https?://(.+\.)?deviantart\.com/.+#i' => 'devianart',
-//            '#https?://(.+\.)?deviantart\.com/.*/d.+#i' => 'devianart',
-//            '#https?://(.+\.)?fav\.me/.+#i' => 'devianart',
-//            '#https?://(.+\.)?sta\.sh/.+#i' => 'devianart',
+            //            '#https?://(.+\.)?deviantart\.com/art/.+#i' => 'devianart',
+            //            '#https?://(.+\.)?deviantart\.com/.+#i' => 'devianart',
+            //            '#https?://(.+\.)?deviantart\.com/.*/d.+#i' => 'devianart',
+            //            '#https?://(.+\.)?fav\.me/.+#i' => 'devianart',
+            //            '#https?://(.+\.)?sta\.sh/.+#i' => 'devianart',
 
             // chirbit.com (http://www.chirbit.com/)
             //'#https?://(.+\.)?chirb\.it/.+#i' => 'chirbit',
@@ -332,7 +344,7 @@ class Core {
         global $wp_rewrite;
 
         if (!class_exists('\\WP_Rewrite')) {
-            $path = ABSPATH.WPINC.'/class-wp-rewrite.php';
+            $path = ABSPATH . WPINC . '/class-wp-rewrite.php';
             if (file_exists($path)) {
                 require_once $path;
             }
@@ -346,7 +358,7 @@ class Core {
 
         foreach ($newProviders as $url => &$data) {
             $data = [
-                rest_url('embedpress/v1/oembed/'.$data),
+                rest_url('embedpress/v1/oembed/' . $data),
                 true,
             ];
         }
@@ -359,9 +371,11 @@ class Core {
     /**
      * Register OEmbed Rest Routes
      */
-    public function registerOEmbedRestRoutes () {
+    public function registerOEmbedRestRoutes()
+    {
         register_rest_route(
-            'embedpress/v1', '/oembed/(?P<provider>[a-zA-Z0-9\-]+)',
+            'embedpress/v1',
+            '/oembed/(?P<provider>[a-zA-Z0-9\-]+)',
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => ['\\EmbedPress\\RestAPI', 'oembed'],
@@ -369,7 +383,8 @@ class Core {
             ]
         );
         register_rest_route(
-            'embedpress/v1', '/oembed/(?P<provider>[a-zA-Z0-9\-]+)',
+            'embedpress/v1',
+            '/oembed/(?P<provider>[a-zA-Z0-9\-]+)',
             [
                 'methods' => \WP_REST_Server::CREATABLE,
                 'callback' => ['\\EmbedPress\\RestAPI', 'oembed'],
@@ -377,6 +392,93 @@ class Core {
             ]
         );
     }
+
+    public function send_user_feedback_email($params)
+    {
+        $params = $params->get_params();
+
+        $site_name   = get_bloginfo('name');
+        $site_url    = get_site_url();
+        $admin_email = get_option('admin_email');
+        $wp_version  = get_bloginfo('version');
+
+        $admin_user = get_user_by('ID', 1);
+        if ($admin_user) {
+            $first_name = get_user_meta($admin_user->ID, 'first_name', true);
+            $last_name = get_user_meta($admin_user->ID, 'last_name', true);
+            
+            $admin_full_name = trim("$first_name $last_name");
+            
+            // Fallback to display name if full name is not set
+            if (empty($admin_full_name)) {
+                $admin_full_name = $admin_user->display_name;
+            }
+        } else {
+            $admin_full_name = 'Unknown';
+        }
+
+        $to = 'akash@wpdeveloper.com, rasel@wpdeveloper.com, nahid@wpdeveloper.com, md-nahid-hasan@wpdeveloper.com'; // Replace with the recipient's email
+        $subject = '[IMPORTANT] New feedback received from an EmbedPress user.';
+
+        // HTML Email Template
+        $message = '<html><body style="font-family: Arial, sans-serif;  padding: 20px;">';
+        $message .= '<div style="max-width: 600px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: auto;">';
+        $message .= '<div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid #ddd">';
+        $message .= '<img src="https://embedpress.com/wp-content/uploads/2025/03/logo.png" alt="EmbedPress" style="max-width: 150px;">';
+        $message .= '</div>';
+        $message .= '<h2 style="font-family: system-ui; color: #333; text-align: center;">Feedback Overview</h2>';
+        $message .= '<table style="font-family: system-ui; width: 100%; border-collapse: collapse; border: 1px solid #ddd">';
+
+        // Email
+        $message .= '<tr><td style="padding: 10px; font-weight: bold; width: 100px; border-bottom: 1px solid #ddd;">Email :</td>';
+        $message .= '<td style="padding: 10px; border-bottom: 1px solid #ddd;"><a href="mailto:' . esc_attr($params['email']) . '">' . esc_html($params['email']) . '</a></td></tr>';
+
+        // Rating
+        $message .= '<tr><td style="padding: 10px; font-weight: bold; width: 100px; border-bottom: 1px solid #ddd;">Rating :</td>';
+        $message .= '<td style="padding: 10px; border-bottom: 1px solid #ddd;">' . esc_html($params['rating']) . ' ⭐️</td></tr>';
+
+        // User
+        $message .= '<tr><td style="padding: 10px; font-weight: bold; width: 100px; border-bottom: 1px solid #ddd;">Name :</td>';
+        $message .= '<td style="padding: 10px; border-bottom: 1px solid #ddd; font-weight: 500;">' . esc_html($admin_full_name) . '</td></tr>';
+
+        // Pack
+        $message .= '<tr><td style="padding: 10px; font-weight: bold; width: 100px; border-bottom: 1px solid #ddd;">Site Url :</td>';
+        $message .= '<td style="padding: 10px; border-bottom: 1px solid #ddd;"><a target="_blank" href="' . esc_url($site_url) . '" style="color: blue;">' . esc_html($site_url) . '</a></td></tr>';
+
+        // Feedback
+        $message .= '<tr><td style="padding: 10px; font-weight: bold; width: 100px; display: flex;">Feedback :</td>';
+        $message .= '<td style="padding: 10px;">' . nl2br(esc_html($params['message'])) . '</td></tr>';
+
+        $message .= '</table>';
+        $message .= '</div></body></html>';
+
+        $headers = [
+            'Content-Type: text/html; charset=UTF-8',
+            'From: ' . esc_html($params['name']) . ' <' . esc_html($params['email']) . '>'
+        ];
+
+        // Send the email
+        $sent = wp_mail($to, $subject, $message, $headers);
+
+        if ($sent) {
+            update_option( 'embedpress_feedback_submited', true );
+            return new \WP_REST_Response(['message' => 'Email sent successfully!'], 200);
+        } else {
+            return new \WP_REST_Response(['message' => 'Failed to send email.'], 500);
+        }
+    }
+
+
+    public function register_feedback_email_endpoint()
+    {
+        register_rest_route('embedpress/v1', '/send-feedback', [
+            'methods' => 'POST',
+            'callback' => [$this, 'send_user_feedback_email'],
+            'permission_callback' => '__return_true'
+        ]);
+    }
+
+
 
     /**
      * Callback called right after the plugin has been activated.
@@ -386,13 +488,14 @@ class Core {
      * @static
      *
      */
-    public static function onPluginActivationCallback () {
-	    $dirname = wp_get_upload_dir()['basedir'].'/embedpress';
-	    if (!file_exists($dirname)) {
-	    	mkdir($dirname, 0777);
-	    }
+    public static function onPluginActivationCallback()
+    {
+        $dirname = wp_get_upload_dir()['basedir'] . '/embedpress';
+        if (!file_exists($dirname)) {
+            mkdir($dirname, 0777);
+        }
         flush_rewrite_rules();
-	    embedpress_schedule_cache_cleanup();
+        embedpress_schedule_cache_cleanup();
     }
 
     /**
@@ -403,13 +506,14 @@ class Core {
      * @static
      *
      */
-    public static function onPluginDeactivationCallback () {
+    public static function onPluginDeactivationCallback()
+    {
         flush_rewrite_rules();
-	    embedpress_cache_cleanup();
-	    $timestamp = wp_next_scheduled( 'embedpress_backup_cleanup_action' );
-	    if ( $timestamp ) {
-		    wp_unschedule_event( $timestamp, 'embedpress_backup_cleanup_action' );
-	    }
+        embedpress_cache_cleanup();
+        $timestamp = wp_next_scheduled('embedpress_backup_cleanup_action');
+        if ($timestamp) {
+            wp_unschedule_event($timestamp, 'embedpress_backup_cleanup_action');
+        }
     }
 
     /**
@@ -420,18 +524,18 @@ class Core {
      * @static
      *
      */
-    public static function getAdditionalServiceProviders () {
-        $additionalProvidersFilePath = EMBEDPRESS_PATH_BASE.'providers.php';
+    public static function getAdditionalServiceProviders()
+    {
+        $additionalProvidersFilePath = EMBEDPRESS_PATH_BASE . 'providers.php';
         if (file_exists($additionalProvidersFilePath)) {
             include $additionalProvidersFilePath;
 
             if (isset($additionalServiceProviders)) {
-	            return apply_filters( 'embedpress_additional_service_providers', $additionalServiceProviders);
+                return apply_filters('embedpress_additional_service_providers', $additionalServiceProviders);
             }
         }
 
-	    return apply_filters( 'embedpress_additional_service_providers', []);
-
+        return apply_filters('embedpress_additional_service_providers', []);
     }
 
     /**
@@ -444,7 +548,8 @@ class Core {
      * @static
      *
      */
-    public static function canServiceProviderBeResponsive ($serviceProviderAlias) {
+    public static function canServiceProviderBeResponsive($serviceProviderAlias)
+    {
         return in_array($serviceProviderAlias, [
             "dailymotion",
             "kickstarter",
@@ -471,7 +576,8 @@ class Core {
      * @static
      *
      */
-    public static function getSettings () {
+    public static function getSettings()
+    {
         $settings = get_option(EMBEDPRESS_PLG_NAME);
 
         if (!isset($settings['enablePluginInAdmin'])) {
@@ -506,7 +612,8 @@ class Core {
      * @static
      *
      */
-    public static function getPlugins () {
+    public static function getPlugins()
+    {
         return self::$plugins;
     }
 
@@ -518,17 +625,19 @@ class Core {
      * @static
      *
      */
-	public static function handleActionLinks($links, $file)
-	{
-		$settingsLink = '<a href="' . admin_url('admin.php?page=embedpress') . '" aria-label="' . __('Open settings page',
-				'embedpress') . '">' . __('Settings', 'embedpress') . '</a>';
+    public static function handleActionLinks($links, $file)
+    {
+        $settingsLink = '<a href="' . admin_url('admin.php?page=embedpress') . '" aria-label="' . __(
+            'Open settings page',
+            'embedpress'
+        ) . '">' . __('Settings', 'embedpress') . '</a>';
 
-		array_unshift($links, $settingsLink);
-		if ( !apply_filters('embedpress/is_allow_rander', false) ) {
-			$links[] = '<a href="https://wpdeveloper.com/in/upgrade-embedpress" target="_blank" class="embedpress-go-pro-action" style="color: green">'.__('Go Pro', 'embedpress').'</a>';
-		}
-		return $links;
-	}
+        array_unshift($links, $settingsLink);
+        if (!apply_filters('embedpress/is_allow_rander', false)) {
+            $links[] = '<a href="https://wpdeveloper.com/in/upgrade-embedpress" target="_blank" class="embedpress-go-pro-action" style="color: green">' . __('Go Pro', 'embedpress') . '</a>';
+        }
+        return $links;
+    }
 
 
     /**
@@ -543,7 +652,8 @@ class Core {
      * @static
      *
      */
-    public static function allowApiHost ($isAllowed, $host, $url) {
+    public static function allowApiHost($isAllowed, $host, $url)
+    {
         if ($host === EMBEDPRESS_LICENSES_API_HOST) {
             $isAllowed = true;
         }
@@ -551,9 +661,9 @@ class Core {
         return $isAllowed;
     }
 
-    public function extended_mime_types( $mimes ) {
+    public function extended_mime_types($mimes)
+    {
         $mimes['ppsx'] = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
         return $mimes;
     }
-
 }
