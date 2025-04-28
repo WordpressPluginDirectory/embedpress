@@ -38,9 +38,20 @@ function embedpress_blocks_cgb_block_assets()
 add_action('enqueue_block_assets', 'embedpress_blocks_cgb_block_assets');
 
 if (!function_exists('get_options_value')) {
-	function get_options_value($key)
+
+
+	 function get_options_value($key)
 	{
 		$g_settings = get_option(EMBEDPRESS_PLG_NAME);
+
+		if(isset($g_settings['enableEmbedResizeWidth']) && $g_settings['enableEmbedResizeWidth'] == 1){
+			$g_settings['enableEmbedResizeWidth'] = 600;
+			update_option(EMBEDPRESS_PLG_NAME, $g_settings);
+		}
+		if(isset($g_settings['enableEmbedResizeHeight']) && $g_settings['enableEmbedResizeHeight'] == 1){
+			$g_settings['enableEmbedResizeHeight'] = 600;
+			update_option(EMBEDPRESS_PLG_NAME, $g_settings);
+		}
 
 		if (isset($g_settings[$key])) {
 			return $g_settings[$key];
@@ -168,6 +179,7 @@ function embedpress_blocks_cgb_editor_assets()
 		'user_roles' => embedpress_get_user_roles(),
 		'current_user' => $current_user->data,
 		'is_embedpress_feedback_submited' => get_option('embedpress_feedback_submited'),
+		'turn_off_rating_help' => get_options_value('turn_off_rating_help'),
 
 	));
 
