@@ -1,4 +1,4 @@
-=== EmbedPress – PDF Embed, PDF 3D FlipBook, Instagram Social Feeds, Google Docs, Vimeo, Wistia, YouTube Videos, Maps & Upload PDF Documents ===
+=== EmbedPress – PDF Embedder PDF 3D FlipBook, Social Feeds, Google Docs, Vimeo, Wistia, YouTube Videos, Maps Embed & Upload PDF Documents ===
 Contributors: EmbedPress, asif2bd, re_enter_rupok, wpdevteam, seakashdiu, alimuzzamanalim
 Author: WPDeveloper
 Author URI: https://wpdeveloper.com
@@ -6,7 +6,7 @@ Tags: embed, embed YouTube, embed PDF, Google Docs, Social Feeds
 Requires at least: 4.6
 Tested up to: 6.8
 Requires PHP: 5.6
-Stable tag: 4.2.6
+Stable tag: 4.2.7
 License: GPLv3 or later
 License URI: https://opensource.org/licenses/GPL-3.0
 
@@ -342,6 +342,10 @@ With EmbedPress you can easily create PDF flipbooks. First, upload PDF into your
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+
+= [4.2.7] – 2025-06-03 =
+- Added: Dynamic Tag Support for JetEngine Custom Fields
+- Few minor bug fixes & improvements.
 
 = [4.2.6] – 2025-05-15 =
 - Added: Viewer selection (Office/Google) support for documents using Shortcode.
