@@ -300,7 +300,7 @@ class Shortcode
             // Identify what service provider the shortcode's link belongs to
             $is_embra_provider = apply_filters('embedpress:isEmbra', false, $url, self::get_embera_settings());
 
-            if ($is_embra_provider || (strpos($url, 'meetup.com') !== false) || (strpos($url, 'sway.office.com') !== false)) {
+            if ($is_embra_provider || (strpos($url, 'meetup.com') !== false) || (strpos($url, 'sway.office.com') !== false) || (strpos($url, 'flourish.studio') !== false)) {
                 $serviceProvider = '';
             } else {
                 $serviceProvider = self::get_oembed()->get_provider($url);
@@ -1081,6 +1081,7 @@ KAMAL;
             'zoom_out' => isset($attributes['zoom_out'])  ? $attributes['zoom_out'] : 'true',
             'fit_view' => isset($attributes['fit_view'])  ? $attributes['fit_view'] : 'true',
             'bookmark' => isset($attributes['bookmark'])  ? $attributes['bookmark'] : 'true',
+            'sound' => isset($attributes['sound'])  ? $attributes['sound'] : 'true',
             'flipbook_toolbar_position' => !empty($attributes['toolbar_position'])  ? $attributes['toolbar_position'] : 'bottom',
         );
 
