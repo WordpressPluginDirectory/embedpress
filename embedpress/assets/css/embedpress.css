@@ -182,7 +182,7 @@
 /*Meetup Event styling starts */
 .ose-meetup {
     overflow: auto !important;
-}
+} 
 
 .ose-meetup img {
     height: auto;
@@ -1668,6 +1668,40 @@ a.ep-social-icon.twitter:focus-visible {
     height: 100% !important;
 }
 
+.embedpress-document-embed {
+    position: relative;
+}
+
+.position-right-wraper .main-content-wraper, .position-left-wraper .main-content-wraper {
+    display: flex;
+}
+
+.position-left-wraper .main-content-wraper {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.position-top-wraper .main-content-wraper {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: center;
+}
+
+.position-bottom-wraper .main-content-wraper {
+    justify-content: center;
+
+}
+
+/* .embedpress-document-embed .ep-social-share {
+    position: absolute;
+}
+
+.embedpress-document-embed .ep-social-share.share-position-top {
+    position: static;
+} */
+
+
+
 .ep-file-download-option-masked.ep-file-link.fullscreen-enabled iframe {
     margin-left: 22%;
 }
@@ -2119,7 +2153,7 @@ a.profile-link, a.profile-link h2 {
 }
 
 
-.insta-grid .embedpress-insta-container .insta-gallery {
+.insta-grid .embedpress-insta-container .insta-gallery, .ose-instagram-feed .insta-gallery {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     /* Set 3 columns */

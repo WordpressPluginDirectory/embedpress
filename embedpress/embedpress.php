@@ -6,7 +6,7 @@
  * Description: EmbedPress lets you embed videos, images, posts, audio, maps and upload PDF, DOC, PPT & all other types of content into your WordPress site with one-click and showcase it beautifully for the visitors. 150+ sources supported.
  * Author: WPDeveloper
  * Author URI: https://wpdeveloper.com
- * Version: 4.3.1
+ * Version: 4.4.0
  * Text Domain: embedpress
  * Domain Path: /languages
  *
@@ -21,6 +21,8 @@
  * @since       1.0.0
  */
 
+
+use EmbedPress\Analytics\Analytics;
 use EmbedPress\Compatibility;
 use EmbedPress\Core;
 use EmbedPress\CoreLegacy;
@@ -34,6 +36,21 @@ use EmbedPress\Shortcode;
 
 defined('ABSPATH') or die("No direct script access allowed.");
 
+// Store HTTP_REFERER if it's external
+if (!defined('EMBEDPRESS_ORIGINAL_REFERRER')) {
+    $original_referrer = '';
+
+    if (!empty($_SERVER['HTTP_REFERER'])) {
+
+        $current_site_url = home_url();
+        if (strpos($_SERVER['HTTP_REFERER'], $current_site_url) !== 0) {
+            $original_referrer = $_SERVER['HTTP_REFERER'];
+        }
+    }
+
+    define('EMBEDPRESS_ORIGINAL_REFERRER', $original_referrer);
+}
+
 
 define('EMBEDPRESS_PLUGIN_BASENAME', plugin_basename(__FILE__));
 define('EMBEDPRESS_FILE', __FILE__);
@@ -43,9 +60,8 @@ if (!defined('EMBEDPRESS_PLUGIN_VERSION')) {
     if (defined('EMBEDPRESS_DEV_MODE') && EMBEDPRESS_DEV_MODE) {
         define('EMBEDPRESS_PLUGIN_VERSION', time());
     } else {
-        define('EMBEDPRESS_PLUGIN_VERSION', '4.3.1');
+        define('EMBEDPRESS_PLUGIN_VERSION', '4.4.0');
     }
-
 }
 
 define('EMBEDPRESS_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
@@ -58,6 +74,9 @@ define('EMBEDPRESS_PLUGIN_URL', plugins_url('/', __FILE__));
 
 
 require_once EMBEDPRESS_PLUGIN_DIR_PATH . 'includes.php';
+
+// Initialize core functionality
+require_once EMBEDPRESS_PLUGIN_DIR_PATH . 'Core/init.php';
 
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
@@ -99,15 +118,30 @@ if (isset($_GET['classic-editor']) || isset($_POST['action']) && $_POST['action'
     $embedPressPlugin = new CoreLegacy();
 }
 
+// Check if we should use the new block system to avoid conflicts
+// $use_new_blocks = apply_filters('embedpress_use_new_block_system', true);
+
+// if (!$use_new_blocks) {
+//     $embedPressPlugin->initialize();
+// } else {
+//     // Only initialize core functionality, skip the handlers that enqueue conflicting scripts
+//     $embedPressPlugin->initialize_minimal();
+// }
 $embedPressPlugin->initialize();
+
 new Feature_Enhancer();
 new Extend_Elementor_Controls();
 new Extend_CustomPlayer_Controls();
+if (is_admin()) {
+    new Analytics();
+}
 
 new Helper();
 
-// Initialize license checking hooks
-Helper::init_license_hooks();
+// Initialize Analytics
+use EmbedPress\Includes\Classes\Analytics\Analytics_Manager;
+
+Analytics_Manager::get_instance();
 
 
 if (is_plugin_active('elementor/elementor.php')) {
@@ -130,8 +164,15 @@ if (class_exists('EmbedPress_Licensing')) {
     $is_pro_active = true;
 }
 
-add_action('wp_enqueue_scripts', 'load_scripts');
-function load_scripts()
+function embedpress_exclude_height($excluded_sources)
 {
-    Shortcode::shortcode_scripts();
+    $social_media_sources = [
+        'opensea',
+        'google-photos'
+    ];
+
+    return array_merge($excluded_sources, $social_media_sources);
 }
+add_filter('embedpress_excluded_height_sources', 'embedpress_exclude_height');
+
+// Old shortcode script loading removed - now handled by AssetManager

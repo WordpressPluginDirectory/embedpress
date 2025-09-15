@@ -346,7 +346,7 @@ if(!$pro_active){
                             <div class="ep-embed-content-wraper">
                                 <div class="position-right-wraper gutenberg-pdf-wraper">
                                     <?php
-                                    $pdf_url = EMBEDPRESS_SETTINGS_ASSETS_URL . 'embedpress.pdf';
+                                    $pdf_url = EMBEDPRESS_URL_ASSETS . 'embedpress.pdf';
                                     $renderer = Helper::get_pdf_renderer();
                                     $src = $renderer . ((strpos($renderer, '?') == false) ? '?' : '&') . 'file=' . urlencode($pdf_url);
                                     ?>
@@ -1162,8 +1162,6 @@ if(!$pro_active){
             "adSkipButton": currentAdAtts?.adSkipButton === 'yes' ? true : false,
             "adSkipButtonAfter": currentAdAtts?.adSkipButtonAfter
         }
-
-        console.log(currentAdAtts);
 
         if (currentAdAtts?.adFileUrl) {
             adInitialization(adContainer, index, adAtts, adType);
