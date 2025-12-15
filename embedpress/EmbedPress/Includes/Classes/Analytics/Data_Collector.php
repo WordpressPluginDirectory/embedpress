@@ -1223,10 +1223,16 @@ class Data_Collector
     }
 
     /**
-     * Get total content count by type (scanning WordPress database)
-     * Shows actual embedded content counts so admins can see usage without visiting frontend
+     * Get total content count by type without loading all posts into PHP memory
      *
-     * @return array
+     * Strategy:
+     * 1) Prefer fast counts from analytics content table if available
+     * 2) Fallback to efficient SQL COUNT queries with LIKE conditions (DB-side scan)
+     * 3) Cache with transient to avoid repeated work
+     *
+     * This avoids unbounded get_results() that fetched every post_content into PHP.
+     *
+     * @return array{elementor:int,gutenberg:int,shortcode:int,total:int}
      */
     public function get_total_content_by_type()
     {
@@ -1235,7 +1241,6 @@ class Data_Collector
         // Use transient caching to avoid expensive database scans on every request
         $cache_key = 'embedpress_total_content_count';
         $cached_data = get_transient($cache_key);
-
         if ($cached_data !== false) {
             return $cached_data;
         }
@@ -1244,37 +1249,103 @@ class Data_Collector
             'elementor' => 0,
             'gutenberg' => 0,
             'shortcode' => 0,
-            'total' => 0
+            'total' => 0,
         ];
 
-        // Scan all published posts and pages for EmbedPress content
-        $posts = $wpdb->get_results(
-            "SELECT ID, post_content, post_type
-             FROM {$wpdb->posts}
-             WHERE post_status IN ('publish', 'draft', 'private', 'future')
-             AND post_type NOT IN ('revision', 'attachment', 'nav_menu_item')"
-        );
+        // 1) Try to use analytics content table (fast path)
+        $content_table = $wpdb->prefix . 'embedpress_analytics_content';
+        // Check if table exists to avoid errors on fresh installs
+        $table_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $wpdb->esc_like($content_table)
+        ));
 
-        foreach ($posts as $post) {
-            $content = $post->post_content;
+        if ($table_exists === $content_table) {
+            $rows = $wpdb->get_results(
+                "SELECT content_type, COUNT(*) as cnt FROM {$content_table} GROUP BY content_type",
+                ARRAY_A
+            );
 
-            // Count Gutenberg blocks
-            if (function_exists('has_blocks') && function_exists('parse_blocks') && has_blocks($content)) {
-                $blocks = parse_blocks($content);
-                $gutenberg_count = $this->count_embedpress_blocks($blocks);
-                $data['gutenberg'] += $gutenberg_count;
+            if (!empty($rows)) {
+                foreach ($rows as $row) {
+                    $type = isset($row['content_type']) ? strtolower($row['content_type']) : '';
+                    $cnt  = isset($row['cnt']) ? (int) $row['cnt'] : 0;
+
+                    if (strpos($type, 'elementor') === 0) {
+                        $data['elementor'] += $cnt;
+                    } elseif ($type === 'gutenberg') {
+                        $data['gutenberg'] += $cnt;
+                    } elseif ($type === 'shortcode') {
+                        $data['shortcode'] += $cnt;
+                    }
+                }
+
+                $data['total'] = $data['elementor'] + $data['gutenberg'] + $data['shortcode'];
+
+                // If we have any data from analytics table, cache and return
+                if ($data['total'] > 0) {
+                    set_transient($cache_key, $data, HOUR_IN_SECONDS);
+                    return $data;
+                }
             }
-
-            // Count shortcodes
-            $shortcode_count = $this->count_embedpress_shortcodes($content);
-            $data['shortcode'] += $shortcode_count;
-
-            // Count Elementor widgets
-            $elementor_count = $this->count_elementor_embedpress_widgets($post->ID);
-            $data['elementor'] += $elementor_count;
         }
 
-        // Calculate total
+        // 2) Fallback: Efficient DB-side COUNTs (no PHP memory blowups)
+        // Limit to common content-bearing post types; allow filtering
+        $allowed_post_types = apply_filters('embedpress_content_count_post_types', [
+            'post', 'page', 'product', 'event', 'portfolio'
+        ]);
+        $allowed_post_types = array_filter((array) $allowed_post_types, function ($t) {
+            return is_string($t) && $t !== '';
+        });
+
+        $status_condition = "p.post_status IN ('publish','draft','private','future')";
+        $post_type_condition = '';
+        if (!empty($allowed_post_types)) {
+            $escaped = array_map('esc_sql', $allowed_post_types);
+            $types_in = "'" . implode("','", $escaped) . "'";
+            $post_type_condition = " AND p.post_type IN (" . $types_in . ")";
+        } else {
+            // Fall back to excluding obviously irrelevant types
+            $post_type_condition = " AND p.post_type NOT IN ('revision','attachment','nav_menu_item')";
+        }
+
+        // Gutenberg: posts containing EmbedPress blocks (stored as comments in content)
+        $gutenberg_count = (int) $wpdb->get_var(
+            "SELECT COUNT(*) FROM {$wpdb->posts} p
+             WHERE {$status_condition} {$post_type_condition}
+               AND (p.post_content LIKE '%<!-- wp:embedpress/%' OR p.post_content LIKE '%wp:embedpress/%')"
+        );
+
+        // Shortcode: posts containing [embedpress*] shortcodes
+        $shortcode_count = (int) $wpdb->get_var(
+            "SELECT COUNT(*) FROM {$wpdb->posts} p
+             WHERE {$status_condition} {$post_type_condition}
+               AND (
+                    p.post_content LIKE '%[embedpress %' OR
+                    p.post_content LIKE '%[embedpress]%' OR
+                    p.post_content LIKE '%[embedpress_pdf %' OR
+                    p.post_content LIKE '%[embedpress_document %' OR
+                    p.post_content LIKE '%[embedpress_calendar %'
+               )"
+        );
+
+        // Elementor: posts with _elementor_data that references EmbedPress widgets
+        $elementor_count = 0;
+        if (class_exists('\\Elementor\\Plugin')) {
+            $elementor_count = (int) $wpdb->get_var(
+                "SELECT COUNT(DISTINCT pm.post_id)
+                 FROM {$wpdb->postmeta} pm
+                 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+                 WHERE {$status_condition} {$post_type_condition}
+                   AND pm.meta_key = '_elementor_data'
+                   AND (pm.meta_value LIKE '%embedpress%' OR pm.meta_value LIKE '%Embedpress%')"
+            );
+        }
+
+        $data['elementor'] = $elementor_count;
+        $data['gutenberg'] = $gutenberg_count;
+        $data['shortcode'] = $shortcode_count;
         $data['total'] = $data['elementor'] + $data['gutenberg'] + $data['shortcode'];
 
         // Cache for 1 hour to avoid expensive scans
@@ -1663,13 +1734,18 @@ class Data_Collector
         $date_condition = $this->build_date_condition($args, 'v.created_at');
 
         // Get country distribution
+        // Updated JOIN to handle new normalized user_id format in browser_info table
         $countries = $wpdb->get_results(
             "SELECT
                 COALESCE(b.country, 'Unknown') as country,
                 COUNT(DISTINCT v.session_id) as visitors,
                 COUNT(v.id) as total_interactions
              FROM $browser_table b
-             INNER JOIN $views_table v ON b.session_id = v.session_id
+             INNER JOIN $views_table v ON (
+                b.user_id = CONCAT('user:', v.session_id) OR
+                b.user_id = CONCAT('guest:', v.session_id) OR
+                b.session_id = v.session_id
+             )
              WHERE 1=1 $date_condition
              GROUP BY b.country
              ORDER BY visitors DESC
@@ -1678,13 +1754,18 @@ class Data_Collector
         );
 
         // Get city distribution for top countries
+        // Updated JOIN to handle new normalized user_id format in browser_info table
         $cities = $wpdb->get_results(
             "SELECT
                 COALESCE(b.country, 'Unknown') as country,
                 COALESCE(b.city, 'Unknown') as city,
                 COUNT(DISTINCT v.session_id) as visitors
              FROM $browser_table b
-             INNER JOIN $views_table v ON b.session_id = v.session_id
+             INNER JOIN $views_table v ON (
+                b.user_id = CONCAT('user:', v.session_id) OR
+                b.user_id = CONCAT('guest:', v.session_id) OR
+                b.session_id = v.session_id
+             )
              WHERE 1=1 $date_condition
              GROUP BY b.country, b.city
              ORDER BY visitors DESC
@@ -2616,11 +2697,6 @@ class Data_Collector
 
         $result = $wpdb->insert($referrers_table, $data);
 
-        if ($result) {
-            // Track unique visitor for this referrer
-            $this->track_referrer_visitor($wpdb->insert_id, $user_identifier);
-        }
-
         return $result !== false;
     }
 
@@ -2672,7 +2748,6 @@ class Data_Collector
 
         if ($is_new_visitor) {
             $sql_parts[] = "unique_visitors = unique_visitors + 1";
-            $this->track_referrer_visitor($referrer_id, $user_identifier);
         }
 
         $values[] = $referrer_id;
@@ -2682,30 +2757,10 @@ class Data_Collector
         return $wpdb->query($wpdb->prepare($sql, $values)) !== false;
     }
 
-    /**
-     * Track unique visitor for referrer (simple implementation using options)
-     *
-     * @param int $referrer_id
-     * @param string $user_identifier
-     * @return void
-     */
-    private function track_referrer_visitor($referrer_id, $user_identifier)
-    {
-        $option_name = "embedpress_referrer_visitors_$referrer_id";
-        $visitors = get_option($option_name, []);
 
-        if (!in_array($user_identifier, $visitors)) {
-            $visitors[] = $user_identifier;
-            // Keep only last 1000 visitors to prevent option from growing too large
-            if (count($visitors) > 1000) {
-                $visitors = array_slice($visitors, -1000);
-            }
-            update_option($option_name, $visitors);
-        }
-    }
 
     /**
-     * Check if user is a new visitor for this referrer
+     * Check if user is a new visitor for this referrer using existing views table
      *
      * @param int $referrer_id
      * @param string $user_identifier
@@ -2713,10 +2768,33 @@ class Data_Collector
      */
     private function is_new_referrer_visitor($referrer_id, $user_identifier)
     {
-        $option_name = "embedpress_referrer_visitors_$referrer_id";
-        $visitors = get_option($option_name, []);
+        global $wpdb;
 
-        return !in_array($user_identifier, $visitors);
+        $views_table = $wpdb->prefix . 'embedpress_analytics_views';
+        $referrers_table = $wpdb->prefix . 'embedpress_analytics_referrers';
+
+        // Get the referrer URL for this referrer_id
+        $referrer_url = $wpdb->get_var($wpdb->prepare(
+            "SELECT referrer_url FROM $referrers_table WHERE id = %d",
+            $referrer_id
+        ));
+
+        if (!$referrer_url) {
+            return true; // If referrer doesn't exist, consider it new
+        }
+
+        // Check if this user has any previous interactions with this referrer URL
+        $existing_interaction = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM $views_table
+             WHERE (user_id = %s OR session_id = %s)
+             AND referrer_url = %s
+             LIMIT 1",
+            $user_identifier,
+            $user_identifier,
+            $referrer_url
+        ));
+
+        return $existing_interaction == 0;
     }
 
     /**

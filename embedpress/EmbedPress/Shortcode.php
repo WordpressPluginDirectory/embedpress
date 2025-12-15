@@ -321,18 +321,28 @@ class Shortcode
             //foreach ( self::$ombed_attributes as $attrName => $attrValue ) {
             //    $attributesHtml[] = $attrName . '="' . $attrValue . '"';
             //}
+
+            // Check if $url is a google shortened url and tries to extract from it which Google service it refers to.
+            self::check_for_google_url($url);
+            $provider_name = self::get_provider_name($urlData, $url);
+
+            // Get excluded height sources
+            $excludedHeightSources = self::get_excluded_height_sources();
+            $shouldExcludeHeight = in_array($provider_name, $excludedHeightSources);
+
             if (isset($customAttributes['height'])) {
                 $height = esc_attr($customAttributes['height']);
             }
 
             if (isset($customAttributes['width'])) {
                 $width = esc_attr($customAttributes['width']);
-                $attributesHtml[] = "style=\"width:{$width}px; height:{$height}px; max-height:{$height}px; max-width:100%; display:inline-block;\"";
+                // Only apply height to wrapper if provider is not excluded
+                if ($shouldExcludeHeight) {
+                    $attributesHtml[] = "style=\"width:{$width}px; max-width:100%; display:inline-block;\"";
+                } else {
+                    $attributesHtml[] = "style=\"width:{$width}px; height:{$height}px; max-height:{$height}px; max-width:100%; display:inline-block;\"";
+                }
             }
-
-            // Check if $url is a google shortened url and tries to extract from it which Google service it refers to.
-            self::check_for_google_url($url);
-            $provider_name = self::get_provider_name($urlData, $url);
             $provider_name = sanitize_text_field($provider_name);
 
             // $html = '{html}';
@@ -492,10 +502,14 @@ KAMAL;
             $parsedContent = apply_filters('pp_embed_parsed_content', $parsedContent, $urlData,  self::get_oembed_attributes());
 
             if (!empty($parsedContent)) {
+                // Get provider name using Helper method
+                $provider_name = Helper::get_provider_name($url);
+
                 $embed = (object) array_merge((array) $urlData, [
                     'attributes' => (object) self::get_oembed_attributes(),
                     'embed'      => $parsedContent,
                     'url'        => $url,
+                    'provider_name' => $provider_name,
                 ]);
 
                 $embed = self::modify_spotify_content($embed);
@@ -781,6 +795,14 @@ KAMAL;
                 self::$emberaInstanceSettings['maxheight'] = esc_attr($attributes['height']);
                 self::$emberaInstanceSettings['height'] = esc_attr($attributes['height']);
                 unset($attributes['height']);
+            }
+        }
+
+        // Add Meetup-specific attributes to Embera settings
+        $meetup_attributes = ['orderby', 'order', 'per_page', 'enable_pagination'];
+        foreach ($meetup_attributes as $attr) {
+            if (isset($attributes[$attr])) {
+                self::$emberaInstanceSettings[$attr] = $attributes[$attr];
             }
         }
 
@@ -1085,7 +1107,9 @@ KAMAL;
     protected static function get_excluded_height_sources()
     {
         // Default excluded sources - you can add more here
-        $defaultExcluded = [];
+        $defaultExcluded = [
+            'meetup' // Meetup events should not have fixed height
+        ];
 
         // Allow filtering of excluded sources
         $excludedSources = apply_filters('embedpress_excluded_height_sources', $defaultExcluded);
@@ -1190,11 +1214,20 @@ KAMAL;
             $urlParamData['customColor'] = isset($attributes['custom_color']) ? esc_attr($attributes['custom_color']) : '#333333';
         }
 
+        $queryString = http_build_query($urlParamData);
+
+        // Ensure UTF-8 encoding with fallback for when mbstring is not available
+        if (function_exists('mb_convert_encoding')) {
+            $queryString = \mb_convert_encoding($queryString, 'UTF-8');
+        } 
+        // If neither mbstring nor iconv is available, use the string as-is
+        // since http_build_query() already produces valid output
+
         if (isset($attributes['viewer_style']) && $attributes['viewer_style'] == 'flip-book') {
-            return "&key=" . base64_encode(mb_convert_encoding(http_build_query($urlParamData), 'UTF-8'));
+            return "&key=" . base64_encode($queryString);
         }
 
-        return "#key=" . base64_encode(mb_convert_encoding(http_build_query($urlParamData), 'UTF-8'));
+        return "#key=" . base64_encode($queryString);
     }
 
     public static function getUnit($value)

@@ -9,6 +9,7 @@ $g_settings = get_option(EMBEDPRESS_PLG_NAME);
 $lazy_load = isset($g_settings['g_lazyload']) ? intval($g_settings['g_lazyload']) : 0;
 $pdf_custom_color_settings = isset($g_settings['pdf_custom_color_settings']) ? intval($g_settings['pdf_custom_color_settings']) : 0;
 $turn_off_rating_help = isset($g_settings['turn_off_rating_help']) ? intval($g_settings['turn_off_rating_help']) : 0;
+$turn_off_milestone = isset($g_settings['turn_off_milestone']) ? intval($g_settings['turn_off_milestone']) : 0;
 
 $custom_color = isset($g_settings['custom_color']) ? sanitize_text_field($g_settings['custom_color']) : '#333333';
 
@@ -94,7 +95,7 @@ $enableEmbedResizeWidth = isset($g_settings['enableEmbedResizeWidth']) ? intval(
 
 							</div>
 						</div>
-						<div class="form__group turn_off_rating_help">
+						<!-- <div class="form__group turn_off_rating_help">
 							<p class="form__label"><?php echo esc_html__('Rating & Help', 'embedpress'); ?></p>
 							<div class="form__control__wrap">
 								<label class="input__switch switch__text">
@@ -106,7 +107,7 @@ $enableEmbedResizeWidth = isset($g_settings['enableEmbedResizeWidth']) ? intval(
 								</label>
 
 							</div>
-						</div>
+						</div> -->
 						<div class="form__group mb0">
 							<p class="form__label"><?php
 												/*translators: % means coming soon text markup*/
@@ -144,7 +145,7 @@ $enableEmbedResizeWidth = isset($g_settings['enableEmbedResizeWidth']) ? intval(
 						<li><img src="<?php echo esc_url(EMBEDPRESS_URL_ASSETS . 'images/check2.svg'); ?>" alt=""><?php echo esc_html__('Content Protection', 'embedpress'); ?></li>
 						<li><img src="<?php echo esc_url(EMBEDPRESS_URL_ASSETS . 'images/check2.svg'); ?>" alt=""><?php echo esc_html__('Custom Audio & Video Player', 'embedpress'); ?></li>
 						<li><img src="<?php echo esc_url(EMBEDPRESS_URL_ASSETS . 'images/check2.svg'); ?>" alt=""><?php echo esc_html__('PDF & Documents Embedding', 'embedpress'); ?></li>
-						<li><img src="<?php echo esc_url(EMBEDPRESS_URL_ASSETS . 'images/check2.svg'); ?>" alt=""><?php echo esc_html__('Embed From 150+ Sources', 'embedpress'); ?></li>
+						<li><img src="<?php echo esc_url(EMBEDPRESS_URL_ASSETS . 'images/check2.svg'); ?>" alt=""><?php echo esc_html__('Embed From 250+ Sources', 'embedpress'); ?></li>
 						<li><img src="<?php echo esc_url(EMBEDPRESS_URL_ASSETS . 'images/check2.svg'); ?>" alt=""><?php echo esc_html__('Wrapper Support', 'embedpress'); ?></li>
 						<li><img src="<?php echo esc_url(EMBEDPRESS_URL_ASSETS . 'images/check2.svg'); ?>" alt=""><?php echo esc_html__('& Many more...', 'embedpress'); ?></li>
 					</ul>

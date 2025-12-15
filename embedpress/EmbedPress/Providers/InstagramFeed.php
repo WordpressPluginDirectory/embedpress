@@ -255,7 +255,9 @@ class InstagramFeed extends Instagram
             'data-media-url="' . htmlspecialchars($media_url) . '" ' .
             'data-permalink="' . htmlspecialchars($permalink) . '" ' .
             'data-timestamp="' . htmlspecialchars($timestamp) . '" ' .
-            'data-username="' . htmlspecialchars($username) . '" ' . (($account_type === 'business') ? 'data-like-count="' . htmlspecialchars($like_count) . '" ' : '') . (($account_type === 'business') ? 'data-comments-count="' . htmlspecialchars($comments_count) . '" ' : '');
+            'data-username="' . htmlspecialchars($username) . '" ' .
+            'data-like-count="' . htmlspecialchars($like_count) . '" ' .
+            'data-comments-count="' . htmlspecialchars($comments_count) . '" ';
 
         $post['account_type'] = $account_type;
         $post['profile_picture_url'] = $profile_picture_url;
@@ -302,7 +304,7 @@ class InstagramFeed extends Instagram
                 </div>
             </div>
             <div class="insta-gallery-item-info">
-                <?php if (apply_filters('embedpress/is_allow_rander', false) && (isset($params['instafeedFeedType']) && $params['instafeedFeedType'] === 'hashtag_type' || (isset($params['instafeedAccountType']) && strtolower($account_type) === 'business' && $params['instafeedAccountType'] === 'business')  && ((!empty($params['instafeedLikesCount']) && $params['instafeedLikesCount'] !== 'false') || (!empty($params['instafeedLikesCount']) || $params['instafeedLikesCount'] !== 'false')))) : ?>
+                <?php if (apply_filters('embedpress/is_allow_rander', false) && (isset($params['instafeedFeedType']) && $params['instafeedFeedType'] === 'hashtag_type' || (isset($params['instafeedLikesCount']) && $params['instafeedLikesCount'] !== 'false')) && ((!empty($params['instafeedLikesCount']) && $params['instafeedLikesCount'] !== 'false') || (!empty($params['instafeedCommentsCount']) && $params['instafeedCommentsCount'] !== 'false'))) : ?>
                     <?php do_action('embedpress/instafeed_reaction_count', $params, $like_count, $comments_count); ?>
                 <?php else : ?>
                     <div class="insta-gallery-item-permalink">
@@ -323,7 +325,10 @@ class InstagramFeed extends Instagram
             $params = $this->getParams();
         }
 
-        $hashtag = $this->getHashTag($this->url);
+        // Use URL from params if available (for Gutenberg blocks), otherwise use instance URL
+        $current_url = isset($params['url']) ? $params['url'] : $this->url;
+
+        $hashtag = $this->getHashTag($current_url);
         if (!empty($hashtag) && !apply_filters('embedpress/is_allow_rander', false)) {
             return sprintf(
                 esc_html__('Unlock %s support by upgrading to our %s! Upgrade today to unlock a whole new level of functionality and make the most out of your experience with Hashtag.', 'embedpress'),
@@ -345,9 +350,9 @@ class InstagramFeed extends Instagram
         }
 
         $styleAttribute = '';
+        $classes = '';
 
         if (isset($params['instaLayout'])) {
-            $classes = '';
             if ($params['instaLayout'] === 'insta-grid') {
 
                 // $classes = 'insta-grid';
@@ -431,11 +436,12 @@ class InstagramFeed extends Instagram
             <?php
             $avater_url = 'http://2.gravatar.com/avatar/b642b4217b34b1e8d3bd915fc65c4452?s=150&d=mm&r=g';
 
-            if (!empty($connected_account_type) && (strtolower($connected_account_type)  === 'business')) {
-                $avater_url = $profile_picture_url;
-            }
+            
             if (!empty($params['instafeedProfileImageUrl']) && $params['instafeedProfileImageUrl'] !== 'true' && $params['instafeedProfileImageUrl'] !== 'false') {
                 $avater_url = $params['instafeedProfileImageUrl'];
+            }
+            else{
+                $avater_url = $profile_picture_url;
             }
 
             $feed_data[$id]['feed_userinfo']['profile_picture_url'] = $avater_url;
@@ -479,19 +485,17 @@ class InstagramFeed extends Instagram
                             <?php endif; ?>
 
                             <?php if (!empty($params['instafeedFollowersCount']) && $params['instafeedFollowersCount'] !== 'false' && $params['instafeedFollowersCountText'] !== 'true') : ?>
-                                <?php if (strtolower($connected_account_type) !== 'personal') : ?>
-                                    <div class="followers-count">
-                                        <?php if (!empty($params['instafeedFollowersCountText']) && $params['instafeedFollowersCountText'] !== 'false' && $params['instafeedFollowersCountText'] !== 'true') : ?>
-                                            <a class="followers-link" target="_blank" href="<?php echo esc_url('https://instagram.com/' . $username . '/followers'); ?>" role="link" tabindex="0">
-                                                <?php
-                                                $followers_count_text = str_replace('[count]', '<span class="count">' . $followers_count . '</span>', $params['instafeedFollowersCountText']);
+                                <div class="followers-count">
+                                    <?php if (!empty($params['instafeedFollowersCountText']) && $params['instafeedFollowersCountText'] !== 'false' && $params['instafeedFollowersCountText'] !== 'true') : ?>
+                                        <a class="followers-link" target="_blank" href="<?php echo esc_url('https://instagram.com/' . $username . '/followers'); ?>" role="link" tabindex="0">
+                                            <?php
+                                            $followers_count_text = str_replace('[count]', '<span class="count">' . $followers_count . '</span>', $params['instafeedFollowersCountText']);
 
-                                                echo wp_kses_post($followers_count_text);
-                                                ?>
-                                            </a>
-                                        <?php endif; ?>
-                                    </div>
-                                <?php endif; ?>
+                                            echo wp_kses_post($followers_count_text);
+                                            ?>
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
                             <?php endif; ?>
                         </div>
                         <?php if (!empty($params['instafeedAccName']) && $params['instafeedAccName'] !== 'false') : ?>
@@ -627,6 +631,7 @@ class InstagramFeed extends Instagram
             $IG_reel = '<iframe width="' . esc_attr($width) . 'px" width="' . esc_attr($height) . 'px" allowtransparency="true" allowfullscreen="true" frameborder="0" height="534" data-instgrm-payload-id="instagram-media-payload-0" scrolling="no" style="background-color: white; border-radius: 3px; border: 1px solid rgb(219, 219, 219); box-shadow: none; display: block; margin: 0px 0px 12px; min-width: 326px; padding: 0px;" class="instagram-media instagram-media-rendered" src="' . esc_url($src_url) . '">Fetching content</iframe>';
 
             $insta_feed['html'] = $IG_reel;
+            $insta_feed['provider_name'] = 'Instagram Feed';
             return $insta_feed;
         }
         $connected_users =  get_option('ep_instagram_account_data');
@@ -666,6 +671,7 @@ class InstagramFeed extends Instagram
                     // No matching username found
                     $page = site_url() . "/wp-admin/admin.php?page=embedpress&page_type=instagram";
                     $insta_feed['html'] = '<p style="text-align:center;height:100%;display:flex;justify-content:center;align-items:center;margin:0;flex-direction: column;">To enable full Instagram embedding experience, please add your access token by navigating to: <b>Dashboard > EmbedPress > Settings > Sources > Instagram</></p>';
+                    $insta_feed['provider_name'] = 'Instagram Feed';
                     return $insta_feed;
                 }
             }
@@ -677,7 +683,7 @@ class InstagramFeed extends Instagram
             }
         }
 
-
+        $insta_feed['provider_name'] = 'Instagram Feed';
         return $insta_feed;
     }
 
@@ -698,12 +704,13 @@ class InstagramFeed extends Instagram
             $IG_reel = '<iframe width="' . esc_attr($width) . 'px" width="' . esc_attr($height) . 'px" allowtransparency="true" allowfullscreen="true" frameborder="0" height="534" data-instgrm-payload-id="instagram-media-payload-0" scrolling="no" style="background-color: white; border-radius: 3px; border: 1px solid rgb(219, 219, 219); box-shadow: none; display: block; margin: 0px 0px 12px; min-width: 326px; padding: 0px;" class="instagram-media instagram-media-rendered" src="' . esc_url($src_url) . '">Fetching content</iframe>';
 
             $insta_feed['html'] = $IG_reel;
+            $insta_feed['provider_name'] = 'Instagram Feed';
             return $insta_feed;
         }
         $connected_users =  get_option('ep_instagram_account_data');
 
         $username = $this->getInstagramUnserName($url) ? $this->getInstagramUnserName($url) : '';
-        
+
         if (is_array($connected_users) && $this->validateInstagramFeed($url) && $this->getHashTag($url)) {
             foreach ($connected_users as $entry) {
                 if ($entry['account_type'] === 'business') {
@@ -737,6 +744,7 @@ class InstagramFeed extends Instagram
                     // No matching username found
                     $page = site_url() . "/wp-admin/admin.php?page=embedpress&page_type=instagram";
                     $insta_feed['html'] = '<p style="text-align:center;height:100%;display:flex;justify-content:center;align-items:center;margin:0;flex-direction: column;">To enable full Instagram embedding experience, please add your access token by navigating to: <b>Dashboard > EmbedPress > Settings > Sources > Instagram</></p>';
+                    $insta_feed['provider_name'] = 'Instagram Feed';
                     return $insta_feed;
                 }
             }
@@ -748,7 +756,7 @@ class InstagramFeed extends Instagram
             }
         }
 
-
+        $insta_feed['provider_name'] = 'Instagram Feed';
         return $insta_feed;
     }
 

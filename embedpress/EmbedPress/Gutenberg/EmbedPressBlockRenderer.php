@@ -77,6 +77,22 @@ class EmbedPressBlockRenderer
             return null;
         }
 
+        // Map Meetup-specific Gutenberg attributes to shortcode attributes
+        if (!empty($url) && strpos($url, 'meetup.com') !== false) {
+            if (isset($attributes['meetupOrderBy'])) {
+                $attributes['orderby'] = $attributes['meetupOrderBy'];
+            }
+            if (isset($attributes['meetupOrder'])) {
+                $attributes['order'] = $attributes['meetupOrder'];
+            }
+            if (isset($attributes['meetupPerPage'])) {
+                $attributes['per_page'] = $attributes['meetupPerPage'];
+            }
+            if (isset($attributes['meetupEnablePagination'])) {
+                $attributes['enable_pagination'] = $attributes['meetupEnablePagination'];
+            }
+        }
+
         try {
             $embed_result = Shortcode::parseContent($url, false, $attributes);
 
@@ -180,7 +196,7 @@ class EmbedPressBlockRenderer
         $wrapper_classes = self::build_legacy_wrapper_classes($attributes, $styling, $legacy_config);
 
         ob_start();
-        ?>
+?>
         <div id="ep-gutenberg-content-<?php echo esc_attr($client_id) ?>" class="ep-gutenberg-content <?php echo esc_attr($wrapper_classes); ?>">
             <div class="embedpress-inner-iframe <?php echo esc_attr($legacy_config['unit_class']); ?> ep-doc-<?php echo esc_attr($client_id); ?>" style="<?php echo esc_attr($legacy_config['style_attr']); ?>" id="<?php echo esc_attr($id); ?>">
                 <div <?php echo esc_attr($styling['ads_attrs']); ?>>
@@ -201,7 +217,7 @@ class EmbedPressBlockRenderer
                 </div>
             </div>
         </div>
-        <?php
+    <?php
         return ob_get_clean();
     }
 
@@ -501,7 +517,7 @@ class EmbedPressBlockRenderer
 
 
         ob_start();
-        ?>
+    ?>
         <div class="wp-block-embedpress-document" data-embed-type="Document">
             <?php self::render_embed_content($content, $contentShare, $id, $attributes, $should_display_content, $protection_data, $styling); ?>
             <?php self::render_ad_template($attributes, $content, $client_id); ?>
@@ -972,7 +988,7 @@ class EmbedPressBlockRenderer
                 </div>
             </div>
         </div>
-<?php
+    <?php
 
         return ob_get_clean();
     }
@@ -1133,6 +1149,206 @@ class EmbedPressBlockRenderer
         if (!empty($attributes['adManager'])) {
             $embed = apply_filters('embedpress/generate_ad_template', $embed, $client_id, $attributes, 'gutenberg');
         }
+    }
+
+    /**
+     * YouTube block legacy render method
+     *
+     * @param array $attributes Block attributes
+     * @param string $content Block content
+     * @param object $block Block object (unused but kept for compatibility)
+     * @return string Rendered HTML content
+     */
+    public static function render_youtube_block($attributes, $content = '', $block = null)
+    {
+
+        if (!empty($content)) {
+            return $content;
+        }
+        // Extract basic attributes for YouTube block
+        $iframe_src = $attributes['iframeSrc'] ?? '';
+        $align = $attributes['align'] ?? 'center';
+
+        // If no iframe source is provided, return empty
+        if (empty($iframe_src)) {
+            return '';
+        }
+
+        // Validate YouTube URL
+        if (!self::is_youtube_url($iframe_src)) {
+            return '';
+        }
+
+        // Apply YouTube parameters filter
+        $youtube_params = apply_filters('embedpress_gutenberg_youtube_params', []);
+        $processed_iframe_url = $iframe_src;
+
+        foreach ($youtube_params as $param => $value) {
+            $processed_iframe_url = add_query_arg($param, $value, $processed_iframe_url);
+        }
+
+        // Build alignment class
+        $align_class = 'align' . $align;
+
+        // Generate YouTube block HTML
+        ob_start();
+    ?>
+        <div class="ose-youtube wp-block-embed-youtube ose-youtube-single-video <?php echo esc_attr($align_class); ?>">
+            <iframe src="<?php echo esc_url($processed_iframe_url); ?>"
+                allowtransparency="true"
+                allowfullscreen="true"
+                frameborder="0"
+                width="640" height="360">
+            </iframe>
+        </div>
+    <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Validate if URL is a YouTube URL
+     *
+     * @param string $url URL to validate
+     * @return bool True if valid YouTube URL, false otherwise
+     */
+    private static function is_youtube_url($url)
+    {
+        $pattern = '/^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?(.*&)?v=|(embed|v)\/))|youtu.be\/([a-zA-Z0-9_-]{11})/';
+        return preg_match($pattern, $url);
+    }
+
+    /**
+     * Wistia block legacy render method
+     *
+     * @param array $attributes Block attributes
+     * @param string $content Block content
+     * @param object $block Block object (unused but kept for compatibility)
+     * @return string Rendered HTML content
+     */
+    public static function render_wistia_block($attributes, $content = '', $block = null)
+    {
+        if (!empty($content)) {
+            return $content;
+        }
+
+        // Extract basic attributes for Wistia block
+        $url = $attributes['url'] ?? '';
+        $iframe_src = $attributes['iframeSrc'] ?? '';
+        $align = $attributes['align'] ?? 'center';
+
+        // If no URL is provided, return empty
+        if (empty($url)) {
+            return '';
+        }
+
+        // Extract Wistia media ID from URL
+        $wistia_id = self::extract_wistia_id($url);
+        if (empty($wistia_id)) {
+            return '';
+        }
+
+        // Build alignment class
+        $align_class = 'align' . $align;
+
+        // Generate Wistia block HTML
+        ob_start();
+    ?>
+        <div class="ose-wistia wp-block-embed-youtube <?php echo esc_attr($align_class); ?>" id="wistia_<?php echo esc_attr($wistia_id); ?>">
+            <iframe src="<?php echo esc_url($iframe_src); ?>"
+                allowtransparency="true"
+                frameborder="0"
+                class="wistia_embed"
+                name="wistia_embed"
+                width="600"
+                height="330">
+            </iframe>
+            <?php do_action('embedpress_gutenberg_wistia_block_after_embed', $attributes); ?>
+        </div>
+<?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Extract Wistia media ID from URL
+     *
+     * @param string $url Wistia URL
+     * @return string|false Wistia media ID or false if not found
+     */
+    private static function extract_wistia_id($url)
+    {
+        preg_match('~medias/(.*)~i', esc_url($url), $matches);
+        return isset($matches[1]) ? $matches[1] : false;
+    }
+
+    /**
+     * Calendar block render method
+     *
+     * @param array $attributes Block attributes
+     * @param string $content Block content
+     * @param object $block Block object (unused but kept for compatibility)
+     * @return string Rendered HTML content
+     */
+    public static function render_embedpress_calendar($attributes, $content = '', $block = null)
+    {
+        if (!empty($content)) {
+            return $content;
+        }
+
+        // Extract basic attributes for Calendar block
+        $url = $attributes['url'] ?? '';
+        $width = $attributes['width'] ?? '600';
+        $height = $attributes['height'] ?? '600';
+        $powered_by = $attributes['powered_by'] ?? false;
+        $is_public = $attributes['is_public'] ?? true;
+        $align = $attributes['align'] ?? 'center';
+
+        // If no URL is provided, return empty
+        if (empty($url)) {
+            return '';
+        }
+
+        // Validate Google Calendar URL
+        if (!self::is_google_calendar_url($url)) {
+            return '<p class="embedpress-el-powered">' . esc_html__('Invalid Calendar Link', 'embedpress') . '</p>';
+        }
+
+        // Build alignment class
+        $align_class = 'align' . $align;
+
+        // Sanitize URL
+        $sanitized_url = esc_url($url);
+
+        // Generate Calendar block HTML
+        ob_start();
+    ?>
+        <figure class="wp-block-embedpress-embedpress-calendar <?php echo esc_attr($align_class); ?>" style="width: <?php echo esc_attr($width); ?>px; height: <?php echo esc_attr($height); ?>px;">
+            <?php if ($is_public && self::is_google_calendar_url($url)) : ?>
+                <iframe src="<?php echo esc_url($sanitized_url); ?>"
+                        width="<?php echo esc_attr($width); ?>"
+                        height="<?php echo esc_attr($height); ?>"
+                        frameborder="0"
+                        scrolling="no">
+                </iframe>
+            <?php endif; ?>
+
+            <?php if ($powered_by && self::is_google_calendar_url($url)) : ?>
+                <p class="embedpress-el-powered"><?php echo esc_html__('Powered By EmbedPress', 'embedpress'); ?></p>
+            <?php endif; ?>
+        </figure>
+    <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Validate if URL is a Google Calendar URL
+     *
+     * @param string $url URL to validate
+     * @return bool True if valid Google Calendar URL, false otherwise
+     */
+    private static function is_google_calendar_url($url)
+    {
+        $pattern = '/^https:\/\/calendar\.google\.com\/calendar\/(?:u\/\d+\/)?embed\?.*/';
+        return preg_match($pattern, $url);
     }
 }
 ?>

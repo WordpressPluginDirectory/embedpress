@@ -22,7 +22,7 @@ if ( ! defined('EMBEDPRESS_PLG_NAME')) {
 }
 
 if ( ! defined('EMBEDPRESS_VERSION')) {
-	define('EMBEDPRESS_VERSION', "4.4.0");
+	define('EMBEDPRESS_VERSION', "4.4.7");
 	/**
 	 * @deprecated 2.2.0
 	 */
@@ -161,11 +161,9 @@ if (!function_exists('stringToBoolean')){
 // Includes the EmbedPress blocks system
 // Check if we should use the new block system
 if (apply_filters('embedpress_use_new_block_system', true)) {
-    // Use new centralized block system
+	$new_block_file = __DIR__ . '/EmbedPress/Gutenberg/InitBlocks.php';
 
-    require_once __DIR__ . '/EmbedPress/Gutenberg/InitBlocks.php';
-} else {
-    // Use old Gutenberg system for backward compatibility
-    require_once __DIR__ . '/Gutenberg/plugin.php';
-}
-
+	if (file_exists($new_block_file)) {
+		require_once $new_block_file;
+	} 
+} 

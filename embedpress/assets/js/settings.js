@@ -494,7 +494,6 @@ jQuery(document).ready(function ($) {
 
 
             jQuery.post(ajaxurl, data, function (response) {
-                console.log(response);
                 if (response) {
                     $that.css('pointer-events', 'all');
                     $that.closest('tr').remove();
@@ -505,7 +504,6 @@ jQuery(document).ready(function ($) {
         function onDeleteCancelled() {
             $that.css('pointer-events', 'all');
             // Code when deletion is cancelled
-            console.log('Deletion cancelled.');
         }
 
 
@@ -537,7 +535,6 @@ jQuery(document).ready(function ($) {
             },
             success: function (response) {
                 // Handle the response
-                console.log(response);
                 if (response.error) {
                     $('#instagram-form button').text('Connect');
                     $('#instagram-access-token').after(`<p>${response.error}</p>`);
@@ -586,7 +583,6 @@ jQuery(document).ready(function ($) {
             },
             success: function (response) {
                 // Handle the response
-                console.log(response);
                 if (response.error) {
                     $that.removeAttr('disabled');
                 } else {
@@ -659,15 +655,201 @@ jQuery(document).ready(function ($) {
                     <button class="close-video_btn">
                         <a href="#" class="close-btn"></a>
                     </button>
-                   <iframe src="https://www.youtube.com/embed/fvYKLkEnJbI?autoplay=1" 
-                        title="YouTube video player" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                   <iframe src="https://www.youtube.com/embed/fvYKLkEnJbI?autoplay=1"
+                        title="YouTube video player"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowfullscreen>
                     </iframe>
 
                 </div>
             `);
+    });
+
+    /**
+     * Hub Popup functionality
+     * - Show popup after 3 seconds
+     * - Handle dismiss button click
+     * - Close on Esc key press
+     * - Close when clicking outside popup content
+     */
+    (function() {
+        var $popup = $('.embedpress-pop-up');
+
+        if ($popup.length > 0) {
+            // Show popup after 3 seconds
+            setTimeout(function() {
+                $popup.addClass('show');
+            }, 3000);
+
+            // Function to dismiss popup
+            function dismissPopup() {
+                // Hide popup with fade out effect
+                $popup.removeClass('show');
+
+                // Send AJAX request to dismiss permanently
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'embedpress_dismiss_element',
+                        element_type: 'hub_popup',
+                        nonce: typeof embedpressSettingsData !== 'undefined' ? embedpressSettingsData.ajaxNonce : ''
+                    },
+                    success: function(response) {
+                        console.log('Hub popup dismissed successfully');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error dismissing hub popup:', error);
+                    }
+                });
+            }
+
+            // Handle dismiss button click
+            $('.embedpress-cancel-button, .embedpress-pop-up-btn, .pop-up-left-content .bfriday-deal-campaign a').on('click', function(e) {
+                dismissPopup();
+            });
+
+            // Close popup when clicking outside the popup content
+            // $popup.on('click', function(e) {
+            //     // Check if click is on the popup overlay (not on the content)
+            //     if ($(e.target).hasClass('embedpress-pop-up')) {
+            //         dismissPopup();
+            //     }
+            // });
+
+            // Close popup when pressing Esc key
+            $(document).on('keydown', function(e) {
+                // Check if popup is visible and Esc key is pressed
+                if (e.key === 'Escape' && $popup.hasClass('show')) {
+                    dismissPopup();
+                }
+            });
+        }
+    })();
+
+    /**
+     * Global Brand Upload functionality
+     * - Handle upload button click
+     * - Handle remove button click
+     * - Save brand image via AJAX
+     */
+    $(document).on('click', '#globalBrandUploadBtn', function(e) {
+        e.preventDefault();
+
+        // Check if button is disabled
+        if ($(this).is(':disabled')) {
+            return;
+        }
+
+        var globalBrandUploader = wp.media({
+            title: 'Select Global Brand Logo',
+            library: {
+                type: 'image'
+            },
+            button: {
+                text: 'Use this image'
+            },
+            multiple: false
+        }).on('select', function() {
+            var attachment = globalBrandUploader.state().get('selection').first().toJSON();
+
+            if (attachment && attachment.id && attachment.url) {
+                // Save the brand image via AJAX
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'save_global_brand_image',
+                        logo_url: attachment.url,
+                        logo_id: attachment.id,
+                        nonce: typeof embedpressSettingsData !== 'undefined' ? embedpressSettingsData.ajaxNonce : ''
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Update all preview areas (for different license states)
+                            $('#globalBrandPreview, #globalBrandPreviewExpired').html(
+                                '<img src="' + attachment.url + '" alt="Global Brand Logo" class="embedpress-global-brand-preview-img">'
+                            );
+
+                            // Update hidden inputs
+                            $('#globalBrandLogoUrl, #globalBrandLogoUrlExpired, #globalBrandLogoUrlValid').val(attachment.url);
+                            $('#globalBrandLogoId, #globalBrandLogoIdExpired, #globalBrandLogoIdValid').val(attachment.id);
+
+                            // Update button text to "Replace"
+                            $('#globalBrandUploadBtn').text('Replace');
+
+                            // Show remove button if not already visible
+                            if ($('#globalBrandRemoveBtn').length === 0) {
+                                $('#globalBrandUploadBtn').after(
+                                    '<button type="button" id="globalBrandRemoveBtn" class="embedpress-font-sm embedpress-font-family-dmsans embedpress-upload-btn remove-btn">Remove</button>'
+                                );
+                            }
+
+                            console.log('Global brand image saved successfully');
+                        } else {
+                            console.error('Failed to save global brand image:', response.data);
+                            alert('Failed to save global brand image. Please try again.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error saving global brand image:', error);
+                        alert('Error saving global brand image. Please try again.');
+                    }
+                });
+            }
+        }).open();
+    });
+
+    // Handle global brand remove button
+    $(document).on('click', '#globalBrandRemoveBtn', function(e) {
+        e.preventDefault();
+
+        // Check if button is disabled
+        if ($(this).is(':disabled')) {
+            return;
+        }
+
+        if (!confirm('Are you sure you want to remove the global brand logo?')) {
+            return;
+        }
+
+        // Remove the brand image via AJAX
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'save_global_brand_image',
+                logo_url: '',
+                logo_id: '',
+                nonce: typeof embedpressSettingsData !== 'undefined' ? embedpressSettingsData.ajaxNonce : ''
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Clear all preview areas
+                    $('#globalBrandPreview, #globalBrandPreviewExpired').html('');
+
+                    // Clear hidden inputs
+                    $('#globalBrandLogoUrl, #globalBrandLogoUrlExpired, #globalBrandLogoUrlValid').val('');
+                    $('#globalBrandLogoId, #globalBrandLogoIdExpired, #globalBrandLogoIdValid').val('');
+
+                    // Update button text to "Upload"
+                    $('#globalBrandUploadBtn').text('Upload');
+
+                    // Remove the remove button
+                    $('#globalBrandRemoveBtn').remove();
+
+                    console.log('Global brand image removed successfully');
+                } else {
+                    console.error('Failed to remove global brand image:', response.data);
+                    alert('Failed to remove global brand image. Please try again.');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error removing global brand image:', error);
+                alert('Error removing global brand image. Please try again.');
+            }
+        });
     });
 
 });

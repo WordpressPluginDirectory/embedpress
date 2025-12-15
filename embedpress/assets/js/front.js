@@ -513,7 +513,7 @@ let epGlobals = {};
 
         let likeComments = '';
 
-        if (embedpressFrontendData.isProPluginActive && accountType === 'business') {
+        if (embedpressFrontendData.isProPluginActive) {
             if (instaPostData.show_likes_count == 'true') {
                 likeComments += `
                     <div class="embedpress-inline popup-like-button"><a target="_blank" href="${instaPostData.permalink}">${likeIcon} ${instaPostData.like_count || 0}</a></div> 
@@ -830,11 +830,14 @@ document.addEventListener('DOMContentLoaded', function () {
             autoplaySpeed: options.autoplayspeed,
             arrows: options.arrows,
             breakpoints: {
+                0: {
+                    slidesPerView: 1
+                },
                 768: {
-                    slidesPerView: parseInt(options.slideshow) - 1
+                    slidesPerView: Math.max(1, parseInt(options.slideshow, 10) - 1)
                 },
                 1024: {
-                    slidesPerView: parseInt(options.slideshow)
+                    slidesPerView: Math.max(1, parseInt(options.slideshow, 10))
                 }
             }
         };
@@ -1158,9 +1161,11 @@ jQuery(window).on("elementor/frontend/init", function () {
         const selectorEl = document.querySelector(classJoint + ' [data-sponsored-id]');
 
         if (jQuery('body').hasClass('elementor-editor-active') && embedpressFrontendData.isProPluginActive) {
-            adInitialization(selectorEl, window.epAdIndex);
+            if (typeof adInitialization === 'function') {
+                adInitialization(selectorEl, window.epAdIndex);
+            }
         }
- 
+
     }
 
     elementorFrontend.hooks.addAction("frontend/element_ready/embedpres_elementor.default", filterableGalleryHandler);
@@ -1415,6 +1420,70 @@ jQuery(document).ready(function () {
 
     players.on('play', function () {
         pauseAllExcept(jQuery(this));
+    });
+});
+
+// Meetup Events Load More
+jQuery(document).on('click', '.ep-load-more-button', function(e) {
+    e.preventDefault();
+
+    const button = jQuery(this);
+    const container = button.closest('.embedpress-meetup-events');
+    const eventsContainer = container.find('.embedpress-meetup-events-list');
+
+    // Get data attributes
+    const embedId = button.data('embed-id');
+    const currentPage = parseInt(container.data('page')) || 1;
+    const perPage = parseInt(container.data('per-page')) || 10;
+    const nextPage = currentPage + 1;
+
+    // Show loading state
+    const loadingText = button.find('.ep-load-more-text');
+    const spinner = button.find('.ep-load-more-spinner');
+    loadingText.hide();
+    spinner.show();
+    button.prop('disabled', true);
+
+    // Make AJAX request
+    jQuery.ajax({
+        url: embedpressFrontendData.ajaxurl,
+        type: 'POST',
+        data: {
+            action: 'embedpress_meetup_load_more',
+            nonce: embedpressFrontendData.nonce,
+            embed_id: embedId,
+            page: nextPage,
+            per_page: perPage
+        },
+        success: function(response) {
+            if (response.success) {
+                // Append new events
+                eventsContainer.append(response.data.html);
+
+                // Update page number
+                container.data('page', nextPage);
+
+                // Hide button if no more events
+                if (!response.data.has_more) {
+                    button.closest('.ep-events-load-more').fadeOut();
+                } else {
+                    loadingText.show();
+                    spinner.hide();
+                    button.prop('disabled', false);
+                }
+            } else {
+                alert(response.data.message || 'Error loading more events');
+                loadingText.show();
+                spinner.hide();
+                button.prop('disabled', false);
+            }
+        },
+        error: function() {
+            alert('Error loading more events');
+            loadingText.show();
+            spinner.hide();
+            button.prop('disabled', false);
+        }
     });
 });
 

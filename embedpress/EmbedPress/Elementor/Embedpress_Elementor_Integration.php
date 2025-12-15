@@ -29,9 +29,12 @@ class Embedpress_Elementor_Integration
             add_action('elementor/widgets/register', array($this, 'register_widget'));
             add_filter('oembed_providers', [$this, 'addOEmbedProviders']);
 
-            if (Helper::get_options_value('turn_off_rating_help') || !is_plugin_active('embedpress-pro/embedpress-pro.php')) {
-                add_action('elementor/editor/after_enqueue_scripts', [$this, 'elementor_upsale']);
-            }
+
+            //Just disabled rating and feedback
+            // if (Helper::get_options_value('turn_off_rating_help') || !is_plugin_active('embedpress-pro/embedpress-pro.php')) {
+            //     add_action('elementor/editor/after_enqueue_scripts', [$this, 'elementor_upsale']);
+            // }
+            add_action('elementor/editor/after_enqueue_scripts', [$this, 'elementor_upsale']);
         }
     }
 
@@ -119,8 +122,7 @@ class Embedpress_Elementor_Integration
         // This method is kept for backward compatibility
     }
 
-    public function editor_enqueue_scripts()
-    { }
+    public function editor_enqueue_scripts() {}
 
     public function addOEmbedProviders($providers)
     {
@@ -133,7 +135,7 @@ class Embedpress_Elementor_Integration
 
     public function elementor_upsale()
     {
-        ?>
+?>
         <style>
             :root {
                 /* Light Mode Variables */
@@ -193,14 +195,14 @@ class Embedpress_Elementor_Integration
                 }
             }
 
-            .elementor-panel .plugin-rating {
+            /* .elementor-panel .plugin-rating {
                 border-top: 2px solid #e6e8ea;
-            }
+            } */
 
             /* Applying Variables */
             .elementor-panel .rating-chat-content {
-                background-color: var(--background-color);
-                border: 0.6px solid var(--border-color);
+                /* background-color: var(--background-color); */
+                /* border: 0.6px solid var(--border-color); */
                 color: var(--text-color);
             }
 
@@ -237,15 +239,15 @@ class Embedpress_Elementor_Integration
                 border-radius: 4px;
                 border-width: 0.6px;
                 gap: 12px;
-                padding: 15px;
+                padding: 15px 5px;
                 position: relative;
                 display: flex;
                 flex-direction: column;
                 overflow: hidden;
-                margin-top: 15px;
+                /* margin-top: 15px; */
             }
 
-            .rating-chat-content::after {
+            /* .rating-chat-content::after {
                 content: "";
                 position: absolute;
                 top: -65px;
@@ -254,7 +256,7 @@ class Embedpress_Elementor_Integration
                 height: 120px;
                 background: radial-gradient(circle, rgb(121 62 255 / 14%) 20%, transparent 70%);
                 border-radius: 50%;
-            }
+            } */
 
 
             /* .rating-chat-content::after{
@@ -533,6 +535,90 @@ class Embedpress_Elementor_Integration
             .elementor-panel .chat-button:hover {
                 background-color: #4b3293;
             }
+
+            /* Analytics Section Styles */
+            .elementor-panel .analytics-section {
+                padding: 12px 20px;
+                background: linear-gradient(180deg, #ffffff 28.76%, #fff9fd 66.19%, #faedff 85.34%);
+                border-radius: 8px;
+                margin-bottom: 0;
+                display: flex;
+                gap: 10px;
+                border-top: 1px solid var(--border-color);
+                overflow: visible;
+                width: calc(100% + 30px);
+                margin-left: -15px;
+                border: none;
+                border-radius: 0;
+                margin-top: 0;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .elementor-panel .analytics-section {
+                    background: linear-gradient(180deg, #1F2023 28.76%, #1A1C1F 66.19%, #1F2124 85.34%);
+                }
+            }
+
+            .elementor-panel .analytics-section .analytics-chart {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                overflow: visible;
+                position: relative;
+                z-index: 10;
+            }
+
+            .elementor-panel .analytics-section .analytics-content {
+                flex: 1;
+            }
+
+            .elementor-panel .analytics-section .analytics-content h3 {
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-color);
+                margin: 0 0 6px 0;
+            }
+
+            .elementor-panel .analytics-section .analytics-content p {
+                font-size: 11px;
+                color: var(--secondary-text-color);
+                margin: 0 0 8px 0;
+                line-height: 1.4;
+            }
+
+            .elementor-panel .analytics-section .view-analytics-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                color: #5b4e96;
+                text-decoration: none;
+                font-size: 11px;
+                font-weight: 500;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .elementor-panel .analytics-section .view-analytics-link {
+                    color: #8C73FA;
+                }
+            }
+
+            .elementor-panel .analytics-section .view-analytics-link:hover {
+                color: #4b3293;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .elementor-panel .analytics-section .view-analytics-link:hover {
+                    color: #A89BFF;
+                }
+            }
+
+            .elementor-panel .mini-pie-chart {
+                width: 70px;
+                height: 70px;
+                overflow: visible;
+                position: relative;
+                z-index: 10;
+            }
         </style>
 
         <script>
@@ -566,18 +652,16 @@ class Embedpress_Elementor_Integration
                         });
 
                         if (rating == 5) {
+                            // Only send the rating, don't show thank you message yet
+                            // Thank you message will be shown after successful API response
                             sendFiveStarRating();
-                        }
-
-                        // Delay message update by 2 seconds
-                        setTimeout(() => {
-                            if (rating < 5) {
+                        } else {
+                            // For ratings less than 5, show the form
+                            setTimeout(() => {
                                 message = "Please describe your issue in details.";
-                            } else {
-                                message = `Thanks for rating ${rating} stars!`;
-                            }
-                            renderUpsellSection();
-                        }, 500);
+                                renderUpsellSection();
+                            }, 500);
+                        }
 
                     }
 
@@ -601,16 +685,25 @@ class Embedpress_Elementor_Integration
                             message: formData.get('message')
                         };
 
-                        fetch('/wp-json/embedpress/v1/send-feedback', { // Updated API endpoint
+                        fetch('/wp-json/embedpress/v1/send-feedback', {
                                 method: 'POST',
                                 headers: {
-                                    'Content-Type': 'application/json'
+                                    'Content-Type': 'application/json',
+                                    'X-WP-Nonce': wpApiSettings.nonce
                                 },
                                 body: JSON.stringify(data)
                             })
-                            .then(response => response.json())
+                            .then(response => {
+                                // Check if response is ok (status 200-299)
+                                if (!response.ok) {
+                                    return response.json().then(errorData => {
+                                        throw new Error(errorData.message || 'HTTP error! status: ' + response.status);
+                                    });
+                                }
+                                return response.json();
+                            })
                             .then(data => {
-
+                                // Success - show thank you message
                                 submitButton.disabled = false; // Re-enable the button
                                 submitButton.textContent = 'Send'; // Reset button text
                                 showThank = 1;
@@ -627,7 +720,12 @@ class Embedpress_Elementor_Integration
                             })
                             .catch(error => {
                                 console.error('Error:', error);
-                                alert('Failed to send email.');
+                                submitButton.disabled = false; // Re-enable the button
+                                submitButton.textContent = 'Send'; // Reset button text
+
+                                // Show user-friendly error message
+                                const errorMessage = error.message || 'Failed to send feedback. Please try again.';
+                                alert(errorMessage);
                             });
                     };
 
@@ -639,23 +737,37 @@ class Embedpress_Elementor_Integration
                             message: ''
                         };
 
-                        fetch('/wp-json/embedpress/v1/send-feedback', { // Updated API endpoint
+                        fetch('/wp-json/embedpress/v1/send-feedback', {
                                 method: 'POST',
                                 headers: {
-                                    'Content-Type': 'application/json'
+                                    'Content-Type': 'application/json',
+                                    'X-WP-Nonce': wpApiSettings.nonce
                                 },
                                 body: JSON.stringify(data)
                             })
-                            .then(response => response.json())
+                            .then(response => {
+                                // Check if response is ok (status 200-299)
+                                if (!response.ok) {
+                                    return response.json().then(errorData => {
+                                        throw new Error(errorData.message || 'HTTP error! status: ' + response.status);
+                                    });
+                                }
+                                return response.json();
+                            })
                             .then(data => {
+                                // Success - show thank you message only on successful response
                                 console.log('Success:', data);
+                                showThank = 1;
                                 localStorage.setItem("feedbackSubmitted", "true");
                                 renderUpsellSection();
 
                             })
                             .catch(error => {
                                 console.error('Error:', error);
-                                alert('Failed to send email.');
+
+                                // Show user-friendly error message
+                                const errorMessage = error.message || 'Failed to send feedback. Please try again.';
+                                alert(errorMessage);
                             });
                     }
 
@@ -670,7 +782,25 @@ class Embedpress_Elementor_Integration
 
                         let upsellHtml = `
                             <div class="plugin-rating">
-                                ${turnOffRattingHelp ? `
+
+                                <!-- Advanced Analytics Section -->
+                                <div class="analytics-section">
+                                    <div class="analytics-chart">
+                                        <div id="mini-pie-chart-elementor" class="mini-pie-chart"></div>
+                                    </div>
+                                    <div class="analytics-content">
+                                        <h3>Advanced Analytics</h3>
+                                        <p>Get full analytics on how your embeds are performing.</p>
+                                        <a href="<?php echo admin_url('admin.php?page=embedpress-analytics'); ?>" class="view-analytics-link">
+                                            View Analytics
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                ${turnOffRattingHelp && false ? `
                                 <div class="rating-chat-content">
                                     ${!isEmbedpressFeedbackSubmited ? `
                                         ${((rating && rating == 5) || showThank)  ? `
@@ -723,12 +853,20 @@ class Embedpress_Elementor_Integration
                                         Let’s Chat
                                     </a>
                                 </div>` : ''}
+
+                                <div class="rating-chat-content">
+                                    <p style="font-weight: 500">Need help? We're here</p>
+                                    <a href="https://embedpress.com/?support=chat" target="_blank" class="chat-button">
+                                        <svg width="13" height="12" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#a)" fill="#fff"><path d="M7.93.727H1.555C.97.727.5 1.198.5 1.782V6c0 .584.471 1.055 1.055 1.055h.351V8.11c0 .254.263.438.52.31.008-.008.022-.008.029-.015 1.934-1.297 1.5-1.008 1.933-1.294a.35.35 0 0 1 .19-.056H7.93c.583 0 1.054-.47 1.054-1.055V1.782c0-.584-.47-1.055-1.054-1.055M5.117 4.946h-2.86c-.463 0-.465-.703 0-.703h2.86c.464 0 .466.703 0 .703m2.11-1.406h-4.97c-.463 0-.465-.704 0-.704h4.97c.463 0 .465.704 0 .704" /><path d="M11.445 3.54H9.687V6c0 .97-.787 1.758-1.757 1.758H4.684l-.668.443v.612c0 .584.47 1.055 1.054 1.055h3.457l2.018 1.35c.276.153.549-.033.549-.296V9.868h.351c.584 0 1.055-.471 1.055-1.055V4.594c0-.583-.471-1.054-1.055-1.054" /></g><defs><clipPath id="a"><path fill="#fff" d="M.5 0h12v12H.5z" /></clipPath></defs></svg>
+                                        Let’s Chat
+                                    </a>
+                                </div>
                                 
                                 ${!isProActive ? `
                                     <div class="upgrade-box">
                                         <h5>Want to explore more?</h5>
                                         <p>Dive in and discover all the premium features</p>
-                                        <a href="https://embedpress.com/#pricing" target="_blank" class="upgrade-link">Upgrade to PRO</a>
+                                        <a href="https://embedpress.com/in/unlock-elementor-contorls" target="_blank" class="upgrade-link">Upgrade to PRO</a>
                                     </div>` : ''}
                             </div>
                         `;
@@ -773,6 +911,218 @@ class Embedpress_Elementor_Integration
                         });
 
                         $("#feedback-form").on("submit", handleSubmit);
+
+                        // Initialize Mini Pie Chart
+                        initMiniPieChart();
+                    }
+
+                    function initMiniPieChart() {
+                        const chartContainer = document.getElementById('mini-pie-chart-elementor');
+                        if (!chartContainer || typeof am5 === 'undefined') {
+                            console.log('Chart container or am5 not found, loading amCharts...');
+
+                            // Load amCharts library
+                            const script1 = document.createElement('script');
+                            script1.src = 'https://cdn.amcharts.com/lib/5/index.js';
+                            script1.onload = function() {
+                                const script2 = document.createElement('script');
+                                script2.src = 'https://cdn.amcharts.com/lib/5/percent.js';
+                                script2.onload = function() {
+                                    const script3 = document.createElement('script');
+                                    script3.src = 'https://cdn.amcharts.com/lib/5/themes/Animated.js';
+                                    script3.onload = function() {
+                                        renderMiniPieChart();
+                                    };
+                                    document.head.appendChild(script3);
+                                };
+                                document.head.appendChild(script2);
+                            };
+                            document.head.appendChild(script1);
+                        } else {
+                            renderMiniPieChart();
+                        }
+                    }
+
+                    function renderMiniPieChart() {
+                        const chartContainer = document.getElementById('mini-pie-chart-elementor');
+                        if (!chartContainer) return;
+
+                        // Detect dark mode
+                        const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+                        // Function to render chart with given data
+                        function renderChartWithData(overview) {
+                            const chartContainer = document.getElementById('mini-pie-chart-elementor');
+                            if (!chartContainer) return;
+
+                                // Get raw values
+                                const totalEmbeds = parseInt(overview.total_embeds) || 0;
+                                const totalViews = parseInt(overview.total_views) || 0;
+                                const totalClicks = parseInt(overview.total_clicks) || 0;
+                                const totalImpressions = parseInt(overview.total_impressions) || 0;
+
+                                // Check if there's any real data
+                                const hasRealData = totalEmbeds > 0 || totalViews > 0 || totalClicks > 0 || totalImpressions > 0;
+
+                                // Always show at least 1 for each metric to avoid blank chart
+                                const chartData = [{
+                                        category: 'Views',
+                                        value: hasRealData ? (totalViews || 1) : 1
+                                    },
+                                    {
+                                        category: 'Clicks',
+                                        value: hasRealData ? (totalClicks || 1) : 1
+                                    },
+                                    {
+                                        category: 'Impr',
+                                        value: hasRealData ? (totalImpressions || 1) : 1
+                                    }
+                                ];
+
+                                // Create chart
+                                const root = am5.Root.new(chartContainer);
+                                root._logo.dispose();
+                                root.setThemes([am5themes_Animated.new(root)]);
+                                root.animationThemesEnabled = false;
+
+                                const chart = root.container.children.push(
+                                    am5percent.PieChart.new(root, {
+                                        layout: root.verticalLayout,
+                                        innerRadius: am5.percent(75),
+                                        radius: am5.percent(100),
+                                    })
+                                );
+
+                                const series = chart.series.push(
+                                    am5percent.PieSeries.new(root, {
+                                        valueField: 'value',
+                                        categoryField: 'category',
+                                        alignLabels: false,
+                                        sequencedInterpolation: false,
+                                    })
+                                );
+
+                                series.slices.template.set("toggleKey", "none");
+                                series.labels.template.set("visible", false);
+                                series.ticks.template.set("visible", false);
+
+                                // Tooltip colors based on theme
+                                const tooltipBg = isDarkMode ? "#1F2124" : "#fff";
+                                const tooltipText = isDarkMode ? "#CBCBD0" : "#333";
+                                const tooltipBorder = isDarkMode ? "#272A2F" : "#e0e0e0";
+
+                                const tooltip = am5.Tooltip.new(root, {
+                                    getFillFromSprite: false,
+                                    labelText: `[${tooltipText}]{category}:\{value}[/]`,
+                                    paddingTop: 6,
+                                    paddingBottom: 6,
+                                    paddingLeft: 8,
+                                    paddingRight: 8,
+                                    autoTextColor: false,
+                                    pointerOrientation: "horizontal",
+                                    centerX: am5.p50,
+                                    centerY: am5.p50,
+                                    background: am5.RoundedRectangle.new(root, {
+                                        fill: am5.color(tooltipBg),
+                                        cornerRadius: 4,
+                                        strokeOpacity: 1,
+                                        stroke: am5.color(tooltipBorder),
+                                        strokeWidth: 1,
+                                        shadowColor: am5.color("#000"),
+                                        shadowBlur: 4,
+                                        shadowOpacity: isDarkMode ? 0.3 : 0.1,
+                                        shadowOffsetX: 0,
+                                        shadowOffsetY: 2,
+                                    }),
+                                });
+
+                                tooltip.label.setAll({
+                                    fill: am5.color(tooltipText),
+                                    fontSize: 10,
+                                    fontWeight: "400",
+                                    textAlign: "center",
+                                    oversizedBehavior: "wrap",
+                                    maxWidth: 100,
+                                });
+
+                                // Slice stroke color based on theme
+                                const sliceStroke = isDarkMode ? "#1A1C1F" : "#fff";
+
+                                series.slices.template.setAll({
+                                    tooltip: tooltip,
+                                    stroke: am5.color(sliceStroke),
+                                    strokeWidth: 1,
+                                    cornerRadius: 4,
+                                    interactive: true,
+                                    hoverable: true,
+                                });
+
+                                series.slices.template.states.create("hover", {
+                                    scale: 1,
+                                });
+
+                                const colors = ["#5B4E96", "#8C73FA", "#C4B5E8"];
+                                series.get('colors').set('colors', colors.map(c => am5.color(c)));
+
+                                series.data.setAll(chartData);
+
+                                // Center text colors based on theme
+                                const centerNumberColor = isDarkMode ? "#ffffff" : "#092161";
+                                const centerLabelColor = isDarkMode ? "#CBCBD0" : "#666";
+
+                                // Add total embeds number
+                                // Show 1 instead of 0 to avoid blank display
+                                const displayEmbeds = hasRealData ? totalEmbeds : 1;
+                                chart.seriesContainer.children.push(
+                                    am5.Label.new(root, {
+                                        text: displayEmbeds.toLocaleString(),
+                                        centerX: am5.p50,
+                                        centerY: am5.p50,
+                                        textAlign: "center",
+                                        fontSize: 14,
+                                        fontWeight: "700",
+                                        fill: am5.color(centerNumberColor),
+                                        dy: -8,
+                                    })
+                                );
+
+                                // Add "Total Embeds" label
+                                chart.seriesContainer.children.push(
+                                    am5.Label.new(root, {
+                                        text: "Total Embeds",
+                                        centerX: am5.p50,
+                                        centerY: am5.p50,
+                                        textAlign: "center",
+                                        fontSize: 7,
+                                        fontWeight: "400",
+                                        fill: am5.color(centerLabelColor),
+                                        dy: 6,
+                                    })
+                                );
+                        }
+
+                        // Fetch analytics data
+                        const nonce = (typeof wpApiSettings !== 'undefined' && wpApiSettings.nonce) ? wpApiSettings.nonce : '<?php echo wp_create_nonce('wp_rest'); ?>';
+                        fetch('/wp-json/embedpress/v1/analytics/overview?date_range=30', {
+                                headers: {
+                                    'X-WP-Nonce': nonce
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(result => {
+                                const overview = result.overview || result;
+                                renderChartWithData(overview);
+                            })
+                            .catch(error => {
+
+                                // Render chart with default values when API fails
+                                renderChartWithData({
+                                    total_embeds: 0,
+                                    total_views: 0,
+                                    total_clicks: 0,
+                                    total_impressions: 0
+                                });
+                            });
                     }
 
                     function addUpsellSection(node) {
@@ -807,7 +1157,6 @@ class Embedpress_Elementor_Integration
                             childList: true,
                             subtree: true,
                         });
-                        console.log("🔍 Observer started on Elementor Panel");
                     } else {
                         console.log("❌ Elementor panel not found, observer not started.");
                     }

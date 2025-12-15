@@ -46,7 +46,7 @@ class Embedpress_Document extends Widget_Base
 	{
 		return [
             'embedpress-elementor-css',
-            'embedpress-style'
+            'embedpress-css'
         ];
 	}
 
@@ -64,7 +64,7 @@ class Embedpress_Document extends Widget_Base
 			$handles[] = 'embedpress-ads';
 		}
 		if (isset($handler_keys['enabled_docs_custom_viewer']) && $handler_keys['enabled_docs_custom_viewer'] === 'yes') {
-			$handles[] = 'embedpress_documents_viewer_script';
+			$handles[] = 'embedpress-documents-viewer';
 		}
 
 		return $handles;
@@ -84,6 +84,39 @@ class Embedpress_Document extends Widget_Base
     {
         return ['embedpress', 'pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'embedpress-document'];
     }
+
+    /**
+	 * Performance Settings Section
+	 */
+	public function init_performance_controls()
+	{
+		// Get global lazy load setting
+		$g_settings = get_option(EMBEDPRESS_PLG_NAME, []);
+		$lazy_load_default = isset($g_settings['g_lazyload']) && $g_settings['g_lazyload'] == 1 ? 'yes' : '';
+
+		$this->start_controls_section(
+			'embedpress_performance_section',
+			[
+				'label' => __('Performance', 'embedpress'),
+			]
+		);
+
+		$this->add_control(
+			'enable_lazy_load',
+			[
+				'label' => sprintf(__('Enable Lazy Loading %s', 'embedpress'), $this->pro_text),
+				'type' => \Elementor\Controls_Manager::SWITCHER,
+				'label_on' => __('Yes', 'embedpress'),
+				'label_off' => __('No', 'embedpress'),
+				'return_value' => 'yes',
+				'default' => $lazy_load_default,
+				'description' => __('Load iframe only when it enters the viewport for better performance', 'embedpress'),
+				'classes' => $this->pro_class,
+			]
+		);
+
+		$this->end_controls_section();
+	}
 
     protected function register_controls()
     {
@@ -259,6 +292,10 @@ class Embedpress_Document extends Widget_Base
             ]
         );
 
+        // Get global powered_by setting
+        $g_settings = get_option(EMBEDPRESS_PLG_NAME, []);
+        $powered_by_default = isset($g_settings['embedpress_document_powered_by']) && $g_settings['embedpress_document_powered_by'] === 'yes' ? 'yes' : 'no';
+
         $this->add_control(
             'embedpress_document_powered_by',
             [
@@ -267,11 +304,13 @@ class Embedpress_Document extends Widget_Base
                 'label_on'     => __( 'Show', 'embedpress' ),
                 'label_off'    => __( 'Hide', 'embedpress' ),
                 'return_value' => 'yes',
-                'default'      => apply_filters( 'embedpress_document_powered_by_control', 'yes' ),
+                'default'      => apply_filters( 'embedpress_document_powered_by_control', $powered_by_default ),
             ]
         );
 
 	    $this->init_branding_controls( 'document');
+
+        
 
 	    $this->end_controls_section();
 
@@ -428,6 +467,8 @@ class Embedpress_Document extends Widget_Base
         $this->end_controls_section();
 
         do_action( 'extend_elementor_controls', $this, '_doc_', $this->pro_text, $this->pro_class);
+      
+        $this->init_performance_controls();
 
     }
 
@@ -443,6 +484,7 @@ class Embedpress_Document extends Widget_Base
 
 		Helper::get_enable_settings_data_for_scripts($settings);
 
+        $is_editor_view = Plugin::$instance->editor->is_edit_mode();
         $client_id = esc_attr($this->get_id());
         $pass_hash_key = md5($settings['embedpress_doc_lock_content_password']);
         $url = esc_url($this->get_file_url());
@@ -764,6 +806,35 @@ class Embedpress_Document extends Widget_Base
                             if (!empty($settings['embedpress_doc_content_share'])) {
                                 $embed_content .= Helper::embed_content_share($content_id, $embed_settings);
                             }
+
+                            // Apply lazy loading if enabled (but not in editor mode)
+                            if (!empty($settings['enable_lazy_load']) && $settings['enable_lazy_load'] === 'yes' && !empty($embed_content) && !$is_editor_view) {
+                                $embed_content = preg_replace_callback(
+                                    '/<iframe([^>]*)src=["\']([^"\']+)["\']([^>]*)>/i',
+                                    function($matches) {
+                                        $before = $matches[1];
+                                        $src = $matches[2];
+                                        $after = $matches[3];
+
+                                        // Extract style attribute if exists
+                                        $style = '';
+                                        if (preg_match('/style=["\']([^"\']+)["\']/i', $before . $after, $style_match)) {
+                                            $style = $style_match[1];
+                                        }
+
+                                        return sprintf(
+                                            '<div class="ep-lazy-iframe-placeholder" data-ep-lazy-src="%s" data-ep-iframe-style="%s" %s %s style="%s"></div>',
+                                            esc_attr($src),
+                                            esc_attr($style),
+                                            $before,
+                                            $after,
+                                            esc_attr($style)
+                                        );
+                                    },
+                                    $embed_content
+                                );
+                            }
+
                             if (!empty($embed_content)) {
                                 echo $embed_content;
                             }
@@ -771,6 +842,35 @@ class Embedpress_Document extends Widget_Base
                             if (!empty($settings['embedpress_doc_content_share'])) {
                                 $embed_content .= Helper::embed_content_share($content_id, $embed_settings);
                             }
+
+                            // Apply lazy loading if enabled (but not in editor mode)
+                            if (!empty($settings['enable_lazy_load']) && $settings['enable_lazy_load'] === 'yes' && !empty($embed_content) && !$is_editor_view) {
+                                $embed_content = preg_replace_callback(
+                                    '/<iframe([^>]*)src=["\']([^"\']+)["\']([^>]*)>/i',
+                                    function($matches) {
+                                        $before = $matches[1];
+                                        $src = $matches[2];
+                                        $after = $matches[3];
+
+                                        // Extract style attribute if exists
+                                        $style = '';
+                                        if (preg_match('/style=["\']([^"\']+)["\']/i', $before . $after, $style_match)) {
+                                            $style = $style_match[1];
+                                        }
+
+                                        return sprintf(
+                                            '<div class="ep-lazy-iframe-placeholder" data-ep-lazy-src="%s" data-ep-iframe-style="%s" %s %s style="%s"></div>',
+                                            esc_attr($src),
+                                            esc_attr($style),
+                                            $before,
+                                            $after,
+                                            esc_attr($style)
+                                        );
+                                    },
+                                    $embed_content
+                                );
+                            }
+
                             if ($settings['embedpress_doc_protection_type'] == 'password') {
                                 do_action('embedpress/display_password_form', $client_id, $embed_content, $pass_hash_key, $embed_settings);
                             } else {
