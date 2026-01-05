@@ -31,6 +31,8 @@ class EmbedPressBlockRenderer
         'photos.google.com',
         'instagram.com',
         'opensea.io',
+        'wistia.com',
+        'wistia.net',
     ];
 
     /**
@@ -90,6 +92,15 @@ class EmbedPressBlockRenderer
             }
             if (isset($attributes['meetupEnablePagination'])) {
                 $attributes['enable_pagination'] = $attributes['meetupEnablePagination'];
+            }
+            if (isset($attributes['meetupTimezone'])) {
+                $attributes['timezone'] = $attributes['meetupTimezone'];
+            }
+            if (isset($attributes['meetupDateFormat'])) {
+                $attributes['date_format'] = $attributes['meetupDateFormat'];
+            }
+            if (isset($attributes['meetupTimeFormat'])) {
+                $attributes['time_format'] = $attributes['meetupTimeFormat'];
             }
         }
 
@@ -267,13 +278,17 @@ class EmbedPressBlockRenderer
         $renderer = Helper::get_pdf_renderer();
 
         $src = $renderer . ((strpos($renderer, '?') == false) ? '?' : '&') . 'file=' . urlencode($href) . self::generate_pdf_params($attributes);
+        
+        $iframe_title = self::get_iframe_title_from_url($href);
 
-        $embed_code = '<iframe title="' . esc_attr(Helper::get_file_title($href)) . '" class="embedpress-embed-document-pdf ' . esc_attr($id) . '" style="' . esc_attr($legacy_config['dimension']) . '; max-width:100%; display: inline-block" src="' . esc_url($src) . '" frameborder="0" oncontextmenu="return false;"></iframe> ';
+        $embed_code = '<iframe title="' . esc_attr($iframe_title) . '" class="embedpress-embed-document-pdf ' . esc_attr($id) . '" style="' . esc_attr($legacy_config['dimension']) . '; max-width:100%; display: inline-block" src="' . esc_url($src) . '" frameborder="0" oncontextmenu="return false;"></iframe> ';
 
         // Handle flip-book viewer style
         if (isset($attributes['viewerStyle']) && $attributes['viewerStyle'] === 'flip-book') {
             $src = urlencode($href) . self::generate_pdf_params($attributes);
-            $embed_code = '<iframe title="' . esc_attr(Helper::get_file_title($href)) . '" class="embedpress-embed-document-pdf ' . esc_attr($id) . '" style="' . esc_attr($legacy_config['dimension']) . '; max-width:100%; display: inline-block" src="' . esc_url(EMBEDPRESS_URL_ASSETS . 'pdf-flip-book/viewer.html?file=' . $src) . '" frameborder="0" oncontextmenu="return false;"></iframe> ';
+            $renderer = Helper::get_flipbook_renderer();
+            $src_url = $renderer . ((strpos($renderer, '?') == false) ? '?' : '&') . 'file=' . $src;
+            $embed_code = '<iframe title="' . esc_attr(Helper::get_file_title($href)) . '" class="embedpress-embed-document-pdf ' . esc_attr($id) . '" style="' . esc_attr($legacy_config['dimension']) . '; max-width:100%; display: inline-block" src="' . esc_url($src_url) . '" frameborder="0" oncontextmenu="return false;"></iframe> ';
         }
 
         // Add powered by if enabled
@@ -496,6 +511,17 @@ class EmbedPressBlockRenderer
         // Get dynamic content
         $embed = self::get_embed_content($attributes, $content);
 
+        // Inject iframeTitle derived from URL
+        $url = $attributes['url'] ?? '';
+        $title = self::get_iframe_title_from_url($url);
+        
+        if (!empty($title)) {
+            if (is_array($embed) && isset($embed['html'])) {
+                $embed['html'] = preg_replace('/<iframe(.*?)>/i', '<iframe$1 title="' . esc_attr($title) . '">', $embed['html']);
+            } elseif (is_string($embed)) {
+                $embed = preg_replace('/<iframe(.*?)>/i', '<iframe$1 title="' . esc_attr($title) . '">', $embed);
+            }
+        }
 
         // Build CSS classes and styling
         $styling = self::build_styling_config($attributes, $protection_data);
@@ -1327,7 +1353,8 @@ class EmbedPressBlockRenderer
                         width="<?php echo esc_attr($width); ?>"
                         height="<?php echo esc_attr($height); ?>"
                         frameborder="0"
-                        scrolling="no">
+                        scrolling="no"
+                        title="<?php echo esc_attr(self::get_iframe_title_from_url($url)); ?>">
                 </iframe>
             <?php endif; ?>
 
@@ -1349,6 +1376,49 @@ class EmbedPressBlockRenderer
     {
         $pattern = '/^https:\/\/calendar\.google\.com\/calendar\/(?:u\/\d+\/)?embed\?.*/';
         return preg_match($pattern, $url);
+    }
+
+    /**
+     * Get iframe title from URL
+     *
+     * @param string $url URL to derive title from
+     * @return string Derived title
+     */
+    private static function get_iframe_title_from_url($url)
+    {
+        if (empty($url)) {
+            return '';
+        }
+
+        // Try getting title from WordPress attachment if it's a local file
+        $file_title = Helper::get_file_title($url);
+        if (!empty($file_title)) {
+            return $file_title;
+        }
+
+        // Try to get filename from URL
+        $path = parse_url($url, PHP_URL_PATH);
+        if ($path) {
+            $filename = basename($path);
+            // Remove extension
+            $filename = preg_replace('/\.[^.]+$/', '', $filename);
+            // Decode URL encoding
+            $filename = urldecode($filename);
+            // Replace hyphens/underscores with spaces
+            $filename = str_replace(['-', '_'], ' ', $filename);
+            
+            if (!empty($filename)) {
+                return ucfirst($filename);
+            }
+        }
+
+        // Fallback to domain name
+        $host = parse_url($url, PHP_URL_HOST);
+        if ($host) {
+            return $host;
+        }
+
+        return $url;
     }
 }
 ?>

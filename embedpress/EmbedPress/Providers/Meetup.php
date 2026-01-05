@@ -42,6 +42,19 @@ class Meetup extends ProviderAdapter implements ProviderInterface
 	/** inline {@inheritdoc} */
 	protected $responsiveSupport = true;
 
+	/** @var array Array with allowed params for the Meetup Provider */
+	protected $allowedParams = [
+		'maxwidth',
+		'maxheight',
+		'timezone',
+		'date_format',
+		'time_format',
+		'orderby',
+		'order',
+		'per_page',
+		'enable_pagination'
+	];
+
 	/** inline {@inheritdoc} */
 	public function validateUrl(Url $url)
 	{
@@ -197,7 +210,8 @@ class Meetup extends ProviderAdapter implements ProviderInterface
 		$allowed_protocols = wp_allowed_protocols();
 		$allowed_protocols[] = 'data';
 
-
+		// Get parameters using getParams() instead of direct config access
+		$params = $this->getParams();
 
 		// Check if this is an RSS feed URL
 		if ($this->isRssUrl($this->getUrl())) {
@@ -208,11 +222,11 @@ class Meetup extends ProviderAdapter implements ProviderInterface
 
 			// Delegate RSS feed handling to the pro plugin
 			if (class_exists('\Embedpress\Pro\Providers\Meetup')) {
-				$hash = 'mu_' . md5($this->getUrl() . serialize($this->config));
+				$hash = 'mu_' . md5($this->getUrl() . serialize($params));
 				$cache_duration = apply_filters('embedpress_meetup_rss_cache_duration', 3600 * 6); // 6 hour default
 				$filename = wp_get_upload_dir()['basedir'] . "/embedpress/{$hash}.txt";
 
-				return \Embedpress\Pro\Providers\Meetup::handleRssFeed($response, $filename, $this->getUrl(), $cache_duration, $this->config);
+				return \Embedpress\Pro\Providers\Meetup::handleRssFeed($response, $filename, $this->getUrl(), $cache_duration, $params);
 			} else {
 				// Pro plugin not available, show upgrade message
 				return $this->getProUpgradeMessage($response);
@@ -252,7 +266,10 @@ class Meetup extends ProviderAdapter implements ProviderInterface
 	 */
 	private function getCachedEventData()
 	{
-		$url_hash = md5($this->getUrl());
+		// Include params in cache key so different timezone/format settings create different cache entries
+		$params = $this->getParams();
+		$cache_key_data = $this->getUrl() . serialize($params);
+		$url_hash = md5($cache_key_data);
 		$data_transient_key = 'meetup_event_data_' . $url_hash;
 
 		return get_transient($data_transient_key);
@@ -263,7 +280,10 @@ class Meetup extends ProviderAdapter implements ProviderInterface
 	 */
 	private function cacheEventData($event_data, $expiration = 3600)
 	{
-		$url_hash = md5($this->getUrl());
+		// Include params in cache key so different timezone/format settings create different cache entries
+		$params = $this->getParams();
+		$cache_key_data = $this->getUrl() . serialize($params);
+		$url_hash = md5($cache_key_data);
 		$data_transient_key = 'meetup_event_data_' . $url_hash;
 
 		set_transient($data_transient_key, $event_data, $expiration);
@@ -303,23 +323,164 @@ class Meetup extends ProviderAdapter implements ProviderInterface
 	}
 
 	/**
+	 * Format event date with timezone conversion and custom formatting
+	 *
+	 * @param string $date_string The date string to format
+	 * @param array $params Parameters containing timezone and format settings
+	 * @return string Formatted date string or HTML with data attributes for JS conversion
+	 */
+	private function formatEventDate($date_string, $params = [])
+	{
+		// Get timezone setting
+		$timezone_setting = isset($params['timezone']) ? $params['timezone'] : 'visitor_timezone';
+
+		// Get date and time format settings
+		$date_format = isset($params['date_format']) ? $params['date_format'] : 'wp_date_format';
+		$time_format = isset($params['time_format']) ? $params['time_format'] : 'wp_time_format';
+
+		// Resolve WordPress format placeholders
+		if ($date_format === 'wp_date_format') {
+			$date_format = get_option('date_format', 'F j, Y');
+		}
+		if ($time_format === 'wp_time_format') {
+			$time_format = get_option('time_format', 'g:i A');
+		}
+
+		// Parse the date string to timestamp
+		// Ensure we're parsing as UTC by using DateTime
+		try {
+			$date_obj = new \DateTime($date_string, new \DateTimeZone('UTC'));
+			$date_timestamp = $date_obj->getTimestamp();
+		} catch (\Exception $e) {
+			// Fallback to strtotime if DateTime fails
+			$date_timestamp = strtotime($date_string);
+		}
+
+		// If visitor timezone is selected, return HTML with data attributes for JS conversion
+		if ($timezone_setting === 'visitor_timezone') {
+			return sprintf(
+				'<span class="ep-event-date" data-visitor-timezone="true" data-utc-timestamp="%d" data-date-format="%s" data-time-format="%s">%s</span>',
+				$date_timestamp,
+				esc_attr($date_format),
+				esc_attr($time_format),
+				esc_html(gmdate('M j, Y, g:i A', $date_timestamp) . ' UTC')
+			);
+		}
+
+		// Get timezone object
+		if ($timezone_setting === 'wp_timezone') {
+			$timezone = wp_timezone();
+		} else {
+			try {
+				$timezone = new \DateTimeZone($timezone_setting);
+			} catch (\Exception $e) {
+				// Fallback to WordPress timezone if invalid timezone provided
+				$timezone = wp_timezone();
+			}
+		}
+
+		// Create DateTime object in UTC (Meetup dates are in UTC)
+		$date = new \DateTime('@' . $date_timestamp);
+
+		// Convert to target timezone
+		$date->setTimezone($timezone);
+
+		// Format the date and time
+		$formatted_date = wp_date($date_format, $date->getTimestamp(), $timezone);
+		$formatted_time = wp_date($time_format, $date->getTimestamp(), $timezone);
+		$timezone_abbr = $date->format('T');
+
+		// Combine date, time, and timezone
+		$full_date = $formatted_date . ', ' . $formatted_time . ' ' . $timezone_abbr;
+
+		return $full_date;
+	}
+
+	/**
+	 * Format event time only (for end time)
+	 *
+	 * @param string $date_string The date string to format
+	 * @param array $params Parameters containing timezone and format settings
+	 * @return string Formatted time string or HTML with data attributes for JS conversion
+	 */
+	private function formatEventTime($date_string, $params = [])
+	{
+		// Get timezone setting
+		$timezone_setting = isset($params['timezone']) ? $params['timezone'] : 'visitor_timezone';
+
+		// Get time format setting
+		$time_format = isset($params['time_format']) ? $params['time_format'] : 'wp_time_format';
+
+		// Resolve WordPress format placeholder
+		if ($time_format === 'wp_time_format') {
+			$time_format = get_option('time_format', 'g:i A');
+		}
+
+		// Parse the date string to timestamp
+		// Ensure we're parsing as UTC by using DateTime
+		try {
+			$date_obj = new \DateTime($date_string, new \DateTimeZone('UTC'));
+			$date_timestamp = $date_obj->getTimestamp();
+		} catch (\Exception $e) {
+			// Fallback to strtotime if DateTime fails
+			$date_timestamp = strtotime($date_string);
+		}
+
+		// If visitor timezone is selected, return HTML with data attributes for JS conversion
+		if ($timezone_setting === 'visitor_timezone') {
+			return sprintf(
+				'<span class="ep-event-end-time" data-visitor-timezone="true" data-utc-timestamp="%d" data-time-format="%s">%s</span>',
+				$date_timestamp,
+				esc_attr($time_format),
+				esc_html(gmdate('g:i A', $date_timestamp) . ' UTC')
+			);
+		}
+
+		// Get timezone object
+		if ($timezone_setting === 'wp_timezone') {
+			$timezone = wp_timezone();
+		} else {
+			try {
+				$timezone = new \DateTimeZone($timezone_setting);
+			} catch (\Exception $e) {
+				// Fallback to WordPress timezone if invalid timezone provided
+				$timezone = wp_timezone();
+			}
+		}
+
+		// Create DateTime object in UTC (Meetup dates are in UTC)
+		$date = new \DateTime('@' . $date_timestamp);
+
+		// Convert to target timezone
+		$date->setTimezone($timezone);
+
+		// Format the time and timezone
+		$formatted_time = wp_date($time_format, $date->getTimestamp(), $timezone);
+		$timezone_abbr = $date->format('T');
+
+		return $formatted_time . ' ' . $timezone_abbr;
+	}
+
+	/**
 	 * Extract event data from Next.js __NEXT_DATA__ JSON
 	 */
 	private function extractFromNextData($event)
 	{
+		// Get parameters for timezone and format settings
+		$params = $this->getParams();
+
 		// Extract basic event info
 		$title = isset($event['title']) ? $event['title'] : '';
 		$description = isset($event['description']) ? $event['description'] : '';
 		$event_url = isset($event['eventUrl']) ? $event['eventUrl'] : $this->getUrl();
 
-		// Extract date/time
+		// Extract date/time with timezone and format settings
 		$date_time = '';
 		if (isset($event['dateTime'])) {
-			$timestamp = strtotime($event['dateTime']);
-			$date_time = date('l, F j, Y · g:i A', $timestamp);
+			$date_time = $this->formatEventDate($event['dateTime'], $params);
 			if (isset($event['endTime'])) {
-				$end_timestamp = strtotime($event['endTime']);
-				$date_time .= ' to ' . date('g:i A T', $end_timestamp);
+				$end_time = $this->formatEventTime($event['endTime'], $params);
+				$date_time .= ' to ' . $end_time;
 			}
 		}
 
@@ -472,7 +633,7 @@ class Meetup extends ProviderAdapter implements ProviderInterface
 								<line x1="8" y1="2" x2="8" y2="6"></line>
 								<line x1="3" y1="10" x2="21" y2="10"></line>
 							</svg>
-							<?php echo esc_html($event_data['date']); ?>
+							<?php echo wp_kses_post($event_data['date']); ?>
 						</span>
 						<?php if (!empty($event_data['event_location_info'])): ?>
 							<div class="ep-event--location">

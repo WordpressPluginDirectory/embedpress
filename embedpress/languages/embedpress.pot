@@ -1,15 +1,15 @@
-# Copyright (C) 2025 WPDeveloper
+# Copyright (C) 2026 WPDeveloper
 # This file is distributed under the same license as the EmbedPress plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: EmbedPress 4.4.7\n"
+"Project-Id-Version: EmbedPress 4.4.8\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/embedpress\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-12-15T05:55:17+00:00\n"
+"POT-Creation-Date: 2026-01-05T09:38:40+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: embedpress\n"
@@ -42,49 +42,49 @@ msgstr ""
 msgid "https://wpdeveloper.com"
 msgstr ""
 
-#: Core/LocalizationManager.php:398
+#: Core/LocalizationManager.php:400
 msgid "All day"
 msgstr ""
 
-#: Core/LocalizationManager.php:399
+#: Core/LocalizationManager.php:401
 msgid "Created by"
 msgstr ""
 
-#: Core/LocalizationManager.php:400
+#: Core/LocalizationManager.php:402
 msgid "Go to event"
 msgstr ""
 
-#: Core/LocalizationManager.php:401
+#: Core/LocalizationManager.php:403
 #: EmbedPress/ThirdParty/Googlecalendar/Embedpress_Google_Helper.php:481
 msgid "Unknown error"
 msgstr ""
 
-#: Core/LocalizationManager.php:402
+#: Core/LocalizationManager.php:404
 msgid "Request error"
 msgstr ""
 
-#: Core/LocalizationManager.php:403
+#: Core/LocalizationManager.php:405
 msgid "Loading"
 msgstr ""
 
-#: Core/LocalizationManager.php:434
-#: EmbedPress/Includes/Classes/Feature_Enhancer.php:417
-#: EmbedPress/Includes/Classes/Feature_Enhancer.php:983
-#: EmbedPress/Includes/Classes/Feature_Enhancer.php:1357
+#: Core/LocalizationManager.php:436
+#: EmbedPress/Includes/Classes/Feature_Enhancer.php:451
+#: EmbedPress/Includes/Classes/Feature_Enhancer.php:1017
+#: EmbedPress/Includes/Classes/Feature_Enhancer.php:1391
 msgid "Watch from the beginning"
 msgstr ""
 
-#: Core/LocalizationManager.php:435
-#: EmbedPress/Includes/Classes/Feature_Enhancer.php:418
-#: EmbedPress/Includes/Classes/Feature_Enhancer.php:984
-#: EmbedPress/Includes/Classes/Feature_Enhancer.php:1358
+#: Core/LocalizationManager.php:437
+#: EmbedPress/Includes/Classes/Feature_Enhancer.php:452
+#: EmbedPress/Includes/Classes/Feature_Enhancer.php:1018
+#: EmbedPress/Includes/Classes/Feature_Enhancer.php:1392
 msgid "Skip to where you left off"
 msgstr ""
 
-#: Core/LocalizationManager.php:436
-#: EmbedPress/Includes/Classes/Feature_Enhancer.php:419
-#: EmbedPress/Includes/Classes/Feature_Enhancer.php:985
-#: EmbedPress/Includes/Classes/Feature_Enhancer.php:1359
+#: Core/LocalizationManager.php:438
+#: EmbedPress/Includes/Classes/Feature_Enhancer.php:453
+#: EmbedPress/Includes/Classes/Feature_Enhancer.php:1019
+#: EmbedPress/Includes/Classes/Feature_Enhancer.php:1393
 msgid "It looks like you've watched<br />part of this video before!"
 msgstr ""
 
@@ -154,18 +154,18 @@ msgstr ""
 
 #: EmbedPress/Elementor/Widgets/Embedpress_Calendar.php:169
 #: EmbedPress/Elementor/Widgets/Embedpress_Document.php:204
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3972
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4037
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:278
-#: src/Blocks/embedpress-calendar/src/components/edit.js:89
+#: src/Blocks/embedpress-calendar/src/components/edit.js:91
 msgid "Width"
 msgstr ""
 
 #: EmbedPress/Elementor/Widgets/Embedpress_Calendar.php:192
 #: EmbedPress/Elementor/Widgets/Embedpress_Document.php:239
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4014
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4079
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:315
 #: src/Blocks/document/src/inspector.js:76
-#: src/Blocks/embedpress-calendar/src/components/edit.js:97
+#: src/Blocks/embedpress-calendar/src/components/edit.js:99
 #: src/Blocks/embedpress-pdf/src/inspector.js:133
 #: src/Blocks/google-docs/src/components/inspector.js:81
 #: src/Blocks/google-drawings/src/components/inspector.js:70
@@ -181,7 +181,7 @@ msgstr ""
 
 #: EmbedPress/Elementor/Widgets/Embedpress_Calendar.php:215
 #: EmbedPress/Elementor/Widgets/Embedpress_Document.php:274
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4125
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4190
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:351
 msgid "Alignment"
 msgstr ""
@@ -189,7 +189,7 @@ msgstr ""
 #: EmbedPress/Elementor/Widgets/Embedpress_Calendar.php:219
 #: EmbedPress/Elementor/Widgets/Embedpress_Document.php:278
 #: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3591
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4129
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4194
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:355
 #: EmbedPress/Includes/Classes/Extend_Elementor_Controls.php:447
 #: src/Blocks/EmbedPress/src/components/InspectorControl/spreaker.js:221
@@ -198,7 +198,7 @@ msgstr ""
 
 #: EmbedPress/Elementor/Widgets/Embedpress_Calendar.php:223
 #: EmbedPress/Elementor/Widgets/Embedpress_Document.php:282
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4133
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4198
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:359
 msgid "Center"
 msgstr ""
@@ -206,7 +206,7 @@ msgstr ""
 #: EmbedPress/Elementor/Widgets/Embedpress_Calendar.php:227
 #: EmbedPress/Elementor/Widgets/Embedpress_Document.php:286
 #: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3590
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4137
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4202
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:363
 #: EmbedPress/Includes/Classes/Extend_Elementor_Controls.php:445
 #: src/Blocks/EmbedPress/src/components/InspectorControl/spreaker.js:220
@@ -216,7 +216,7 @@ msgstr ""
 #: EmbedPress/Elementor/Widgets/Embedpress_Calendar.php:239
 #: EmbedPress/Elementor/Widgets/Embedpress_Document.php:302
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:379
-#: src/Blocks/embedpress-calendar/src/components/edit.js:109
+#: src/Blocks/embedpress-calendar/src/components/edit.js:111
 #: src/Blocks/embedpress-pdf/src/inspector.js:334
 #: src/Blocks/google-docs/src/components/inspector.js:92
 #: src/Blocks/google-drawings/src/components/inspector.js:79
@@ -351,7 +351,7 @@ msgstr ""
 
 #: EmbedPress/Elementor/Widgets/Embedpress_Calendar.php:257
 #: EmbedPress/Elementor/Widgets/Embedpress_Document.php:107
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3942
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4007
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:111
 #, php-format
 msgid "Enable Lazy Loading %s"
@@ -377,8 +377,8 @@ msgstr ""
 #: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3731
 #: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3759
 #: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3833
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3909
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3944
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3918
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4009
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:113
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:618
 #: EmbedPress/Ends/Back/Settings/templates/dailymotion.php:49
@@ -439,8 +439,8 @@ msgstr ""
 #: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3732
 #: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3760
 #: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3834
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3910
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3945
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3919
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4010
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:114
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:619
 #: EmbedPress/Ends/Back/Settings/templates/dailymotion.php:45
@@ -483,7 +483,7 @@ msgstr ""
 
 #: EmbedPress/Elementor/Widgets/Embedpress_Calendar.php:264
 #: EmbedPress/Elementor/Widgets/Embedpress_Document.php:113
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3948
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4013
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:117
 msgid "Load iframe only when it enters the viewport for better performance"
 msgstr ""
@@ -503,12 +503,12 @@ msgstr ""
 #: EmbedPress/Elementor/Widgets/Embedpress_Calendar.php:337
 #: EmbedPress/Elementor/Widgets/Embedpress_Document.php:655
 #: EmbedPress/Elementor/Widgets/Embedpress_Document.php:782
-#: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:1056
-#: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:1064
+#: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:1058
+#: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:1066
 #: EmbedPress/Ends/Back/Settings/templates/ads.php:354
-#: EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:287
-#: EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:1335
-#: EmbedPress/Shortcode.php:1341
+#: EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:302
+#: EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:1362
+#: EmbedPress/Shortcode.php:1340
 msgid "Powered By EmbedPress"
 msgstr ""
 
@@ -517,14 +517,14 @@ msgid "EmbedPress Document"
 msgstr ""
 
 #: EmbedPress/Elementor/Widgets/Embedpress_Document.php:100
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3935
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4000
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:104
 msgid "Performance"
 msgstr ""
 
 #: EmbedPress/Elementor/Widgets/Embedpress_Document.php:134
 #: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:151
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3961
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4026
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:138
 #: src/Blocks/EmbedPress/src/components/inspector.js:125
 #: src/Blocks/google-docs/src/components/inspector.js:90
@@ -1279,9 +1279,9 @@ msgstr ""
 #: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:1676
 #: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:2015
 #: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:2350
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3870
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3879
 #: EmbedPress/Includes/Classes/Extend_Elementor_Controls.php:457
-#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:94
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:115
 #: src/Blocks/EmbedPress/src/components/InspectorControl/opensea.js:452
 msgid "Title"
 msgstr ""
@@ -1305,9 +1305,9 @@ msgid "Limit"
 msgstr ""
 
 #: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:1814
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3866
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3875
 #: EmbedPress/Ends/Back/Settings/templates/opensea.php:41
-#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:90
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:111
 #: src/Blocks/EmbedPress/src/components/InspectorControl/opensea.js:370
 msgid "Order By"
 msgstr ""
@@ -1902,78 +1902,208 @@ msgid "Enable an external link icon to visit the original Google Photos album"
 msgstr ""
 
 #: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3858
-#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:86
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:104
 msgid "Meetup Settings"
 msgstr ""
 
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3869
-#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:93
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3867
+msgid "Note: Order By, Order, Events Per Page, and Load More controls only apply to Meetup RSS feeds (URLs with /events). For single event embeds, only timezone and date/time format settings will be used."
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3878
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:114
 msgid "Date"
 msgstr ""
 
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3871
-#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:95
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3880
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:116
 msgid "Attendees"
 msgstr ""
 
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3874
-#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:98
-msgid "Choose how to sort the events"
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3883
+msgid "Choose how to sort the events (RSS feeds only)"
 msgstr ""
 
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3881
-#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:103
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3890
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:124
 msgid "Order"
 msgstr ""
 
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3884
-#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:106
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3893
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:127
 msgid "Ascending"
 msgstr ""
 
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3885
-#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:107
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3894
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:128
 msgid "Descending"
 msgstr ""
 
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3888
-#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:110
-msgid "Sort direction"
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3897
+msgid "Sort direction (RSS feeds only)"
 msgstr ""
 
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3895
-#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:115
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3904
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:136
 msgid "Events Per Page"
 msgstr ""
 
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3900
-#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:121
-msgid "Number of events to show per page"
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3909
+msgid "Number of events to show per page (RSS feeds only)"
 msgstr ""
 
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3907
-#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:125
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3916
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:146
 msgid "Enable Load More"
 msgstr ""
 
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3912
-#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:128
-msgid "Show a \"Load More\" button to load additional events"
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3921
+msgid "Show a \"Load More\" button to load additional events (RSS feeds only)"
 msgstr ""
 
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4096
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3928
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:155
+msgid "Timezone"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3931
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:158
+msgid "Visitor Timezone (Auto-detect)"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3932
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:159
+msgid "WordPress Site Timezone"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3933
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:160
+msgid "UTC"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3934
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:161
+msgid "America/New_York (EST/EDT)"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3935
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:162
+msgid "America/Chicago (CST/CDT)"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3936
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:163
+msgid "America/Denver (MST/MDT)"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3937
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:164
+msgid "America/Los_Angeles (PST/PDT)"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3938
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:165
+msgid "Europe/London (GMT/BST)"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3939
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:166
+msgid "Europe/Paris (CET/CEST)"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3940
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:167
+msgid "Asia/Tokyo (JST)"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3941
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:168
+msgid "Australia/Sydney (AEST/AEDT)"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3944
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:171
+msgid "Select timezone for displaying event dates and times. Visitor timezone will auto-detect based on their browser."
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3951
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:176
+msgid "Date Format"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3954
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:179
+msgid "WordPress Date Format"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3955
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:180
+msgid "MM/DD/YYYY"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3956
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:181
+msgid "DD/MM/YYYY"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3957
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:182
+msgid "YYYY-MM-DD"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3958
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:183
+msgid "Month DD, YYYY"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3959
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:184
+msgid "DD Month YYYY"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3962
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:187
+msgid "Select date format for event dates"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3969
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:192
+msgid "Time Format"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3972
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:195
+msgid "WordPress Time Format"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3973
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:196
+msgid "12-hour (h:mm AM/PM)"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3974
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:197
+msgid "24-hour (HH:mm)"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:3977
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:200
+msgid "Select time format for event times"
+msgstr ""
+
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4161
 msgid "Note: The maximum width and height are set to 100%."
 msgstr ""
 
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4103
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4168
 msgid "Margin"
 msgstr ""
 
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4114
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4179
 msgid "Padding"
 msgstr ""
 
-#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4560
+#: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:4634
 msgid "You need EmbedPress Pro to Embed Apple Podcast. Note. This message is only visible to you."
 msgstr ""
 
@@ -2800,9 +2930,9 @@ msgid "License Key Icon"
 msgstr ""
 
 #: EmbedPress/Ends/Back/Settings/templates/hub.php:122
-#: EmbedPress/Includes/Classes/Helper.php:1149
-#: EmbedPress/Includes/Classes/Helper.php:1152
-#: EmbedPress/Includes/Classes/Helper.php:1196
+#: EmbedPress/Includes/Classes/Helper.php:1155
+#: EmbedPress/Includes/Classes/Helper.php:1158
+#: EmbedPress/Includes/Classes/Helper.php:1202
 msgid "Activate License"
 msgstr ""
 
@@ -3544,7 +3674,7 @@ msgstr ""
 msgid "Show Subscriber Count"
 msgstr ""
 
-#: EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:1312
+#: EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:1338
 msgid "Invalid Calendar Link"
 msgstr ""
 
@@ -4045,60 +4175,60 @@ msgstr ""
 msgid "LinkedIn"
 msgstr ""
 
-#: EmbedPress/Includes/Classes/Helper.php:1131
+#: EmbedPress/Includes/Classes/Helper.php:1137
 msgid "EmbedPress Pro Required"
 msgstr ""
 
-#: EmbedPress/Includes/Classes/Helper.php:1132
+#: EmbedPress/Includes/Classes/Helper.php:1138
 msgid "This feature requires EmbedPress Pro. Please install and activate EmbedPress Pro to access this feature."
 msgstr ""
 
-#: EmbedPress/Includes/Classes/Helper.php:1143
-#: EmbedPress/Includes/Classes/Helper.php:1196
+#: EmbedPress/Includes/Classes/Helper.php:1149
+#: EmbedPress/Includes/Classes/Helper.php:1202
 msgid "Renew License"
 msgstr ""
 
-#: EmbedPress/Includes/Classes/Helper.php:1157
+#: EmbedPress/Includes/Classes/Helper.php:1163
 msgid "Pro Features Disabled"
 msgstr ""
 
-#: EmbedPress/Includes/Classes/Helper.php:1199
+#: EmbedPress/Includes/Classes/Helper.php:1205
 msgid "EmbedPress Pro Features Disabled"
 msgstr ""
 
-#: EmbedPress/Includes/Classes/Helper.php:1250
+#: EmbedPress/Includes/Classes/Helper.php:1256
 msgid "EmbedPress Pro is not installed or activated."
 msgstr ""
 
-#: EmbedPress/Includes/Classes/Helper.php:1255
+#: EmbedPress/Includes/Classes/Helper.php:1261
 msgid "Your license is active and valid."
 msgstr ""
 
-#: EmbedPress/Includes/Classes/Helper.php:1257
+#: EmbedPress/Includes/Classes/Helper.php:1263
 msgid "Your license has expired. Please renew to continue receiving updates and support."
 msgstr ""
 
-#: EmbedPress/Includes/Classes/Helper.php:1260
+#: EmbedPress/Includes/Classes/Helper.php:1266
 msgid "Your license is not active for this URL. Please activate your license."
 msgstr ""
 
-#: EmbedPress/Includes/Classes/Helper.php:1263
+#: EmbedPress/Includes/Classes/Helper.php:1269
 msgid "Your license key has been disabled or revoked."
 msgstr ""
 
-#: EmbedPress/Includes/Classes/Helper.php:1265
+#: EmbedPress/Includes/Classes/Helper.php:1271
 msgid "License key is missing. Please enter your license key."
 msgstr ""
 
-#: EmbedPress/Includes/Classes/Helper.php:1267
+#: EmbedPress/Includes/Classes/Helper.php:1273
 msgid "Unable to verify license due to connection issues. Please try again later."
 msgstr ""
 
-#: EmbedPress/Includes/Classes/Helper.php:1271
+#: EmbedPress/Includes/Classes/Helper.php:1277
 msgid "Please activate your license key to enable EmbedPress Pro features."
 msgstr ""
 
-#: EmbedPress/Includes/Classes/Helper.php:1483
+#: EmbedPress/Includes/Classes/Helper.php:1489
 #: EmbedPress/Providers/Youtube.php:827
 msgid "EmbedPress: "
 msgstr ""
@@ -4194,16 +4324,16 @@ msgstr ""
 msgid "Unlock %s support by upgrading to our %s! Upgrade today to unlock a whole new level of functionality and make the most out of your experience with Hashtag."
 msgstr ""
 
-#: EmbedPress/Providers/Meetup.php:119
+#: EmbedPress/Providers/Meetup.php:132
 msgid "Meetup Events Feed"
 msgstr ""
 
-#: EmbedPress/Providers/Meetup.php:130
+#: EmbedPress/Providers/Meetup.php:143
 #, php-format
 msgid "Display multiple Meetup events from RSS feeds is a premium feature. You need to upgrade to the <a href=\"%s\" target=\"_blank\">Premium</a> Version to use this feature."
 msgstr ""
 
-#: EmbedPress/Providers/Meetup.php:140
+#: EmbedPress/Providers/Meetup.php:153
 msgid "For single events, use the individual event URL instead of the RSS feed."
 msgstr ""
 
@@ -4654,8 +4784,8 @@ msgstr ""
 msgid "Upload a file or pick one from your media library for embed."
 msgstr ""
 
-#: src/Blocks/document/src/components/edit.js:129
-#: src/Blocks/embedpress-pdf/src/components/edit.js:322
+#: src/Blocks/document/src/components/edit.js:131
+#: src/Blocks/embedpress-pdf/src/components/edit.js:324
 msgid "Re Upload"
 msgstr ""
 
@@ -4725,33 +4855,33 @@ msgstr ""
 msgid "Works as max container width"
 msgstr ""
 
-#: src/Blocks/embedpress-calendar/src/components/edit.js:86
+#: src/Blocks/embedpress-calendar/src/components/edit.js:88
 msgid "Customize Embedded Calendar"
 msgstr ""
 
-#: src/Blocks/embedpress-calendar/src/components/edit.js:87
+#: src/Blocks/embedpress-calendar/src/components/edit.js:89
 msgid "You can adjust the width and height of embedded content."
 msgstr ""
 
-#: src/Blocks/embedpress-calendar/src/components/edit.js:106
+#: src/Blocks/embedpress-calendar/src/components/edit.js:108
 msgid "Calendar Type and other options"
 msgstr ""
 
-#: src/Blocks/embedpress-calendar/src/components/edit.js:107
+#: src/Blocks/embedpress-calendar/src/components/edit.js:109
 msgid "You can show public calendar without any API key"
 msgstr ""
 
-#: src/Blocks/embedpress-calendar/src/components/edit.js:116
+#: src/Blocks/embedpress-calendar/src/components/edit.js:118
 msgid "Embedding Public Calendar"
 msgstr ""
 
-#: src/Blocks/embedpress-calendar/src/components/edit.js:130
-#: src/Blocks/EmbedPress/src/components/edit.js:510
-#: src/Blocks/google-docs/src/components/edit.js:183
+#: src/Blocks/embedpress-calendar/src/components/edit.js:132
+#: src/Blocks/EmbedPress/src/components/edit.js:523
+#: src/Blocks/google-docs/src/components/edit.js:185
 #: src/Blocks/google-drawings/src/components/edit.js:171
-#: src/Blocks/google-forms/src/components/edit.js:173
-#: src/Blocks/google-maps/src/components/edit.js:176
-#: src/Blocks/google-sheets/src/components/edit.js:197
+#: src/Blocks/google-forms/src/components/edit.js:175
+#: src/Blocks/google-maps/src/components/edit.js:178
+#: src/Blocks/google-sheets/src/components/edit.js:199
 msgid "Edit URL"
 msgstr ""
 
@@ -4771,11 +4901,11 @@ msgstr ""
 msgid "Presentation Mode"
 msgstr ""
 
-#: src/Blocks/EmbedPress/src/components/edit.js:473
+#: src/Blocks/EmbedPress/src/components/edit.js:486
 msgid "EmbedPress - Embed anything from 250+ sites"
 msgstr ""
 
-#: src/Blocks/EmbedPress/src/components/edit.js:479
+#: src/Blocks/EmbedPress/src/components/edit.js:492
 msgid "Learn more about EmbedPress"
 msgstr ""
 
@@ -4915,6 +5045,22 @@ msgstr ""
 
 #: src/Blocks/EmbedPress/src/components/InspectorControl/instafeed.js:380
 msgid "Space"
+msgstr ""
+
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:119
+msgid "Choose how to sort the events"
+msgstr ""
+
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:131
+msgid "Sort direction"
+msgstr ""
+
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:142
+msgid "Number of events to show per page"
+msgstr ""
+
+#: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:149
+msgid "Show a \"Load More\" button to load additional events"
 msgstr ""
 
 #: src/Blocks/EmbedPress/src/components/InspectorControl/opensea.js:342

@@ -6,7 +6,7 @@ Tags: embed, embed YouTube, embed PDF, Google Docs, Social Feeds
 Requires at least: 4.6
 Tested up to: 6.9
 Requires PHP: 5.6
-Stable tag: 4.4.7
+Stable tag: 4.4.8
 License: GPLv3 or later
 License URI: https://opensource.org/licenses/GPL-3.0
 
@@ -348,6 +348,13 @@ With EmbedPress you can easily create PDF flipbooks. First, upload PDF into your
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+
+= [4.4.8] – 2026-01-5 =
+- Fixed: PDF block accessibility issue with missing iframe title.
+- Fixed: Wistia video scheme color issue in Elementor.
+- Improved: Meetup event date now shows in local time.
+- Improved: PDF embedding performance.
+- Minor bug fixes and improvements.
 
 = [4.4.7] – 2025-12-15 =
 - Fixed: Control panel disappearing after embedding a PDF in Elementor.

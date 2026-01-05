@@ -226,7 +226,13 @@ class Elementor_Enhancer {
 	}
 
 	public static function wistia( $embed, $setting ) {
-		if ( ! isset( $embed->provider_name ) || strtoupper( $embed->provider_name ) !== 'WISTIA, INC.' || ! isset( $embed->embed ) || $setting['embedpress_pro_embeded_source'] !== 'wistia' ) {
+
+		// echo '<pre>';
+		// print_r($setting);
+		// die;
+		
+		if ( ! isset( $embed->provider_name ) || (strtoupper( $embed->provider_name ) !== 'WISTIA, INC.' && strtoupper( $embed->provider_name ) !== 'WISTIA') || ! isset( $embed->embed ) || $setting['embedpress_pro_embeded_source'] !== 'wistia' ) {
+			
 			return $embed;
 		}
 		preg_match( '/src=\"(.+?)\"/', $embed->embed, $match );
@@ -257,7 +263,9 @@ class Elementor_Enhancer {
 			$embedOptions->time             = $setting['embedpress_pro_video_start_time'];
 		}
 
-		$embedOptions = apply_filters('embedpress/elementor_enhancer_wistia', $embedOptions, $setting);
+		if (is_embedpress_pro_active()) {
+			$embedOptions = apply_filters('embedpress/elementor_enhancer_wistia', $embedOptions, $setting);
+		}
 
 
 		// Plugins
@@ -266,8 +274,10 @@ class Elementor_Enhancer {
 		$pluginList = [];
 
 
-		$embedOptions = apply_filters('embedpress/elementor_enhancer_wistia_captions', $embedOptions, $setting, $pluginList);
-		$pluginList = apply_filters('embedpress/elementor_enhancer_wistia_pluginlist', $embedOptions, $setting, $pluginList);
+		if (is_embedpress_pro_active()) {
+			$embedOptions = apply_filters('embedpress/elementor_enhancer_wistia_captions', $embedOptions, $setting, $pluginList);
+			$pluginList = apply_filters('embedpress/elementor_enhancer_wistia_pluginlist', $embedOptions, $setting, $pluginList);
+		}
 
 
 		$embedOptions->plugin = $pluginList;
@@ -308,7 +318,10 @@ class Elementor_Enhancer {
 		$html         .= '</div>';
 		$embed->embed = $html;
 
-		$embed = apply_filters('embedpress/elementor_enhancer_wistia_cta', $embed, $setting);
+		if (is_embedpress_pro_active()) {
+			$embed = apply_filters('embedpress/elementor_enhancer_wistia_cta', $embed, $setting);
+		}
+
 
 		return $embed;
 	}

@@ -125,6 +125,12 @@ class Helper
 		return $renderer;
 	}
 
+	public static function get_flipbook_renderer()
+	{
+		$renderer = admin_url('admin-ajax.php?action=get_flipbook_viewer');
+		return $renderer;
+	}
+
 	public static  function get_extension_from_file_url($url)
 	{
 		$urlSplit = explode(".", $url);

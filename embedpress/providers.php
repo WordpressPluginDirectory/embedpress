@@ -45,4 +45,5 @@ $additionalServiceProviders = [
 	EMBEDPRESS_NAMESPACE . "\\Providers\\FITE"    => ['fite.tv', 'triller.tv','trillertv.com'],
 	EMBEDPRESS_NAMESPACE . "\\Providers\\Meetup"    => ['meetup.com'],
 	EMBEDPRESS_NAMESPACE . "\\Providers\\GettyImages"    => ['gettyimages.com'],
+	EMBEDPRESS_NAMESPACE . "\\Providers\\Wistia"    => ['*.wistia.com', 'wistia.com'],
 ];
