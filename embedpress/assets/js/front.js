@@ -69,10 +69,26 @@ let epGlobals = {};
 
     epGlobals.handlePosterImageLoad = function () {
         var posterImages = document.querySelectorAll(".plyr__poster");
+        var videoWrappers = document.querySelectorAll("[data-playerid]");
+
+        // If no poster images found, make all players visible immediately
+        if (!posterImages.length) {
+            videoWrappers.forEach(function (videoWrapper) {
+                videoWrapper.style.opacity = "1";
+            });
+            return;
+        }
+
         posterImages.forEach(function (posterImage) {
             if (posterImage) {
-                var videoWrappers = document.querySelectorAll("[data-playerid]");
                 videoWrappers.forEach(function (videoWrapper) {
+                    // Check if already visible via computed style
+                    var posterImageStyle = window.getComputedStyle(posterImage);
+                    if (posterImageStyle.getPropertyValue('background-image') !== 'none') {
+                        videoWrapper.style.opacity = "1";
+                        return;
+                    }
+
                     var observer = new MutationObserver(function (mutationsList, observer) {
                         var posterImageStyle = window.getComputedStyle(posterImage);
                         if (posterImageStyle.getPropertyValue('background-image') !== 'none') {
@@ -84,6 +100,12 @@ let epGlobals = {};
                     });
 
                     observer.observe(posterImage, { attributes: true, attributeFilter: ['style'] });
+
+                    // Fallback timeout to ensure player becomes visible
+                    setTimeout(function () {
+                        observer.disconnect();
+                        videoWrapper.style.opacity = "1";
+                    }, 5000);
                 });
             }
         });
@@ -379,7 +401,17 @@ let epGlobals = {};
                     jQuery(that).closest('.password-form-container').find('.error-message').removeClass('hidden');
                 }
                 else {
-                    jQuery('#' + perentSel + '-' + ep_client_id + ' .ep-embed-content-wraper').html(response.embedHtml);
+                    // Replace the content inside the wrapper, keeping the wrapper itself
+                    const wrapperEl = jQuery('#' + perentSel + '-' + ep_client_id);
+                    const parentWrapper = wrapperEl.parent('.ep-embed-content-wraper');
+
+                    if (parentWrapper.length > 0) {
+                        // If there's a parent .ep-embed-content-wraper, replace its content
+                        parentWrapper.html(response.embedHtml);
+                    } else {
+                        // Otherwise replace the wrapper content directly
+                        wrapperEl.html(response.embedHtml);
+                    }
 
                     if (jQuery('#' + perentSel + '-' + ep_client_id + ' .ose-youtube').length > 0) {
                         epGlobals.youtubeChannelGallery();
@@ -390,10 +422,11 @@ let epGlobals = {};
                     }
 
                     // Custom player initialization when content protection enabled
-                    document.querySelector('#' + perentSel + '-' + ep_client_id + ' .ep-embed-content-wraper')?.classList?.remove('plyr-initialized');
+                    const targetEl = parentWrapper.length > 0 ? parentWrapper[0] : wrapperEl[0];
+                    targetEl?.classList?.remove('plyr-initialized');
 
                     if (typeof initPlayer === 'function') {
-                        initPlayer(document.querySelector('#' + perentSel + '-' + ep_client_id + ' .ep-embed-content-wraper'));
+                        initPlayer(targetEl);
                     }
                     if (embedpressFrontendData.isProPluginActive) {
                         const adIdEl = document.querySelector('#' + perentSel + '-' + ep_client_id + ' [data-sponsored-id]');
@@ -1173,6 +1206,46 @@ jQuery(window).on("elementor/frontend/init", function () {
     elementorFrontend.hooks.addAction("frontend/element_ready/embedpres_document.default", filterableGalleryHandler);
     elementorFrontend.hooks.addAction("frontend/element_ready/embedpres_elementor.default", adsHandler);
     elementorFrontend.hooks.addAction("frontend/element_ready/embedpres_elementor.default", epGlobals.handlePosterImageLoad);
+
+    // Re-initialize custom player when Elementor widget becomes ready
+    var customPlayerHandler = function ($scope, $) {
+        var wrappers = $scope[0].querySelectorAll('.ep-embed-content-wraper');
+        if (typeof initPlayer === 'function') {
+            wrappers.forEach(function (wrapper) {
+                var playerId = wrapper.getAttribute('data-playerid');
+
+                // Destroy existing player instance so initPlayer can re-create it
+                if (playerId && wrapper.classList.contains('plyr-initialized')) {
+                    if (typeof playerInit !== 'undefined' && playerInit[playerId]) {
+                        try {
+                            playerInit[playerId].destroy();
+                        } catch (e) {
+                            // Player may already be detached
+                        }
+                        delete playerInit[playerId];
+                    }
+                    wrapper.classList.remove('plyr-initialized');
+                }
+
+                if (playerId) {
+                    initPlayer(wrapper);
+                }
+            });
+        } else {
+            // Fallback: ensure embeds are visible even if Plyr scripts failed to load
+            wrappers.forEach(function (wrapper) {
+                if (wrapper.hasAttribute('data-playerid')) {
+                    wrapper.style.opacity = '1';
+                }
+            });
+        }
+
+        // Re-initialize lazy loaded iframes for this widget
+        if (typeof window.epReinitLazyLoad === 'function') {
+            window.epReinitLazyLoad();
+        }
+    };
+    elementorFrontend.hooks.addAction("frontend/element_ready/embedpres_elementor.default", customPlayerHandler);
 });
 
 

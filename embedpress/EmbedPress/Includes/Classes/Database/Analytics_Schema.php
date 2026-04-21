@@ -176,7 +176,7 @@ class Analytics_Schema
             referrer_url text DEFAULT NULL,
             page_url text DEFAULT NULL,
             interaction_type enum('impression', 'click', 'view', 'play', 'pause', 'complete') NOT NULL DEFAULT 'impression',
-            interaction_data json DEFAULT NULL,
+            interaction_data longtext DEFAULT NULL,
             view_duration int(11) unsigned DEFAULT 0,
             created_at datetime DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),

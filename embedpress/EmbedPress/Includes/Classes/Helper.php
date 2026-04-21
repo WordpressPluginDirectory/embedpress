@@ -256,34 +256,6 @@ class Helper
 		update_option($source_option_name, json_encode($unique_sources));
 	}
 
-	//Delete source data from option table when widget is removed
-	public static function get_delete_source_data($blockid, $source_option_name, $source_temp_option_name)
-	{
-		if (!empty($blockid) && $blockid != 'undefined') {
-			$sources = json_decode(get_option($source_option_name), true);
-			$temp_sources = json_decode(get_option($source_temp_option_name), true);
-			if ($sources) {
-				foreach ($sources as $i => $source) {
-					if ($source['id'] === $blockid) {
-						unset($sources[$i]);
-						break;
-					}
-				}
-				update_option($source_option_name, json_encode(array_values($sources)));
-			}
-			if ($temp_sources) {
-				foreach ($temp_sources as $i => $source) {
-					if ($source['id'] === $blockid) {
-						unset($temp_sources[$i]);
-						break;
-					}
-				}
-				update_option($source_temp_option_name, json_encode(array_values($temp_sources)));
-			}
-		}
-		wp_die();
-	}
-
 	//Delete source temporary data when reload without update or publish
 	public static function get_delete_source_temp_data_on_reload($source_temp_option_name)
 	{
@@ -413,7 +385,7 @@ class Helper
 		$lock_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g fill="#6354a5" class="color134563 svgShape"><path d="M46.3 28.7h-3v-6.4C43.3 16.1 38.2 11 32 11c-6.2 0-11.3 5.1-11.3 11.3v6.4h-3v-6.4C17.7 14.4 24.1 8 32 8s14.3 6.4 14.3 14.3v6.4" fill="#6354a5" class="color000000 svgShape"></path><path d="M44.8 55.9H19.2c-2.6 0-4.8-2.2-4.8-4.8V31.9c0-2.6 2.2-4.8 4.8-4.8h25.6c2.6 0 4.8 2.2 4.8 4.8v19.2c0 2.7-2.2 4.8-4.8 4.8zM19.2 30.3c-.9 0-1.6.7-1.6 1.6v19.2c0 .9.7 1.6 1.6 1.6h25.6c.9 0 1.6-.7 1.6-1.6V31.9c0-.9-.7-1.6-1.6-1.6H19.2z" fill="#6354a5" class="color000000 svgShape"></path><path d="M35.2 36.7c0 1.8-1.4 3.2-3.2 3.2s-3.2-1.4-3.2-3.2 1.4-3.2 3.2-3.2 3.2 1.5 3.2 3.2" fill="#6354a5" class="color000000 svgShape"></path><path d="M32.8 36.7h-1.6l-1.6 9.6h4.8l-1.6-9.6" fill="#6354a5" class="color000000 svgShape"></path></g></svg>';
 
 		echo '
-		<div class="password-form-container">
+		<div class="password-form-container sd">
 			<h2>' . esc_html($lock_heading) . '</h2>
 			<p>' . esc_html($lock_subheading) . ' </p>
 				<form class="password-form" method="post" class="password-form" data-unlocking-text="' . esc_attr($unlocking_text) . '">
@@ -1613,7 +1585,13 @@ class Helper
 
 	public static function getBooleanParam($param, $default = false)
 	{
-		return isset($param) && is_string($param) && ($param == 'true' || $param == 'yes') ? 'true' : ($default ? 'true' : 'false');
+		if (in_array($param, [true, 'true', 'yes', 1, '1'], true)) {
+			return true;
+		}
+		if (in_array($param, [false, 'false', 'no', 0, '0'], true)) {
+			return false;
+		}
+		return (bool) $default;
 	}
 
 	public static function has_allowed_roles($allowed_roles = [])

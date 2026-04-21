@@ -100,9 +100,21 @@ embedpressDocViewer.viewerStyle = () => {
         document.head.appendChild(customStyle);
     }
 }
+
 embedpressDocViewer.epDocumentsViewerController = () => {
+    // Remove previous listeners to prevent duplicates when called multiple times
+    if (embedpressDocViewer._handleClick) {
+        document.removeEventListener('click', embedpressDocViewer._handleClick);
+    }
+    if (embedpressDocViewer._handleDrawIconClick) {
+        document.removeEventListener('click', embedpressDocViewer._handleDrawIconClick);
+    }
+    if (embedpressDocViewer._handleFullscreenChange) {
+        document.removeEventListener('fullscreenchange', embedpressDocViewer._handleFullscreenChange);
+    }
+
     const viwerParentEls = document.querySelectorAll('.ep-file-download-option-masked');
-  
+
     function handleFullscreenChange() {
       if (!document.fullscreenElement) {
         viwerParentEls.forEach((el) => {
@@ -115,10 +127,10 @@ embedpressDocViewer.epDocumentsViewerController = () => {
   
     function handleClick(event) {
       event.stopPropagation();
-  
+
       const viwerParentEl = event.target.closest('.ep-file-download-option-masked');
-  
-      if (!viwerParentEl) return;
+
+      if (!viwerParentEl) { return; }
   
       const viewerIframeEl = viwerParentEl.querySelector('iframe');
       if (!viewerIframeEl) return;
@@ -139,7 +151,7 @@ embedpressDocViewer.epDocumentsViewerController = () => {
       const downloadcIcon = event.target.closest('.ep-doc-download-icon svg');
       const minimizeIcon = event.target.closest('.ep-doc-minimize-icon svg');
       const fullscreenIcon = event.target.closest('.ep-doc-fullscreen-icon svg');
-  
+
       if (popupIcon instanceof SVGElement) {
         window.open(fileUrl, '_blank');
       } else if (printIcon instanceof SVGElement) {
@@ -237,6 +249,10 @@ embedpressDocViewer.epDocumentsViewerController = () => {
       canvas.style.display = canDraw ? "block" : "none";
     }
   
+    embedpressDocViewer._handleClick = handleClick;
+    embedpressDocViewer._handleDrawIconClick = handleDrawIconClick;
+    embedpressDocViewer._handleFullscreenChange = handleFullscreenChange;
+
     document.addEventListener('click', handleClick);
     document.addEventListener('click', handleDrawIconClick);
     document.addEventListener('fullscreenchange', handleFullscreenChange);
@@ -255,6 +271,13 @@ if (typeof wp !== 'undefined' && typeof wp.editor !== 'undefined') {
     }
 }
 
+// Initialize for Elementor frontend (non-editor) when document viewers exist on the page
+if (typeof embedpressDocViewer.epDocumentsViewerController === "function") {
+    if (jQuery('.ep-file-download-option-masked').length > 0) {
+        embedpressDocViewer.epDocumentsViewerController();
+        embedpressDocViewer.viewerStyle();
+    }
+}
 
 if (typeof embedpressDocViewer.viewerStyle === "function") {
     if (jQuery('.wp-block-embedpress-document.embedpress-document-embed').length > 0) {

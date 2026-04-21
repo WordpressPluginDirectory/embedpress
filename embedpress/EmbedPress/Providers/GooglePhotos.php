@@ -37,6 +37,7 @@ class GooglePhotos extends ProviderAdapter implements ProviderInterface
         'backgroundColor',
         'expiration',
         'photos_link',
+        'showTitle',
     ];
 
 
@@ -59,11 +60,12 @@ class GooglePhotos extends ProviderAdapter implements ProviderInterface
         return preg_match('~^https:\/\/(photos\.app\.goo\.gl|photos\.google\.com)\/.*$~i', (string) $url);
     }
 
-    public function get_embeded_content($link, $width = 0, $height = 480, $imageWidth = 1920, $imageHeight = 1080, $expiration = 60, $mode = 'gallery-player', $playerAutoplay = false, $delay = 5, $repeat = true, $aspectRatio = true, $enlarge = true, $stretch = true, $cover = false, $backgroundColor = '#000000', $photos_link = true)
+    public function get_embeded_content($link, $width = 0, $height = 480, $imageWidth = 1920, $imageHeight = 1080, $expiration = 60, $mode = 'gallery-player', $playerAutoplay = false, $delay = 5, $repeat = true, $aspectRatio = true, $enlarge = true, $stretch = true, $cover = false, $backgroundColor = '#000000', $photos_link = true, $showTitle = true)
     {
         if (is_object($link)) {
             return $this->get_html($link, $expiration);
         }
+
 
         $props = $this->create_default_attr();
         $props->link = $link;
@@ -77,6 +79,8 @@ class GooglePhotos extends ProviderAdapter implements ProviderInterface
         $props->repeat = $repeat;
         $props->backgroundColor = $backgroundColor;
         $props->photos_link = $photos_link;
+        $props->showTitle = $showTitle;
+
 
         $html = $this->get_html($props, $expiration);
 
@@ -115,9 +119,9 @@ class GooglePhotos extends ProviderAdapter implements ProviderInterface
             $items_code .= '</div>';
 
             return sprintf(
-                "<div class=\"google-photos-%s-widget\"><h3 style='text-align:left; margin: 22px 10px;'>%s</h3>%s</div>\n",
+                "<div class=\"google-photos-%s-widget\">%s%s</div>\n",
                 esc_attr($props->mode),
-                esc_html($title),
+                !empty($title) && (!isset($props->showTitle) || $props->showTitle) ? "<h3 style='text-align:left; margin: 22px 10px;'>" . esc_html($title) . "</h3>" : '',
                 $items_code
             );
         } else {
@@ -138,6 +142,7 @@ class GooglePhotos extends ProviderAdapter implements ProviderInterface
             'data-mediaitems-cover' => '',
             'data-background-color' => $props->backgroundColor,
             'data-photos-link' => isset($props->photos_link) ? ($props->photos_link ? 'true' : 'false') : 'true',
+            'data-show-title' => isset($props->showTitle) ? ($props->showTitle ? 'true' : 'false') : 'true',
         ];
 
         $attributes = apply_filters('embedpress_google_photos_attributes', $attributes, $props);
@@ -149,7 +154,7 @@ class GooglePhotos extends ProviderAdapter implements ProviderInterface
             isset($props->photos_link) &&
             $props->photos_link &&
             in_array($props->mode, ['gallery-player', 'carousel']) && 
-            $props->photos_link !== 'false'
+            $props->photos_link !== false
         ) {
             $external_link_html = sprintf(
                 '<a href="%s" target="_blank" rel="noopener noreferrer"
@@ -299,9 +304,9 @@ class GooglePhotos extends ProviderAdapter implements ProviderInterface
                 $items_code .= '</div>';
 
                 return sprintf(
-                    "<div class=\"google-photos-%s-widget\"><h3 style='text-align:left; margin: 22px 10px;'>%s</h3>%s</div>\n",
+                    "<div class=\"google-photos-%s-widget\">%s%s</div>\n",
                     esc_attr($props->mode),
-                    $title,
+                    !empty($title) && (!isset($props->showTitle) || $props->showTitle) ? "<h3 style='text-align:left; margin: 22px 10px;'>" . esc_html($title) . "</h3>" : '',
                     $items_code
                 );
             } else {
@@ -370,13 +375,13 @@ class GooglePhotos extends ProviderAdapter implements ProviderInterface
         $props->mediaitemsCover = false;
         $props->backgroundColor = '#000000';
         $props->photos_link = true;
+        $props->showTitle = true;
         return $props;
     }
 
     public function fakeDynamicResponse($html, $params)
     {
-
-        return $html;
+ 
 
         $src_url = urldecode($params['url']);
 
@@ -385,15 +390,17 @@ class GooglePhotos extends ProviderAdapter implements ProviderInterface
 
         $expiration = $params['expiration'] ?? 60;
         $mode = $params['mode'] ?? 'carousel';
-        $playerAutoplay = isset($params['playerAutoplay']) ? Helper::getBooleanParam($params['playerAutoplay']) : false;
+        $playerAutoplay = isset($params['playerAutoplay']) ? Helper::getBooleanParam($params['playerAutoplay'], false) : false;
+        $showTitle = isset($params['showTitle']) ? Helper::getBooleanParam($params['showTitle'], true) : true;
         $delay = $params['delay'] ?? 5;
-        $repeat = isset($params['repeat']) ? Helper::getBooleanParam($params['repeat']) : false;
+        $repeat = isset($params['repeat']) ? Helper::getBooleanParam($params['repeat'], true) : true;
         $aspectRatio = isset($params['mediaitemsAspectRatio']) ? Helper::getBooleanParam($params['mediaitemsAspectRatio']) : false;
         $enlarge = isset($params['mediaitemsEnlarge']) ? Helper::getBooleanParam($params['mediaitemsEnlarge']) : false;
         $stretch = isset($params['mediaitemsStretch']) ? Helper::getBooleanParam($params['mediaitemsStretch']) : false;
         $cover = isset($params['mediaitemsCover']) ? Helper::getBooleanParam($params['mediaitemsCover']) : false;
         $backgroundColor = $params['backgroundColor'] ?? '#000000';
 
+        $photos_link = isset($params['photos_link']) ? Helper::getBooleanParam($params['photos_link']) : true;
         $html = $this->get_embeded_content(
             $src_url,
             $width,
@@ -409,7 +416,9 @@ class GooglePhotos extends ProviderAdapter implements ProviderInterface
             $enlarge,
             $stretch,
             $cover,
-            $backgroundColor
+            $backgroundColor,
+            $photos_link,
+            $showTitle
         );
 
         // Conditionally load player JS only if mode is 'carousel' or autoplay is enabled
@@ -417,8 +426,8 @@ class GooglePhotos extends ProviderAdapter implements ProviderInterface
             $html .= '<script src="' . $this->player_js . '"></script>';
         }
         if ($mode === 'gallery-justify') {
-            $html .= '<script src="' . EMBEDPRESS_PLUGIN_DIR_URL . 'assets/js/gallery-justify.js"></script>';
-        }        
+            wp_enqueue_script('embedpress-gallery-justify');
+        }
         return $html;
     }
 
@@ -443,7 +452,8 @@ class GooglePhotos extends ProviderAdapter implements ProviderInterface
         $stretch = isset($params['mediaitemsStretch']) ? Helper::getBooleanParam($params['mediaitemsStretch']) : false;
         $cover = isset($params['mediaitemsCover']) ? Helper::getBooleanParam($params['mediaitemsCover']) : false;
         $backgroundColor = $params['backgroundColor'] ?? '#000000';
-        $photos_link = isset($params['photos_link']) ? Helper::getBooleanParam($params['photos_link']) : true;
+        $photos_link = isset($params['photos_link']) ? Helper::getBooleanParam($params['photos_link'], true) : true;
+        $showTitle = isset($params['showTitle']) ? Helper::getBooleanParam($params['showTitle'], true) : true;
 
         $html = $this->get_embeded_content(
             $src_url,
@@ -461,7 +471,8 @@ class GooglePhotos extends ProviderAdapter implements ProviderInterface
             $stretch,
             $cover,
             $backgroundColor,
-            $photos_link
+            $photos_link,
+            $showTitle
         );
 
         // Conditionally load player JS only if mode is 'carousel' or autoplay is enabled
@@ -469,10 +480,8 @@ class GooglePhotos extends ProviderAdapter implements ProviderInterface
             $html .= '<script src="' . $this->player_js . '"></script>';
         }
         if ($mode === 'gallery-justify') {
-            $html .= '<script src="' . EMBEDPRESS_PLUGIN_DIR_URL . 'assets/js/gallery-justify.js"></script>';
+            wp_enqueue_script('embedpress-gallery-justify');
         }
-
-        // Always load gallery layout script (or make this conditional too if needed)
 
         return [
             'type' => 'rich',
