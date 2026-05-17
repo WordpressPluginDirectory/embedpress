@@ -133,14 +133,29 @@ class EmbedPressBlockRenderer
         $url = $attributes['url'] ?? '';
         $client_id = !empty($attributes['clientId']) ? md5($attributes['clientId']) : '';
 
+        // Pro: Country Restriction. Filter returns rendered HTML to
+        // short-circuit, or false to render normally. No-op without Pro.
+        $restricted = apply_filters('embedpress/gutenberg/country_restriction_html', false, $attributes);
+        if ($restricted !== false) {
+            return $restricted;
+        }
+
         // Handle content protection
         $protection_data = self::extract_protection_data($attributes, $client_id);
         $should_display_content = self::should_display_content($protection_data);
         $isAdManager = !empty($attributes['adManager']) ? true : false;
 
 
-        // Early return for non-dynamic providers with displayable content
-        if ((!empty($content) && !self::is_dynamic_provider($url)) && $should_display_content && !$isAdManager) {
+        // Early return for non-dynamic providers with displayable content.
+        //
+        // When Custom Player (Pro #81243) is enabled we MUST fall through to
+        // render_embed_html() so build_player_options() can emit the Pro
+        // feature keys (chapters, email_capture, heatmap, etc.) into
+        // data-options. The block's save() function only emits the 13 basic
+        // player keys, so without this gate Pro features never reach
+        // initplyr.js on the front-end.
+        $has_custom_player = !empty($attributes['customPlayer']);
+        if ((!empty($content) && !self::is_dynamic_provider($url)) && !$has_custom_player && $should_display_content && !$isAdManager) {
             return $content;
         }
 
@@ -900,7 +915,11 @@ class EmbedPressBlockRenderer
             $custom_player = 'data-playerid=' . esc_attr($client_id);
 
             $options = self::build_player_options($attributes, $is_self_hosted);
-            $player_options = 'data-options=' . htmlentities(json_encode($options), ENT_QUOTES);
+            // Wrap in quotes — htmlentities(..., ENT_QUOTES) already encoded `"` as
+            // `&quot;`, but values like email-capture headlines can contain spaces,
+            // which would terminate an unquoted attribute mid-JSON and break
+            // initplyr.js's JSON.parse, silently disabling the custom player.
+            $player_options = 'data-options="' . htmlentities(json_encode($options), ENT_QUOTES) . '"';
         }
 
         return [
@@ -931,6 +950,13 @@ class EmbedPressBlockRenderer
             'download'         => !empty($attributes['playerDownload']),
         ];
 
+        // Pro: advanced custom-player feature data (auto resume, timed CTA,
+        // chapters, email capture, action lock, adaptive streaming, heatmap,
+        // LMS tracking, privacy mode, end screen). Pro plugin populates the
+        // array; with Pro disabled this is a no-op and the keys never reach
+        // the data-options blob — frontend skips those features entirely.
+        $options = apply_filters('embedpress/gutenberg/advanced_player_options', $options, $attributes);
+
         // Add conditional options
         $conditional_options = [
             'fullscreen' => 'fullscreen',
@@ -958,6 +984,88 @@ class EmbedPressBlockRenderer
 
         return $options;
     }
+
+    /**
+     * Country Restriction (Pro)
+     *
+     * Returns the HTML restricted-fallback when the viewer's country is
+     * blocked, or `false` to render normally. Reads country from
+     * Cloudflare's `CF-IPCountry` header, falling back to common Apache
+     * GeoIP / proxy headers. If no country can be detected, allow.
+     *
+     * Adds `Vary: CF-IPCountry` so caches can vary per-country.
+     */
+    /**
+     * Resolve the visitor's ISO country code. Order:
+     *   1. CDN / reverse-proxy headers (zero-cost when present)
+     *   2. `embedpress_visitor_country` filter (lets sites inject their own)
+     *   3. Free HTTP GeoIP lookup at ipwho.is, cached per-IP for 12h
+     *
+     * Returns '' (fail-open) if every source is unavailable so a misconfigured
+     * lookup never silently blocks legitimate visitors.
+     */
+    public static function resolve_visitor_country_public()
+    {
+        return self::resolve_visitor_country();
+    }
+
+    private static function resolve_visitor_country()
+    {
+        $country = '';
+        foreach (['HTTP_CF_IPCOUNTRY', 'GEOIP_COUNTRY_CODE', 'HTTP_X_COUNTRY_CODE'] as $key) {
+            if (!empty($_SERVER[$key])) {
+                $country = strtoupper(sanitize_text_field($_SERVER[$key]));
+                break;
+            }
+        }
+        $country = apply_filters('embedpress_visitor_country', $country);
+        if ($country) return $country;
+
+        $ip = self::client_ip();
+        if (!$ip) return '';
+
+        $cache_key = 'ep_geo_' . md5($ip);
+        $cached = get_transient($cache_key);
+        if ($cached !== false) {
+            return $cached === '__none__' ? '' : $cached;
+        }
+
+        $resp = wp_remote_get('https://ipwho.is/' . rawurlencode($ip) . '?fields=country_code,success', [
+            'timeout' => 2,
+        ]);
+        if (is_wp_error($resp)) {
+            // Negative-cache briefly so failed lookups don't repeat per-render.
+            set_transient($cache_key, '__none__', 5 * MINUTE_IN_SECONDS);
+            return '';
+        }
+        $body = json_decode(wp_remote_retrieve_body($resp), true);
+        $code = (is_array($body) && !empty($body['country_code'])) ? strtoupper($body['country_code']) : '';
+        set_transient($cache_key, $code ?: '__none__', $code ? 12 * HOUR_IN_SECONDS : 5 * MINUTE_IN_SECONDS);
+        return $code;
+    }
+
+    private static function client_ip()
+    {
+        foreach (['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'REMOTE_ADDR'] as $key) {
+            if (empty($_SERVER[$key])) continue;
+            $candidate = trim(explode(',', $_SERVER[$key])[0]);
+            if (filter_var($candidate, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                return $candidate;
+            }
+            // Allow private IPs only as last-resort REMOTE_ADDR (dev environments).
+            if ($key === 'REMOTE_ADDR' && filter_var($candidate, FILTER_VALIDATE_IP)) {
+                return $candidate;
+            }
+        }
+        return '';
+    }
+
+
+    /**
+     * Rewrite self-hosted video / source URLs to the configured CDN URL
+     * when an attachment has been offloaded. Best-effort regex pass over
+     * the embed HTML.
+     */
 
     /**
      * Get embed content with dynamic rendering
@@ -1034,7 +1142,7 @@ class EmbedPressBlockRenderer
     private static function get_alignment_class($align)
     {
         return isset(self::$alignment_classes[$align])
-            ? self::$alignment_classes[$align] . ' clear'
+            ? self::$alignment_classes[$align] . ' ep-clear'
             : 'aligncenter';
     }
 
@@ -1171,6 +1279,34 @@ class EmbedPressBlockRenderer
         $embed_wrapper_classes = self::build_embed_wrapper_classes($attributes);
         $content_wrapper_classes = self::build_content_wrapper_classes($attributes, $config, $styling);
 
+        // Cap the content wrapper width to the block's width control so the
+        // outer wrapper doesn't render wider than the embed itself (the inner
+        // .plyr already gets width/height inline).
+        $content_wrapper_style = '';
+        if (!empty($attributes['width'])) {
+            $unit = ($attributes['unitoption'] ?? 'px') === '%' ? '%' : 'px';
+            $content_wrapper_style = 'max-width:' . intval($attributes['width']) . $unit;
+            // max-width alone leaves the wrapper flush-left; mirror the block's
+            // align control so centered/right alignments still take effect.
+            $align = $attributes['align'] ?? '';
+            if ($align === 'center') {
+                $content_wrapper_style .= ';margin-left:auto;margin-right:auto';
+            } elseif ($align === 'right') {
+                $content_wrapper_style .= ';margin-left:auto;margin-right:0';
+            }
+        }
+
+        // Pro: CDN Offloading and Advanced Privacy Mode. Filters are
+        // no-ops without Pro; the Pro callbacks gate on the toggle.
+        $embed = apply_filters('embedpress/gutenberg/cdn_rewrite_html', $embed, $attributes);
+        $embed = apply_filters('embedpress/gutenberg/privacy_mode_html', $embed, $attributes);
+        if (!empty($attributes['customPlayer']) && !empty($attributes['playerPrivacyMode'])) {
+            // Mirror the Pro gate so the click-to-load overlay class
+            // attaches to the wrapper. Without Pro the overlay JS never
+            // runs, but the unused class is harmless.
+            $content_wrapper_classes .= ' ep-privacy-pending';
+        }
+
     ?>
         <?php if (!empty($styling['custom_branding']['styles'])): ?>
             <style>
@@ -1178,13 +1314,14 @@ class EmbedPressBlockRenderer
             </style>
         <?php endif; ?>
 
-        <div class="embedpress-gutenberg-wrapper source-provider-<?php echo Helper::get_provider_name($url); ?> <?php echo esc_attr($wrapper_classes); ?>" id="<?php echo esc_attr($block_id); ?>" data-embed-type="<?php echo Helper::get_provider_name($url); ?> ">
+        <div class="embedpress-gutenberg-wrapper source-provider-<?php echo esc_attr( Helper::get_provider_name($url) ); ?> <?php echo esc_attr($wrapper_classes); ?>" id="<?php echo esc_attr($block_id); ?>" data-embed-type="<?php echo esc_attr( Helper::get_provider_name($url) ); ?> ">
             <div class="wp-block-embed__wrapper <?php echo esc_attr($embed_wrapper_classes); ?>">
                 <div id="ep-gutenberg-content-<?php echo esc_attr($client_id) ?>" class="ep-gutenberg-content<?php echo esc_attr($styling['auto_pause']); ?>">
                     <div <?php echo esc_attr($styling['ads_attrs']); ?>>
                         <div class="ep-embed-content-wraper <?php echo esc_attr($content_wrapper_classes); ?>"
+                            <?php if (!empty($content_wrapper_style)): ?>style="<?php echo esc_attr($content_wrapper_style); ?>"<?php endif; ?>
                             <?php echo esc_attr($player_config['custom_player']); ?>
-                            <?php echo esc_attr($player_config['player_options']); ?>
+                            <?php echo $player_config['player_options']; // already a complete escaped attribute (data-options="..."); esc_attr would double-encode the outer quotes ?>
                             <?php echo esc_attr($carousel_config['carousel_id']); ?>
                             <?php echo esc_attr($carousel_config['carousel_options']); ?>>
 
@@ -1519,37 +1656,75 @@ class EmbedPressBlockRenderer
         $is_public = $attributes['is_public'] ?? true;
         $align = $attributes['align'] ?? 'center';
 
-        // If no URL is provided, return empty
+        $align_class = 'align' . $align;
+
+        // Private branch: same path Elementor uses — fire the action that Pro
+        // ([Embedpress\Pro\Filters\Calendar]) hooks to emit the epgc-calendar
+        // shortcode markup. Frontend JS then hydrates it via the AJAX endpoint
+        // (which has its own transient cache via epgc_cache_time).
+        if (!$is_public) {
+            if (!apply_filters('embedpress/is_allow_rander', false)) {
+                return '';
+            }
+            // Enqueue the FullCalendar bundle. The Elementor widget gets these
+            // automatically via get_script_depends(); the Gutenberg block needs
+            // an explicit call at render time since block.json has no viewScript.
+            if (class_exists('Embedpress_Google_Helper')) {
+                \Embedpress_Google_Helper::enqueue_scripts(); // ensures registration
+            }
+            wp_enqueue_style('fullcalendar');
+            wp_enqueue_style('fullcalendar_daygrid');
+            wp_enqueue_style('fullcalendar_timegrid');
+            wp_enqueue_style('fullcalendar_list');
+            wp_enqueue_style('epgc');
+            wp_enqueue_style('tippy_light');
+            wp_enqueue_script('fullcalendar_moment_timezone');
+            wp_enqueue_script('fullcalendar_daygrid');
+            wp_enqueue_script('fullcalendar_timegrid');
+            wp_enqueue_script('fullcalendar_list');
+            wp_enqueue_script('fullcalendar_locales');
+            wp_enqueue_script('tippy');
+            wp_enqueue_script('epgc');
+            // Localize the nonce + ajax URL onto the epgc handle. LocalizationManager
+            // handles this on Elementor pages; on Gutenberg frontends we have to.
+            if (class_exists('\\EmbedPress\\Core\\LocalizationManager')) {
+                \EmbedPress\Core\LocalizationManager::setup_elementor_localization();
+            }
+
+            ob_start();
+            ?>
+            <figure class="wp-block-embedpress-embedpress-calendar <?php echo esc_attr($align_class); ?>" style="width: <?php echo esc_attr($width); ?>px; height: <?php echo esc_attr($height); ?>px;">
+                <?php do_action('embedpress_google_helper_shortcode', 10); ?>
+                <?php if ($powered_by) : ?>
+                    <p class="embedpress-el-powered"><?php echo esc_html__('Powered By EmbedPress', 'embedpress'); ?></p>
+                <?php endif; ?>
+            </figure>
+            <?php
+            return ob_get_clean();
+        }
+
+        // Public branch: iframe to calendar.google.com's embed view.
         if (empty($url)) {
             return '';
         }
-
-        // Validate Google Calendar URL
         if (!self::is_google_calendar_url($url)) {
             return '<p class="embedpress-el-powered">' . esc_html__('Invalid Calendar Link', 'embedpress') . '</p>';
         }
 
-        // Build alignment class
-        $align_class = 'align' . $align;
-
-        // Sanitize URL
         $sanitized_url = esc_url($url);
 
-        // Generate Calendar block HTML
         ob_start();
     ?>
         <figure class="wp-block-embedpress-embedpress-calendar <?php echo esc_attr($align_class); ?>" style="width: <?php echo esc_attr($width); ?>px; height: <?php echo esc_attr($height); ?>px;">
-            <?php if ($is_public && self::is_google_calendar_url($url)) : ?>
-                <iframe src="<?php echo esc_url($sanitized_url); ?>"
-                        width="<?php echo esc_attr($width); ?>"
-                        height="<?php echo esc_attr($height); ?>"
-                        frameborder="0"
-                        scrolling="no"
-                        title="<?php echo esc_attr(self::get_iframe_title_from_url($url)); ?>">
-                </iframe>
-            <?php endif; ?>
+            <iframe src="<?php echo esc_url($sanitized_url); ?>"
+                    width="<?php echo esc_attr($width); ?>"
+                    height="<?php echo esc_attr($height); ?>"
+                    frameborder="0"
+                    scrolling="no"
+                    title="<?php echo esc_attr(self::get_iframe_title_from_url($url)); ?>">
+            </iframe>
 
-            <?php if ($powered_by && self::is_google_calendar_url($url)) : ?>
+            <?php if ($powered_by) : ?>
                 <p class="embedpress-el-powered"><?php echo esc_html__('Powered By EmbedPress', 'embedpress'); ?></p>
             <?php endif; ?>
         </figure>
