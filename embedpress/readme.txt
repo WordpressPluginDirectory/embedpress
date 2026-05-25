@@ -6,7 +6,7 @@ Tags: embed, embed YouTube, embed PDF, Google Docs, Social Feeds
 Requires at least: 4.6
 Tested up to: 7.0
 Requires PHP: 5.6
-Stable tag: 4.5.3
+Stable tag: 4.5.4
 License: GPLv3 or later
 License URI: https://opensource.org/licenses/GPL-3.0
 
@@ -106,7 +106,7 @@ Along with YouTube video embeds, EmbedPress also enables you to embed custom log
 - Custom Branding for Dailymotion embed [PRO]
 - Custom Branding for PDFs & Documents [PRO]
 
-### 🏆 EXCLUSIVE CUSTOMIZATIONS FOR MULTIMEDIA EMBEDS [PRO]
+### 🏆 EXCLUSIVE CUSTOMIZATIONS FOR MULTIMEDIA EMBEDS [PRO] 
 
 
 -   [Vimeo](https://embedpress.com/docs/embed-vimeo-videos-wordpress/): Play your videos on Loop, turn on Auto Pause, enable DNT, and much more.
@@ -349,6 +349,12 @@ With EmbedPress you can easily create PDF flipbooks. First, upload PDF into your
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+= [4.5.4] – 2026-05-25 =
+- Fixed: Plain permalink issue in Gutenberg embeds.
+- Fixed: WPML translation issue on Admin Settings page.
+- Improved: YouTube video embedding process with proper escaping.
+- Few minor bug fixes and improvements.
+
 = [4.5.3] – 2026-05-17 =
 - Added: WordPress 7.0 compatibility.
 - Added: Instagram shortcode generator with Grid, Masonry, Carousel, and Justify layouts.
@@ -503,7 +509,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed: Text domain error in WordPress 6.8
 - Improved: Smoother popup pre-loader and animation transitions.
 - Added: Support for large-scale images in popup viewer.
-- Added: Controls in dashboard for quick support & review option.
+- Added: Controls in dashboard for quick support & review option. 
 - Fixed: EmbedPress global height settings issue in Elementor.
 - Few minor bug fixes and improvements.
 
@@ -541,7 +547,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Minor bug fixes and performance enhancements.
 
 = [4.1.8] – 2025-01-07 =
-- Fixed: Embedding on Elementor wasn’t working properly.
+- Fixed: Embedding on Elementor wasn’t working properly. 
 - Few minor bug fixes & improvements.
 
 = [4.1.7] – 2025-01-06 =
@@ -559,89 +565,89 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed: Missing Instagram controls in Elementor.
 - Few minor bug fixes & improvements.
 
-= [4.1.4] – 2024-11-25 =
+= [4.1.4] – 2024-11-25 =  
 - Fixed: Global height & width control issues.
 - Fixed: CSS conflict with the Pretty Google Calendar plugin.
 - Improved: Security enhancements for better performance.
 - Few minor bug fixes and improvements.
 
-= [4.1.3] – 2024-11-13 =
+= [4.1.3] – 2024-11-13 =  
 - Fixed: Custom player switching issues to full-screen mode on iPhone.
 - Fixed: Disable “Copy Text” option wasn’t working on Safari browser.
 - Fixed: Horizontal scrollbar was appearing in PDF 3D Flipbook view.
 - Few minor bug fixes and improvements.
 
-= [4.1.2] – 2024-11-07 =
+= [4.1.2] – 2024-11-07 =  
 - Fixed: Shortcode issues with Beaver Builder.
 - Fixed: Undefined error in Gutenberg Editor.
 - Fixed: Facebook embedding issues.
 - Few minor bug fixes & improvements.
 
-= [4.1.1] – 2024-10-23 =
+= [4.1.1] – 2024-10-23 =  
 - Added: Spreaker embedding support.
 - Added: Height/Width unit selection (px/%) for shortcodes.
 - Fixed: Height and width issues in the EmbedPress Elementor widget.
 - Fixed: Responsive display issues with Google Docs.
 - Few minor bug fixes and improvements.
 
-= [4.1.0] – 2024-10-03 =
+= [4.1.0] – 2024-10-03 =  
 - Fixed: Dailymotion video embedding issue in Elementor.
 - Fixed: Global Branding settings issue.
 - Improved: Custom Ad UI in the dashboard.
 - Improved: Security based on PatchStack report.
 - Few minor bug fixes and improvements.
 
-= [4.0.14] – 2024-09-12 =
+= [4.0.14] – 2024-09-12 =  
 - Added: Option to update/replace embedded PDFs.
 - Improved: Auto-pause for self-hosted audio/video when a new one plays.
 - Few minor bug fixes and improvements.
 
-= [4.0.13] – 2024-09-10 =
-- Improved: Refactored codebase for enhanced performance.
+= [4.0.13] – 2024-09-10 =  
+- Improved: Refactored codebase for enhanced performance.  
 - Few minor bug fixes and improvements.
 
-= [4.0.12] – 2024-08-28 =
-- fixed: Thumbnail size issues in media library.
+= [4.0.12] – 2024-08-28 =  
+- fixed: Thumbnail size issues in media library.  
 - Few minor bug fixes and improvements.
 
-= [4.0.11] – 2024-08-22 =
+= [4.0.11] – 2024-08-22 =  
 - Added: Advanced layouts for Youtube Embed.
 - Few minor bug fixes and improvements.
 
-= [4.0.10] – 2024-08-12 =
+= [4.0.10] – 2024-08-12 =  
 - Improved: Security Enhancement reported by PatchStack.
 - Few minor bug fixes & improvements.
 
-= [4.0.9] – 2024-08-8 =
+= [4.0.9] – 2024-08-8 =  
 - Improved: Added lazy load option for PDF embeds.
 - Enhanced: Security improvements reported by Patchstack (Kinorth).
 - Fixed: few minor bugs and overall performance enhancements.
 
-= [4.0.8] – 2024-07-31 =
-- Hotfix: PDF stopped loading.
+= [4.0.8] – 2024-07-31 =  
+- Hotfix: PDF stopped loading. 
 
-= [4.0.7] – 2024-07-31 =
+= [4.0.7] – 2024-07-31 =  
 - Fixed: Youtube Video embedding issue.
 - Improved: Embedded PDF's way of loading in frontend.
 - Few minor bug fixes & improvements.
 
-= [4.0.6] – 2024-07-16 =
+= [4.0.6] – 2024-07-16 =  
 - Added: WordPress 6.6 compatibility.
 - Fixed: PDF Download, Print and Presentation for IOS devices.
 - Few minor bug fixes & improvements.
 
-= [4.0.5] – 2024-07-07 =
+= [4.0.5] – 2024-07-07 =  
 - Added: Google viewer for PPTX file.
 - Improved: Security Enhancement
 - Few minor bug fixes & improvements.
 
-= [4.0.4] – 2024-06-30 =
+= [4.0.4] – 2024-06-30 =  
 - Fixed: Giphy Embedding issues.
 - Added: ‘Add image’ controller in EmbedPress PDF.
 - Fixed: Conflicts with BetterDocs plugin.
 - Few minor bug fixes and improvements.
 
-= [4.0.3] – 2024-06-12 =
+= [4.0.3] – 2024-06-12 =  
 - Added: 3D FlipBook viewer for Embedded PDF.
 - Fixed: PHP 8.3 deprecated issues.
 - Fixed: Conflict with Toolset plugin.
@@ -652,7 +658,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Improved: Security Enhancement (Reported by PatchStack).
 - Few minor bug fixes & improvements.
 
-= [4.0.2] – 2024-06-04 =
+= [4.0.2] – 2024-06-04 =  
 - Fixed: Embedded video's issues with Custom Player.
 - Fixed: PDF’s Save & Print button weren’t working on small devices
 - Fixed: Current page preview wasn’t working for Embeded PDF.
@@ -660,7 +666,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Improved: Global settings support for height, width, and PDF custom color.
 - Few minor bug fixes & improvements.
 
-= [4.0.1] – 2024-05-26 =
+= [4.0.1] – 2024-05-26 =  
 - Added: LinkedIn post embedding support.
 - Fixed: Design broken issues with latest Elementor.
 - Fixed: X post embedding issues.
@@ -668,7 +674,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Improved: Optimized code for better performance.
 - Few minor bug fixes & improvements.
 
-= [4.0.0] – 2024-05-21 =
+= [4.0.0] – 2024-05-21 =  
 - Added: Instagram feed embedding support with advanced layouts.
 - Improved: EP dashboard UI.
 - Few minor bug fixes & improvements.
@@ -683,7 +689,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 = [3.9.16] – 2024-04-16 =
 - Fixed: Global CSS breaks page layout.
 - Fixed: Hight width controller for Matterport Video embedding.
-- Fixed: Responsiveness issue for iPhone navigation.
+- Fixed: Responsiveness issue for iPhone navigation. 
 - Improved: Optimized performance & Security.
 - Few minor bug fixes & improvements.
 
@@ -701,12 +707,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed : Gutenberg editor responsive issues.
 - Improved: Security patch updated.
 - Improved:  PDF controls for Elementor editor.
-- Few minor bug fixes and improvements.
+- Few minor bug fixes and improvements. 
 
 = [3.9.12] – 2024-03-12 =
-- Added: Security Enhancement.
-- Fixed: License activation issues with page reload.
-- Few minor bug fixes and improvements.
+- Added: Security Enhancement. 
+- Fixed: License activation issues with page reload. 
+- Few minor bug fixes and improvements. 
 
 = [3.9.11] – 2024-03-5 =
 - Fixed: OpenSea NFT collection/assets embedding issues.
@@ -730,7 +736,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed: Auto-play control of Tiktok embedding.
 - Fixed: SoundCloud settings page wasn't working.
 - Fixed: '.dk' domain URL wasn't embedding.
-- Improved: OpenSea embedding.
+- Improved: OpenSea embedding. 
 - Few minor bug fixes & improvements.
 
 = [3.9.7] – 2024-01-09 =
@@ -759,8 +765,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Few minor bug fixes & improvements.
 
 = [3.9.2] - 2023-11-16 =
-- Fixed: Conflicts with Essential Blocks for Gutenberg.
-- Improved: Security Enhancement | Suggested by WPScan.
+- Fixed: Conflicts with Essential Blocks for Gutenberg. 
+- Improved: Security Enhancement | Suggested by WPScan. 
 - Few minor bug fixes & improvements.
 
 = [3.9.1] - 2023-10-22 =
