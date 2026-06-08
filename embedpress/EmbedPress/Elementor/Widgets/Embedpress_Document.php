@@ -119,6 +119,49 @@ class Embedpress_Document extends Widget_Base
 		$this->end_controls_section();
 	}
 
+	/**
+	 * Per-embed toggles for the visitor view-count / download-count badge.
+	 * Default on; the frontend script honours the global option as the master
+	 * gate and treats these switches as a per-embed opt-out.
+	 */
+	public function init_stats_controls()
+	{
+		$this->start_controls_section(
+			'embedpress_stats_section',
+			[
+				'label' => __('Engagement Stats', 'embedpress'),
+			]
+		);
+
+		$this->add_control(
+			'embedpress_doc_show_view_count',
+			[
+				'label'        => __('Show View Count', 'embedpress'),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'label_on'     => __('Show', 'embedpress'),
+				'label_off'    => __('Hide', 'embedpress'),
+				'return_value' => 'yes',
+				'default'      => '',
+				'description'  => __('Display the visitor view counter on this embed.', 'embedpress'),
+			]
+		);
+
+		$this->add_control(
+			'embedpress_doc_show_download_count',
+			[
+				'label'        => __('Show Download Count', 'embedpress'),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'label_on'     => __('Show', 'embedpress'),
+				'label_off'    => __('Hide', 'embedpress'),
+				'return_value' => 'yes',
+				'default'      => '',
+				'description'  => __('Display the download counter on this embed.', 'embedpress'),
+			]
+		);
+
+		$this->end_controls_section();
+	}
+
     protected function register_controls()
     {
 	    $class = 'embedpress-pro-control not-active';
@@ -470,6 +513,7 @@ class Embedpress_Document extends Widget_Base
         do_action( 'extend_elementor_controls', $this, '_doc_', $this->pro_text, $this->pro_class);
 
         $this->init_performance_controls();
+        $this->init_stats_controls();
 
 
     }
@@ -533,7 +577,15 @@ class Embedpress_Document extends Widget_Base
         $url = esc_url($this->get_file_url());
         $id = 'embedpress-pdf-' . esc_attr($this->get_id());
 
-        if ($settings['embedpress_document_type'] === 'url' && !empty($settings['__dynamic__']['embedpress_document_file_link'])) {
+        if (
+            $settings['embedpress_document_type'] === 'url'
+            && !empty($settings['__dynamic__']['embedpress_document_file_link'])
+        ) {
+            // ACF / Toolset / JetEngine dynamic-tag resolution has been a free
+            // capability of this widget since 2024 — do NOT Pro-gate it. The
+            // newer Gutenberg / shortcode "Dynamic Source" flow is gated
+            // separately in EmbedPressBlockRenderer::apply_dynamic_source
+            // and Shortcode::parseContent.
             $resolved = DynamicFieldResolver::resolve_elementor_dynamic($settings['__dynamic__']['embedpress_document_file_link']);
             if ($resolved !== '') {
                 $url = $resolved;
@@ -562,12 +614,17 @@ class Embedpress_Document extends Widget_Base
         // Track Document widget usage for analytics
         $this->track_document_widget_usage($settings, $url, $content_id);
 
-        $this->add_render_attribute('embedpres-pdf-render', [
+        $doc_render_attrs = [
             'class' => ['embedpress-embed-document-pdf', $id],
             'data-emid' => esc_attr($id),
             'data-embedpress-content' => esc_attr($content_id),
             'data-embed-type' => 'Document'
-        ]);
+        ];
+        // Per-embed override for the engagement-stats badge (default = off).
+        // Explicit on/off lets the per-embed toggle win over the global option.
+        $doc_render_attrs['data-ep-views'] = (isset($settings['embedpress_doc_show_view_count']) && $settings['embedpress_doc_show_view_count'] === 'yes') ? 'on' : 'off';
+        $doc_render_attrs['data-ep-downloads'] = (isset($settings['embedpress_doc_show_download_count']) && $settings['embedpress_doc_show_download_count'] === 'yes') ? 'on' : 'off';
+        $this->add_render_attribute('embedpres-pdf-render', $doc_render_attrs);
 
         Helper::get_source_data(md5($this->get_id()) . '_eb_elementor', $url, 'elementor_source_data', 'elementor_temp_source_data');
 
