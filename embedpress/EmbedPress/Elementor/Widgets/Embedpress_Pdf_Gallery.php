@@ -662,6 +662,42 @@ class Embedpress_Pdf_Gallery extends Widget_Base
             ]
         );
 
+        $this->add_control(
+            'flipbook_rtl',
+            [
+                'label' => sprintf(__('RTL Page Flip %s', 'embedpress'), $this->pro_text),
+                'description' => __('Reverse the page-turn direction so the flipbook opens and flips from right to left.', 'embedpress'),
+                'type' => Controls_Manager::SWITCHER,
+                'default' => '',
+                'classes' => $this->pro_class,
+                'condition' => ['viewer_style' => 'flip-book'],
+            ]
+        );
+
+        $this->add_control(
+            'flipbook_highlight_links',
+            [
+                'label' => __('Highlight Links', 'embedpress'),
+                'description' => __('Show a colored background behind hyperlinks in the flipbook.', 'embedpress'),
+                'type' => Controls_Manager::SWITCHER,
+                'default' => '',
+                'condition' => ['viewer_style' => 'flip-book'],
+            ]
+        );
+
+        $this->add_control(
+            'flipbook_highlight_color',
+            [
+                'label' => __('Highlight Color', 'embedpress'),
+                'type' => Controls_Manager::COLOR,
+                'default' => 'rgba(255, 255, 0, 0.1)',
+                'condition' => [
+                    'viewer_style' => 'flip-book',
+                    'flipbook_highlight_links' => 'yes',
+                ],
+            ]
+        );
+
         $this->end_controls_section();
 
         // Watermark Controls Section
@@ -765,6 +801,9 @@ class Embedpress_Pdf_Gallery extends Widget_Base
             'zoom_out' => !empty($settings['zoom_out']) ? 'true' : 'false',
             'fit_view' => !empty($settings['fit_view']) ? 'true' : 'false',
             'bookmark' => !empty($settings['bookmark']) ? 'true' : 'false',
+            'flipbook_rtl' => defined('EMBEDPRESS_SL_ITEM_SLUG') && !empty($settings['flipbook_rtl']) && $settings['flipbook_rtl'] === 'yes' ? 'true' : 'false',
+            'flipbook_highlight_links' => !empty($settings['flipbook_highlight_links']) && $settings['flipbook_highlight_links'] === 'yes' ? 'true' : 'false',
+            'flipbook_highlight_color' => !empty($settings['flipbook_highlight_color']) ? esc_attr($settings['flipbook_highlight_color']) : '',
             'watermark_text' => defined('EMBEDPRESS_SL_ITEM_SLUG') && !empty($settings['watermark_text']) ? $settings['watermark_text'] : '',
             'watermark_font_size' => defined('EMBEDPRESS_SL_ITEM_SLUG') && !empty($settings['watermark_font_size']) ? $settings['watermark_font_size'] : '48',
             'watermark_color' => defined('EMBEDPRESS_SL_ITEM_SLUG') && !empty($settings['watermark_color']) ? Helper::get_elementor_global_color($settings, 'watermark_color') : '#000000',

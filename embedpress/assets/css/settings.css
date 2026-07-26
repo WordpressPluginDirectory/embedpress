@@ -5692,6 +5692,10 @@ ul.feature-list li {
     border: none;
     outline: none;
     box-shadow: none;
+    background: transparent;
+    color: inherit;
+    -webkit-text-fill-color: currentColor;
+    opacity: 1;
     width: calc(100% - 50px);
     display: inline;
 }

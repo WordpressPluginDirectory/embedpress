@@ -172,10 +172,61 @@ class AssetManager
             'priority' => 5,
             'page' => 'embedpress-player-engagement'
         ],
+        'google-reviews-js' => [
+            'file' => 'js/google-reviews.build.js',
+            'deps' => [],
+            'contexts' => ['admin'],
+            'type' => 'script',
+            'footer' => true,
+            'handle' => 'embedpress-google-reviews-admin',
+            'priority' => 5,
+            'page' => 'embedpress-google-reviews'
+        ],
+        'google-reviews-css' => [
+            'file' => 'css/google-reviews.build.css',
+            'deps' => [],
+            'contexts' => ['admin'],
+            'type' => 'style',
+            'handle' => 'embedpress-google-reviews-admin-css',
+            'priority' => 5,
+            'page' => 'embedpress-google-reviews'
+        ],
+        // GR FRONTEND assets (the block/shortcode render CSS + read-more JS).
+        // Registered at priority 1 (register_all_assets) so the handle
+        // `embedpress-google-reviews` ALWAYS exists early — Pro's
+        // `embedpress-google-reviews-pro` style declares it as a dependency on
+        // `wp_enqueue_scripts`, which fires before the block renders. Previously
+        // this was registered lazily inside GoogleReviewsRenderer at render time,
+        // so Pro's dependency was "not registered" on the frontend → WP 6.9.1
+        // "dependencies that are not registered" notice. `has_content` keeps the
+        // actual ENQUEUE gated to pages that have a GR block/shortcode.
+        'google-reviews-frontend-css' => [
+            'file' => 'css/google-reviews.css',
+            'deps' => [],
+            'contexts' => ['frontend', 'editor', 'elementor'],
+            'type' => 'style',
+            'handle' => 'embedpress-google-reviews',
+            'priority' => 1,
+            'condition' => 'has_content',
+        ],
+        'google-reviews-frontend-js' => [
+            'file' => 'js/google-reviews.js',
+            'deps' => [],
+            'contexts' => ['frontend', 'editor', 'elementor'],
+            'type' => 'script',
+            'footer' => true,
+            'handle' => 'embedpress-google-reviews',
+            'priority' => 1,
+            'condition' => 'has_content',
+        ],
         // Priority 7-10: Blocks
         'blocks-js' => [
             'file' => 'js/blocks.build.js',
-            'deps' => ['wp-blocks', 'wp-i18n', 'wp-element', 'wp-api-fetch', 'wp-is-shallow-equal', 'wp-editor', 'wp-components'],
+            // wp-hooks is required: blocks call wp.hooks.applyFilters() to expose
+            // Pro extension slots (e.g. Google Reviews Pro controls). Without it,
+            // load order isn't guaranteed and Pro's addFilter() can register after
+            // the block first renders, leaving the free upsell placeholder showing.
+            'deps' => ['wp-blocks', 'wp-i18n', 'wp-element', 'wp-api-fetch', 'wp-is-shallow-equal', 'wp-editor', 'wp-components', 'wp-hooks'],
             'contexts' => ['editor'],
             'type' => 'script',
             'footer' => true,
@@ -974,6 +1025,8 @@ class AssetManager
                 return $current_page === 'embedpress-onboarding';
             case 'embedpress-player-engagement':
                 return $current_page === 'embedpress-player-engagement';
+            case 'embedpress-google-reviews':
+                return $current_page === 'embedpress-google-reviews';
             default:
                 return false;
         }
@@ -1343,7 +1396,8 @@ class AssetManager
             'embedpress/embedpress-pdf',
             'embedpress/pdf-gallery',
             'embedpress/document',
-            'embedpress/embedpress-calendar'
+            'embedpress/embedpress-calendar',
+            'embedpress/google-reviews'
         ];
 
         foreach ($embedpress_blocks as $block_name) {
@@ -1680,6 +1734,7 @@ class AssetManager
                     'googledocs' => 'google-docs',
                     'googlesheets' => 'google-sheets',
                     'googleslides' => 'google-slides',
+                    'googlephotos' => 'google-photos',
                 ];
 
                 // Check if provider name matches our map
@@ -1712,6 +1767,10 @@ class AssetManager
             } else {
                 $types[] = 'youtube';
             }
+        }
+        // Google Photos (shared album links)
+        elseif (strpos($url_lower, 'photos.app.goo.gl') !== false || strpos($url_lower, 'photos.google.com') !== false) {
+            $types[] = 'google-photos';
         }
         // PDF detection
         elseif (preg_match('/\.pdf$/i', $url)) {

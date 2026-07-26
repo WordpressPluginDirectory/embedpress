@@ -158,6 +158,59 @@ class Helper
 	{
 		return strpos($url, "opensea.io") !== false;
 	}
+
+	/**
+	 * Reject the three internal IPv4 ranges that WordPress core's own SSRF guard
+	 * (wp_http_validate_url) leaves reachable: link-local (169.254/16, incl. the
+	 * 169.254.169.254 cloud-metadata endpoint), CGNAT (100.64/10) and benchmark
+	 * (198.18/15). Core already rejects loopback, RFC1918 and every IPv6 form, so
+	 * this only fills the IPv4 gap — using the same octet check core uses itself.
+	 *
+	 * Core's `http_request_host_is_external` filter only fires for IPs core
+	 * already suspects, so it can't cover these; `pre_http_request` fires for every
+	 * request, guarding every wp_remote / wp_safe_remote call (including redirect
+	 * hops). Resolving the host with gethostbyname mirrors core and normalises
+	 * hostnames + integer-encoded literals to a dotted quad.
+	 *
+	 * @param false|array|\WP_Error $preempt Short-circuit value (false to proceed).
+	 * @param array                 $args    Request args (unused).
+	 * @param string                $url     The request URL.
+	 * @return false|\WP_Error
+	 */
+	public static function block_internal_http_requests($preempt, $args, $url)
+	{
+		if (false !== $preempt) {
+			return $preempt; // a prior hook already decided
+		}
+
+		$host = wp_parse_url($url, PHP_URL_HOST);
+		if (empty($host)) {
+			return $preempt;
+		}
+		$host = rtrim(trim($host, '[]'), '.'); // drop IPv6 brackets + trailing FQDN dot
+
+		// Resolve to an IPv4 address, exactly as core's wp_http_validate_url does.
+		$ip = preg_match('/^(\d{1,3}\.){3}\d{1,3}$/', $host) ? $host : gethostbyname($host);
+		if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+			return $preempt; // not IPv4 (IPv6 is core's job) or unresolved
+		}
+
+		$p = array_map('intval', explode('.', $ip));
+		$internal =
+			(169 === $p[0] && 254 === $p[1])                      // link-local 169.254/16
+			|| (100 === $p[0] && 64 <= $p[1] && 127 >= $p[1])     // CGNAT 100.64/10
+			|| (198 === $p[0] && (18 === $p[1] || 19 === $p[1])); // benchmark 198.18/15
+
+		if ($internal) {
+			return new \WP_Error(
+				'http_request_blocked',
+				__('Requests to internal hosts are not allowed.', 'embedpress')
+			);
+		}
+
+		return $preempt;
+	}
+
 	public static function is_youtube_channel($url)
 	{
 		return (bool) (preg_match('~(?:https?:\/\/)?(?:www\.)?(?:youtube.com\/)(?:channel\/|c\/|user\/|@)(\w+)~i', (string) $url));
@@ -1196,7 +1249,18 @@ class Helper
 
 			if ($license_data_raw) {
 				$license_data = json_decode(json_encode($license_data_raw), true);
-				$license_key = isset($license_data['license_key']) ? $license_data['license_key'] : '';
+			}
+
+			// The license STATUS is a persistent option, but the license_data
+			// TRANSIENT (which carries the key) expires — so reading the key
+			// only from the transient leaves an "Active" license with an empty
+			// key field once it lapses. The Pro LicenseManager also persists the
+			// full key in the `embedpress_pro_software__license` option, so use
+			// that as the authoritative source; fall back to the transient's
+			// (already-masked) key only if the option is somehow empty.
+			$license_key = get_option('embedpress_pro_software__license', '');
+			if ($license_key === '' && isset($license_data['license_key'])) {
+				$license_key = $license_data['license_key'];
 			}
 
 			$is_features_enabled = ($license_status === 'valid');
@@ -1210,6 +1274,42 @@ class Helper
 			'is_features_enabled' => $is_features_enabled,
 			'status_message' => self::get_license_status_message($is_pro_active, $license_status)
 		];
+	}
+
+	/**
+	 * Mask a license key for display, keeping only the head and tail visible.
+	 *
+	 * The full key must never render into the DOM of the settings page (it sits
+	 * in a disabled input, readable via view-source / dev-tools). This keeps the
+	 * real key's first 4 and last 5 characters and replaces every character in
+	 * between with an asterisk — so the mask length matches the true key length
+	 * (e.g. a 29-char key → "2343********************32432"). Safe to echo into
+	 * the visible input's value.
+	 *
+	 * Short keys (<= head+tail chars) are fully masked so nothing meaningful
+	 * leaks. Empty input returns empty.
+	 *
+	 * @param string $key  The raw license key.
+	 * @param int    $head Visible leading chars. Default 4.
+	 * @param int    $tail Visible trailing chars. Default 5.
+	 * @return string Masked key, or '' when $key is empty.
+	 */
+	public static function mask_license_key($key, $head = 4, $tail = 5)
+	{
+		$key = (string) $key;
+		$len = strlen($key);
+
+		if ($len === 0) {
+			return '';
+		}
+
+		// Too short to reveal head+tail without overlap — mask entirely.
+		if ($len <= ($head + $tail)) {
+			return str_repeat('*', $len);
+		}
+
+		// Star out the real middle so the masked length equals the key length.
+		return substr($key, 0, $head) . str_repeat('*', $len - $head - $tail) . substr($key, -$tail);
 	}
 
 	/**

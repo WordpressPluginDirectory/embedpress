@@ -59,6 +59,13 @@ class MilestoneNotification
             return;
         }
 
+        // Never show two EmbedPress announcements at once: when the "What's
+        // New" feature-preview modal is queued for this release it owns the
+        // dashboard, so suppress the milestone entirely (assets + markup).
+        if ($this->whatsnew_modal_active()) {
+            return;
+        }
+
         // Enqueue the milestone CSS
         wp_enqueue_style(
             'embedpress-milestone',
@@ -134,6 +141,14 @@ class MilestoneNotification
         // Only show on main dashboard
         $screen = get_current_screen();
         if (!$screen || $screen->id !== 'dashboard') {
+            return;
+        }
+
+        // Never show two EmbedPress announcements at once: the "What's New"
+        // feature-preview modal takes precedence on the dashboard, so bail if
+        // it's queued for this release (mirrors FeatureNoticeManager's tooltip
+        // suppression).
+        if ($this->whatsnew_modal_active()) {
             return;
         }
 
@@ -471,6 +486,23 @@ class MilestoneNotification
         }
 
         return false;
+    }
+
+    /**
+     * Whether the "What's New" feature-preview modal is queued for this
+     * request. When it is, the modal is the single, higher-priority dashboard
+     * announcement and every other EmbedPress notice (milestone, menu tooltip)
+     * must stand down so the user never sees two at once.
+     *
+     * @return bool
+     */
+    private function whatsnew_modal_active()
+    {
+        if (!class_exists('\\EmbedPress\\Includes\\Classes\\FeaturePreviewModal')) {
+            return false;
+        }
+
+        return \EmbedPress\Includes\Classes\FeaturePreviewModal::get_instance()->has_active_modal();
     }
 
     /**

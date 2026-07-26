@@ -11,6 +11,8 @@ use EmbedPress\Elementor\Widgets\Embedpress_Document;
 use EmbedPress\Elementor\Widgets\Embedpress_Elementor;
 use EmbedPress\Elementor\Widgets\Embedpress_Pdf;
 use EmbedPress\Elementor\Widgets\Embedpress_Pdf_Gallery;
+use EmbedPress\Elementor\Widgets\Embedpress_Google_Reviews;
+use EmbedPress\Elementor\Controls\Place_Picker as GR_Place_Picker;
 use EmbedPress\Includes\Classes\Helper;
 
 class Embedpress_Elementor_Integration
@@ -23,7 +25,10 @@ class Embedpress_Elementor_Integration
     {
         $elements = (array) get_option(EMBEDPRESS_PLG_NAME . ":elements", []);
         $e_blocks = isset($elements['elementor']) ? (array) $elements['elementor'] : [];
-        if (!empty($e_blocks['embedpress']) || !empty($e_blocks['embedpress-document']) || !empty($e_blocks['embedpress-pdf']) || !empty($e_blocks['embedpress-pdf-gallery'])) {
+        if (!empty($e_blocks['embedpress']) || !empty($e_blocks['embedpress-document']) || !empty($e_blocks['embedpress-pdf']) || !empty($e_blocks['embedpress-pdf-gallery']) || !empty($e_blocks['embedpress-google-reviews'])) {
+            // Custom control type for the Google Reviews place picker.
+            add_action('elementor/controls/register', [$this, 'register_google_reviews_controls']);
+            add_action('elementor/editor/before_enqueue_scripts', [$this, 'enqueue_google_reviews_picker']);
             // Asset enqueuing now handled by AssetManager
             add_action('elementor/elements/categories_registered', array($this, 'register_widget_categories'));
             add_action('elementor/widgets/widgets_registered', array($this, 'register_widget'));
@@ -72,6 +77,17 @@ class Embedpress_Elementor_Integration
      */
     public function register_widget($widgets_manager)
     {
+        // Guard against double-registration when both `widgets_registered`
+        // and `widgets/register` hooks fire (Elementor fires both on modern
+        // versions). The pre-existing did_action guard misses the second
+        // call, which triggers PHP notices like "Cannot redeclare control
+        // with same name 'ep_gr_place'" from the Google Reviews widget.
+        static $registered = false;
+        if ($registered) {
+            return;
+        }
+        $registered = true;
+
         if (
             did_action('elementor/widgets/widgets_registered') &&
             did_action('elementor/widgets/register') // doing action
@@ -99,6 +115,9 @@ class Embedpress_Elementor_Integration
             if (!empty($e_blocks['embedpress-calendar'])) {
                 $widgets_manager->register(new Embedpress_Calendar);
             }
+            if (!isset($e_blocks['embedpress-google-reviews']) || !empty($e_blocks['embedpress-google-reviews'])) {
+                $widgets_manager->register(new Embedpress_Google_Reviews);
+            }
         } else {
             if (!empty($e_blocks['embedpress'])) {
                 $widgets_manager->register_widget_type(new Embedpress_Elementor);
@@ -116,6 +135,9 @@ class Embedpress_Elementor_Integration
             if (!empty($e_blocks['embedpress-calendar'])) {
                 $widgets_manager->register_widget_type(new Embedpress_Calendar);
             }
+            if (!isset($e_blocks['embedpress-google-reviews']) || !empty($e_blocks['embedpress-google-reviews'])) {
+                $widgets_manager->register_widget_type(new Embedpress_Google_Reviews);
+            }
         }
     }
 
@@ -128,6 +150,75 @@ class Embedpress_Elementor_Integration
     {
         // Assets are now handled by the centralized AssetManager
         // This method is kept for backward compatibility
+    }
+
+    /**
+     * Register custom Elementor controls for Google Reviews.
+     */
+    public function register_google_reviews_controls($controls_manager)
+    {
+        if (method_exists($controls_manager, 'register')) {
+            $controls_manager->register(new GR_Place_Picker());
+        } else {
+            $controls_manager->register_control(GR_Place_Picker::CONTROL_TYPE, new GR_Place_Picker());
+        }
+    }
+
+    /**
+     * Enqueue the Backbone view + stylesheet that drive the place picker
+     * custom control. Loaded only in the Elementor editor.
+     */
+    public function enqueue_google_reviews_picker()
+    {
+        // Enqueue from assets/ (the build output shipped in the dist zip), NOT
+        // static/ — `/static` is stripped by .distignore, so EMBEDPRESS_URL_STATIC
+        // 404s in production and the Elementor picker control renders unstyled.
+        wp_enqueue_style(
+            'embedpress-gr-elementor-picker',
+            EMBEDPRESS_URL_ASSETS . 'css/ep-gr-elementor-picker.css',
+            [],
+            EMBEDPRESS_VERSION
+        );
+        wp_enqueue_script(
+            'embedpress-gr-elementor-picker',
+            EMBEDPRESS_URL_ASSETS . 'js/ep-gr-elementor-control.js',
+            ['jquery', 'underscore', 'backbone', 'elementor-editor'],
+            EMBEDPRESS_VERSION,
+            true
+        );
+        // Search needs a provider. When the effective provider is the hosted
+        // EmbedPress API ('managed' — the default when the user has no own
+        // Google/Apify key) but the site isn't connected, the picker blocks
+        // search + prompts to connect (the backend refuses it too). A user with
+        // their own key isn't 'managed', so they're not blocked.
+        $gr_connected = true;
+        if (\EmbedPress\Includes\Classes\GoogleReviewsRenderer::get_search_provider() === 'managed') {
+            $gr_connected = \EmbedPress\Includes\Classes\GoogleReviewsManaged::get_auth() !== [];
+        }
+        wp_localize_script('embedpress-gr-elementor-picker', 'epGoogleReviewsElementor', [
+            'restUrl'    => esc_url_raw(rest_url('embedpress/v1/google-reviews')),
+            'nonce'      => wp_create_nonce('wp_rest'),
+            // Drives the search dropdown's free/Pro flow (results-first + "+ Select"
+            // / "Upgrade to add" / upsell note), matching the settings + block pickers.
+            'proActive'  => defined('EMBEDPRESS_SL_ITEM_SLUG'),
+            'connected'  => $gr_connected,
+            'upgradeUrl' => 'https://wpdeveloper.com/in/upgrade-embedpress',
+            'i18n'    => [
+                'noResults' => __('No matches. Try a different spelling or include the city.', 'embedpress'),
+                'failed'    => __('Search failed.', 'embedpress'),
+                'addKey'    => __('Connect the EmbedPress API in EmbedPress → Google Reviews to search.', 'embedpress'),
+                'notConnected' => __('Connect to the EmbedPress API to search. Open EmbedPress → Google Reviews settings to connect.', 'embedpress'),
+                'select'    => __('Select', 'embedpress'),
+                'added'     => __('already added', 'embedpress'),
+                'upgrade'   => __('Upgrade to add', 'embedpress'),
+                'limitLead' => __('You’ve added your 1 free place.', 'embedpress'),
+                'goPro'     => __('Go Pro', 'embedpress'),
+                'limitTail' => __('to show reviews from multiple businesses at once.', 'embedpress'),
+                'limitTitle' => __('Showing more than one place needs EmbedPress Pro — click to upgrade.', 'embedpress'),
+                'review'     => __('review', 'embedpress'),
+                'reviews'    => __('reviews', 'embedpress'),
+            ],
+        ]);
     }
 
     public function editor_enqueue_style()
@@ -1148,7 +1239,7 @@ class Embedpress_Elementor_Integration
                         mutations.forEach((mutation) => {
                             mutation.addedNodes.forEach((node) => {
                                 if ($(node).hasClass("elementor-controls-stack")) {
-                                    const elementorControls = node.querySelector("#elementor-controls:has(.elementor-control-embedpress_elementor_content_settings, .elementor-control-embedpress_pdf_content_settings, .elementor-control-embedpress_document_content_settings, .elementor-control-embedpress_calendar_content_settings)");
+                                    const elementorControls = node.querySelector("#elementor-controls:has(.elementor-control-embedpress_elementor_content_settings, .elementor-control-embedpress_pdf_content_settings, .elementor-control-embedpress_document_content_settings, .elementor-control-embedpress_calendar_content_settings, .elementor-control-ep_gr_section_place)");
 
                                     if (elementorControls) {
                                         addUpsellSection(elementorControls);

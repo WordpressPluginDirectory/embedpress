@@ -220,7 +220,7 @@ class EmbedPress_GoogleClient {
 	 */
 	public function handleCodeRedirect($state = '') {
 		if (!empty($_GET['error'])) {
-			throw new Exception($_GET['error']);
+			throw new Exception(sanitize_text_field(wp_unslash($_GET['error'])));
 		}
 		if (empty($_GET['code'])) {
 			throw new Exception('Code missing');

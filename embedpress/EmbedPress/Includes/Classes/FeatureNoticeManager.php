@@ -176,6 +176,13 @@ class FeatureNoticeManager {
      * Renders tooltip/popover next to EmbedPress menu item
      */
     public function display_menu_tooltip() {
+        // Suppress the small menu tooltip when the bigger "What's New" modal is
+        // queued for this release — never announce the same release twice.
+        if (class_exists('\\EmbedPress\\Includes\\Classes\\FeaturePreviewModal')
+            && FeaturePreviewModal::get_instance()->has_active_modal()) {
+            return;
+        }
+
         // Get the highest priority notice
         $notice_to_display = null;
         $notice_id = null;
@@ -218,8 +225,6 @@ class FeatureNoticeManager {
      * @param array $notice Notice configuration
      */
     private function render_tooltip($id, $notice) {
-
-        error_log(print_r($notice, true));
 
         $icon = !empty($notice['icon']) ? $notice['icon'] : '';
         $title = esc_html($notice['title']);

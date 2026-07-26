@@ -1385,7 +1385,9 @@ jQuery(document).ready(function ($) {
 });
 jQuery(document).ready(function ($) {
     let currentIndex = 0;
-    const $photos = $('.photo-item');
+    // Recomputed on each open so galleries rendered after this point
+    // (e.g. inside an Elementor popup or loaded via AJAX) are handled too.
+    let $photos = $();
 
     function createPopupGooglePhotos() {
         if ($('#ep-popup-overlay').length === 0) {
@@ -1474,7 +1476,15 @@ jQuery(document).ready(function ($) {
         };
     }
 
-    $('.photo-item').on('click', function () {
+    // Delegated binding: works for `.photo-item` elements that are added to the
+    // DOM after page load — e.g. an EmbedPress gallery placed inside an Elementor
+    // popup, which Elementor injects only when the popup is opened. A direct
+    // `$('.photo-item').on('click', ...)` bound here would miss those elements.
+    $(document).on('click', '.photo-item', function () {
+        // Scope navigation (prev/next) to the gallery that was actually clicked,
+        // so multiple galleries on the same page don't get mixed together.
+        var $gallery = $(this).closest('.photos-gallery-grid, .photos-gallery-justify, .photos-gallery-masonary');
+        $photos = $gallery.length ? $gallery.find('.photo-item') : $('.photo-item');
         currentIndex = $photos.index(this);
         createPopupGooglePhotos();
         updatePopupImage();

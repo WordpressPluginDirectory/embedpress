@@ -693,10 +693,43 @@
       .catch(error => console.error('Error downloading the PDF:', error));
   };
 
-  document.getElementById('download-pdf').addEventListener('click', function (e) {
+  // Notify the host page's view/download badge whenever the toolbar download
+  // is clicked. We listen on the whole toolbar item (.cmdDownload) in the
+  // CAPTURE phase rather than only the inner #download-pdf <a>, because the
+  // user may click the <li> / <span class="icon"> and the FlipBook plugin may
+  // stop propagation — so a listener bound to the inner anchor never fires.
+  function _epNotifyDownload() {
+    // The flipbook viewer runs in a blank (srcdoc/about:blank) frame, so
+    // location.href is useless for identifying the embed. Send the real PDF
+    // url (dataFile) so the host can match the embed by its file=. Post to
+    // window.top (the host page) — window.parent may be an intermediate blank
+    // frame, not the host that owns the badge.
+    var msg = {
+      source: 'embedpress-pdf-viewer',
+      type: 'download',
+      kind: 'flipbook',
+      file: (typeof dataFile !== 'undefined' && dataFile) ? dataFile : '',
+      href: (typeof dataFile !== 'undefined' && dataFile) ? dataFile : location.href
+    };
+    try {
+      var targets = [];
+      if (window.top && window.top !== window) targets.push(window.top);
+      if (window.parent && window.parent !== window && window.parent !== window.top) targets.push(window.parent);
+      targets.forEach(function (t) { t.postMessage(msg, '*'); });
+    } catch (err) { /* host unreachable — download still proceeds */ }
+  }
+
+  document.addEventListener('click', function (e) {
+    var trigger = e.target && e.target.closest
+      ? e.target.closest('.cmdDownload, #download-pdf')
+      : null;
+    if (!trigger) return;
     e.preventDefault();
+    // Fire immediately so the badge updates without waiting for the
+    // (possibly slow) watermark render / blob fetch in DownloadPDF.
+    _epNotifyDownload();
     DownloadPDF(dataFile);
-  });
+  }, true);
 
   // Print with watermark support using a hidden iframe (no popup window)
   const _epWatermarkPrint = (pdfUrl, wm) => {

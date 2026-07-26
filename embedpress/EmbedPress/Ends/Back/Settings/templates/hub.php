@@ -194,7 +194,7 @@ $username = $current_user->display_name ? $current_user->display_name : $current
                             <p class="embedpress-font-m embedpress-font-family-dmsans embedpress-mb-16 embedpress-font-m embedpress-banner-sub-header error-msg">
                                 You‘re currently receiving regular plugin updates and support.</p>
                             <div class="embedpress-license-input-wrapper ">
-                                <input type="text" class="embedpress-license-input " value="<?php echo esc_attr($license_key); ?>" disabled>
+                                <input type="text" class="embedpress-license-input " value="<?php echo esc_attr(\EmbedPress\Includes\Classes\Helper::mask_license_key($license_key)); ?>" disabled>
                                 <button class="embedpress-font-m embedpress-font-family-dmsans embedpress-active-btn ">
                                     <span class="embedpress-line-height-0">
                                         <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -271,7 +271,7 @@ $username = $current_user->display_name ? $current_user->display_name : $current
                             <p class="embedpress-font-m embedpress-font-family-dmsans embedpress-mb-16 embedpress-font-m embedpress-banner-sub-header valid-msg">
                                 You‘re currently receiving regular plugin updates and support.</p>
                             <div class="embedpress-license-input-wrapper ">
-                                <input type="text" class="embedpress-license-input " value="<?php echo esc_attr($license_key); ?>" disabled>
+                                <input type="text" class="embedpress-license-input " value="<?php echo esc_attr(\EmbedPress\Includes\Classes\Helper::mask_license_key($license_key)); ?>" disabled>
                                 <button class="embedpress-font-m embedpress-font-family-dmsans embedpress-active-btn">
                                     <span class="embedpress-line-height-0">
                                         <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">

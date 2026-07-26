@@ -514,11 +514,11 @@ class Embedpress_Google_Helper {
 					$s[] = $error->getDescription();
 				}
 			}
-			wp_die(implode("<br>", $s) . $backLink);
+			wp_die(implode("<br>", array_map('esc_html', $s)) . $backLink);
 		} elseif (is_array($error)) {
-			wp_die(implode("<br>", $error) . $backLink);
+			wp_die(implode("<br>", array_map('esc_html', $error)) . $backLink);
 		} elseif (is_string($error)) {
-			wp_die($error . $backLink);
+			wp_die(esc_html($error) . $backLink);
 		} else {
 			wp_die(__('Unknown error format', 'embedpress') . $backLink);
 		}
@@ -703,7 +703,26 @@ class Embedpress_Google_Helper {
 		       . esc_attr(get_locale()) . '" class="epgc-calendar"></div>' . ($userFilter === 'bottom' ? $filterHTML : '') . '</div>';
 	}
 
+	/**
+	 * Reject an admin-post request that fails the capability or nonce check
+	 * and stop execution. Used by the Google Calendar admin_post_* handlers so
+	 * an unauthorized role can't drive the site's stored Google OAuth
+	 * credentials and a forged (CSRF) request without a valid nonce is denied.
+	 */
+	private static function admin_post_access_denied() {
+		wp_die(
+			esc_html__( 'Sorry, you are not allowed to perform this action.', 'embedpress' ),
+			esc_html__( 'Forbidden', 'embedpress' ),
+			[ 'response' => 403 ]
+		);
+	}
+
 	public static function admin_post_calendarlist() {
+		if ( ! current_user_can( 'manage_options' )
+			|| ! isset( $_POST['epgc_calendarlist_data'] )
+			|| ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['epgc_calendarlist_data'] ) ), 'epgc_calendarlist' ) ) {
+			self::admin_post_access_denied();
+		}
 		try {
 			$client = static::getGoogleClient(true);
 			if ($client->isAccessTokenExpired()) {
@@ -725,6 +744,11 @@ class Embedpress_Google_Helper {
 		}
 	}
 	public static function admin_post_colorlist() {
+		if ( ! current_user_can( 'manage_options' )
+			|| ! isset( $_POST['epgc_colorlist_data'] )
+			|| ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['epgc_colorlist_data'] ) ), 'epgc_colorlist' ) ) {
+			self::admin_post_access_denied();
+		}
 		try {
 			$client = static::getGoogleClient(true);
 			if ($client->isAccessTokenExpired()) {
@@ -753,6 +777,11 @@ class Embedpress_Google_Helper {
 		}
 	}
 	public static function admin_post_verify() {
+		if ( ! current_user_can( 'manage_options' )
+			|| ! isset( $_POST['epgc_verify_data'] )
+			|| ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['epgc_verify_data'] ) ), 'epgc_verify' ) ) {
+			self::admin_post_access_denied();
+		}
 		try {
 			$client = static::getGoogleClient(true);
 			$client->refreshAccessToken();

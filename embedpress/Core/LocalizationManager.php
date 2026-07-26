@@ -96,6 +96,7 @@ class LocalizationManager
                 'baseUrl'    => get_site_url() . '/',
                 'versionUID' => $version,
                 'debug'      => defined('WP_DEBUG') && WP_DEBUG,
+                'nonce'      => wp_create_nonce('embedpress_do_ajax_request'),
             ],
             'shortcode'  => $shortcode,
             'assetsUrl' => $assets_url,
@@ -201,6 +202,12 @@ class LocalizationManager
             'pdfRenderer' => Helper::get_pdf_renderer(),
             'flipbookRenderer' => Helper::get_flipbook_renderer(),
             'isProPluginActive' => defined('EMBEDPRESS_SL_ITEM_SLUG'),
+            // Google Reviews: when the hosted EmbedPress API (managed proxy) is
+            // connected, a place can hold far more than Google's 5-review API
+            // cap, so the "Reviews per page" ceiling lifts to 50. (Drives the
+            // block + settings count controls; must match the renderer's
+            // max_reviews gate in GoogleReviewsRenderer.)
+            'googleReviewsApifyConnected' => \EmbedPress\Includes\Classes\GoogleReviewsManaged::is_connected(),
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'adminUrl' => admin_url(),
             'sourceNonce' => wp_create_nonce('source_nonce_embedpress'),
@@ -226,8 +233,6 @@ class LocalizationManager
             'viewCount' => [
                 'restUrl'         => esc_url_raw(get_rest_url(null, 'embedpress/v1/analytics/view-count')),
                 'downloadUrl'     => esc_url_raw(get_rest_url(null, 'embedpress/v1/analytics/download-count')),
-                'viewEnabled'     => \EmbedPress\Includes\Classes\View_Count_Display::is_enabled(),
-                'downloadEnabled' => \EmbedPress\Includes\Classes\View_Count_Display::is_download_enabled(),
                 'labels'          => [
                     /* translators: %s: formatted number of views */
                     'singular'         => __('%s view', 'embedpress'),
@@ -564,13 +569,28 @@ class LocalizationManager
         // Generate a new ephemeral session ID
         $id = 'ep-sess-' . time() . '-' . wp_generate_password(8, false);
 
-        // Set a session cookie (expires when the browser closes)
+        // Set a session cookie (expires when the browser closes).
+        // Build the Set-Cookie header manually so we can add SameSite=Lax while
+        // staying compatible with PHP 5.6+ (the options-array form of setcookie()
+        // requires PHP 7.3). HttpOnly is intentionally omitted: the analytics
+        // tracker reads ep_session_id via document.cookie to deduplicate views
+        // within a session, so the cookie must be JS-readable.
         if (!headers_sent()) {
             $path = defined('COOKIEPATH') ? COOKIEPATH : '/';
             $domain = (defined('COOKIE_DOMAIN') && COOKIE_DOMAIN) ? COOKIE_DOMAIN : '';
             $secure = is_ssl();
-            $httponly = true;
-            setcookie('ep_session_id', $id, 0, $path, $domain, $secure, $httponly);
+
+            $cookie = 'ep_session_id=' . rawurlencode($id)
+                . '; path=' . ($path ? $path : '/')
+                . '; SameSite=Lax';
+            if ($domain) {
+                $cookie .= '; domain=' . $domain;
+            }
+            if ($secure) {
+                $cookie .= '; Secure';
+            }
+
+            header('Set-Cookie: ' . $cookie, false);
         }
 
         return $id;

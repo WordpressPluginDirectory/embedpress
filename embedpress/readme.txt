@@ -1,4 +1,4 @@
-=== EmbedPress – PDF Embedder, Embed PDF viewer, YouTube Videos, 3D FlipBook, Social feeds & more ===
+=== EmbedPress – PDF Embedder, 3D PDF FlipBook, Google Reviews, YouTube Videos, Upload & Embed PDF documents ===
 Contributors: EmbedPress, asif2bd, re_enter_rupok, wpdevteam, seakashdiu, alimuzzamanalim
 Author: WPDeveloper
 Author URI: https://wpdeveloper.com
@@ -6,7 +6,7 @@ Tags: embed, embed YouTube, embed PDF, Google Docs, Social Feeds
 Requires at least: 4.6
 Tested up to: 7.0
 Requires PHP: 5.6
-Stable tag: 4.5.5
+Stable tag: 4.6.2
 License: GPLv3 or later
 License URI: https://opensource.org/licenses/GPL-3.0
 
@@ -35,6 +35,19 @@ https://youtu.be/1yVbt3XW-Wo
 ### ⚡ [DISPLAY 3D FLIPBOOK](https://embedpress.com/docs/turn-embedded-pdf-into-a-3d-flip-book/) PDF VIEWER ON YOUR SITE
 
 EmbedPress allows you to embed PDFs and convert them into 3D PDF flipbooks with a single click. Upload PDF Documents and make your PDF 3D flipbooks more dynamic to capture viewers' attention immediately. Moreover, you can add a toolbar, sound effects and more to make your PDF 3D flipbook more interactive.
+
+### ⭐ [EMBED GOOGLE REVIEWS](https://embedpress.com/) & BUILD SOCIAL PROOF
+
+Showcase authentic reviews from any Google Business on your website to build trust and boost conversions. Just search and pick a place with the built-in place picker — no Google API key or Place ID needed — and display your reviews in List, Grid, Carousel, or Card layouts. EmbedPress makes it easy on Gutenberg, Elementor, and shortcodes without any coding.
+
+### 🌟 CUSTOMIZE GOOGLE REVIEWS WITH ADVANCED FEATURES [PRO]
+
+- Display reviews in six premium layouts — Masonry, Compact Badge, Spotlight, Knowledge Panel, Marquee, and Bubble.
+- Match any site design with a Dark Theme and Custom Accent Color.
+- Enable Autoplay and slider controls for a more dynamic showcase.
+- Filter reviews by keyword, sort order, and hide empty (text-less) reviews.
+- Merge multiple Google Businesses into a single embed with Multi-Place support.
+- Boost SEO with Review Schema (AggregateRating + Review JSON-LD) for rich search snippets.
 
 ### ⚡ [EMBED POSTS](https://embedpress.com/docs/embed-web-pages-post-embedpress-wrapper/) AND PAGES FROM COUNTLESS WEBSITES
 
@@ -348,6 +361,31 @@ With EmbedPress you can easily create PDF flipbooks. First, upload PDF into your
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+
+= [4.6.2] – 2026-07-26 =
+- Fixed: "What's New" modal appearing on brand-new installations.
+- Few minor bug fixes and improvements.
+
+= [4.6.1] – 2026-07-19 =
+- Fixed: Unauthenticated SSRF via oEmbed REST - Reported by WPScan (Ayush Srivastava).
+- Fixed: Google Reviews conflicts when Classic Editor plugin is active.
+- Few minor bug fixes and improvements.
+
+= [4.6.0] – 2026-07-08 =
+- Added: Google Reviews embedding.
+- Added: Highlight Links control for the PDF 3D Flipbook.
+- Fixed: Improved security for Google Calendar admin handlers.
+- Fixed: Blank URL placeholder shown in the EmbedPress block editor for legacy embeds.
+- Few minor bug fixes and improvements.
+
+= [4.5.6] – 2026-06-24 =
+- Improved: PDF download count now increments on every download.
+- Added: View Count positioning controls for PDF embeds.
+- Fixed: PDF block placeholder not selectable before uploading a PDF.
+- Fixed: Google Photos block showing an empty URL when re-editing.
+- Fixed: Missing SameSite attribute for the ep_session_id cookie.
+- Fixed: Sketchfab embedding issue.
+- Few minor bug fixes and improvements.
 
 = [4.5.5] – 2026-06-08 =
 - Added: Visitor counter for PDF and Document embeds.

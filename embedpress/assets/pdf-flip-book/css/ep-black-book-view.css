@@ -836,3 +836,17 @@ li.fnav-item.disabled {
     z-index: 5;
   }
 }
+/* Flipbook hyperlink highlight color override (fbs-82452).
+   The 3dflipbook library injects `.fb3d-link a { background-color: rgba(255,255,0,.1) }`
+   into the page CSS layer and exposes no color prop. This stylesheet is the template's
+   `styles` entry, which the library concatenates AFTER its own layer CSS, so these rules
+   win on source order (equal specificity, no !important needed). viewer.html sets
+   --ep-flipbook-highlight-color per-embed ONLY when the user enables the highlight AND
+   picks a color; the fallback is transparent (never the library's yellow), so links show
+   no background unless the user explicitly chooses a highlight color. */
+.fb3d-link a {
+  background-color: var(--ep-flipbook-highlight-color, transparent);
+}
+.fb3d-link a:hover {
+  background-color: var(--ep-flipbook-highlight-color, transparent);
+}

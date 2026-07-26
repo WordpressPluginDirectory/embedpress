@@ -163,6 +163,31 @@ class Embedpress_Pdf extends Widget_Base
 			]
 		);
 
+		// Count badge position. The control is a Pro feature — free installs
+		// keep the default 'below' (the dropdown is disabled via pro_class);
+		// Pro unlocks the six placements. Mirrors the Gutenberg blocks.
+		$this->add_control(
+			'embedpress_pdf_count_position',
+			[
+				'label'     => sprintf(__('Count Position %s', 'embedpress'), $this->pro_text),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'below',
+				'classes'   => $this->pro_class,
+				'options'   => [
+					'below'        => __('Below — Left (default)', 'embedpress'),
+					'below-center' => __('Below — Center', 'embedpress'),
+					'below-right'  => __('Below — Right', 'embedpress'),
+					'above-left'   => __('Above — Left', 'embedpress'),
+					'above-center' => __('Above — Center', 'embedpress'),
+					'above-right'  => __('Above — Right', 'embedpress'),
+				],
+				'description' => __('Where the count badge sits relative to the embed.', 'embedpress'),
+				'condition'   => [
+					'embedpress_pdf_show_view_count' => 'yes',
+				],
+			]
+		);
+
 		$this->end_controls_section();
 	}
 
@@ -176,7 +201,17 @@ class Embedpress_Pdf extends Widget_Base
 	{
 		$view = (isset($settings['embedpress_pdf_show_view_count']) && $settings['embedpress_pdf_show_view_count'] === 'yes') ? 'on' : 'off';
 		$download = (isset($settings['embedpress_pdf_show_download_count']) && $settings['embedpress_pdf_show_download_count'] === 'yes') ? 'on' : 'off';
-		return ' data-ep-views="' . $view . '" data-ep-downloads="' . $download . '"';
+		$attrs = ' data-ep-views="' . $view . '" data-ep-downloads="' . $download . '"';
+
+		// Badge position is Pro-only; free installs always use the default
+		// 'below'. Only emit the marker for a non-default Pro position when Pro
+		// is active, so a free site never renders a gated placement.
+		$position = isset($settings['embedpress_pdf_count_position']) ? (string) $settings['embedpress_pdf_count_position'] : 'below';
+		if ($position !== 'below' && \EmbedPress\Includes\Classes\Helper::is_pro_active()) {
+			$attrs .= ' data-ep-count-position="' . esc_attr($position) . '"';
+		}
+
+		return $attrs;
 	}
 
     protected function register_controls()
@@ -801,6 +836,52 @@ class Embedpress_Pdf extends Widget_Base
             ]
         );
 
+        $this->add_control(
+            'pdf_flipbook_rtl',
+            [
+                'label'        => sprintf(__('RTL Page Flip %s', 'embedpress'), $this->pro_text),
+                'description'  => __('Reverse the page-turn direction so the flipbook opens and flips from right to left.', 'embedpress'),
+                'type'         => Controls_Manager::SWITCHER,
+                'label_on'     => __('On', 'embedpress'),
+                'label_off'    => __('Off', 'embedpress'),
+                'return_value' => 'yes',
+                'default'      => '',
+                'classes'      => $this->pro_class,
+                'condition' => [
+                    'embedpress_pdf_viewer_style' => 'flip-book',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'pdf_flipbook_highlight_links',
+            [
+                'label'        => __('Highlight Links', 'embedpress'),
+                'description'  => __('Show a colored background behind hyperlinks in the flipbook.', 'embedpress'),
+                'type'         => Controls_Manager::SWITCHER,
+                'label_on'     => __('On', 'embedpress'),
+                'label_off'    => __('Off', 'embedpress'),
+                'return_value' => 'yes',
+                'default'      => '',
+                'condition' => [
+                    'embedpress_pdf_viewer_style' => 'flip-book',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'pdf_flipbook_highlight_color',
+            [
+                'label'      => __('Highlight Color', 'embedpress'),
+                'type'       => Controls_Manager::COLOR,
+                'default'    => 'rgba(255, 255, 0, 0.1)',
+                'condition'  => [
+                    'embedpress_pdf_viewer_style'    => 'flip-book',
+                    'pdf_flipbook_highlight_links'   => 'yes',
+                ],
+            ]
+        );
+
 
         $this->add_control(
             'pdf_presentation_mode',
@@ -1196,6 +1277,9 @@ class Embedpress_Pdf extends Widget_Base
             'bookmark' => !empty($settings['pdf_bookmark'])  ? 'true' : 'false',
             'sound' => !empty($settings['pdf_sound'])  ? 'true' : 'false',
             'flipbook_toolbar_position' => !empty($settings['flipbook_toolbar_position'])  ? $settings['flipbook_toolbar_position'] : 'bottom',
+            'flipbook_rtl' => defined('EMBEDPRESS_SL_ITEM_SLUG') && !empty($settings['pdf_flipbook_rtl']) && $settings['pdf_flipbook_rtl'] === 'yes' ? 'true' : 'false',
+            'flipbook_highlight_links' => !empty($settings['pdf_flipbook_highlight_links']) && $settings['pdf_flipbook_highlight_links'] === 'yes' ? 'true' : 'false',
+            'flipbook_highlight_color' => !empty($settings['pdf_flipbook_highlight_color']) ? esc_attr($settings['pdf_flipbook_highlight_color']) : '',
             'selection_tool' => isset($settings['selection_tool']) ? esc_attr($settings['selection_tool']) : '0',
             'scrolling' => isset($settings['scrolling']) ? esc_attr($settings['scrolling']) : '-1',
             'spreads' => isset($settings['spreads']) ? esc_attr($settings['spreads']) : '-1',
@@ -1268,6 +1352,11 @@ class Embedpress_Pdf extends Widget_Base
         // Explicit on/off lets the per-embed toggle win over the global option.
         $pdf_render_attrs['data-ep-views'] = (isset($settings['embedpress_pdf_show_view_count']) && $settings['embedpress_pdf_show_view_count'] === 'yes') ? 'on' : 'off';
         $pdf_render_attrs['data-ep-downloads'] = (isset($settings['embedpress_pdf_show_download_count']) && $settings['embedpress_pdf_show_download_count'] === 'yes') ? 'on' : 'off';
+        // Badge position is Pro-only; only emit a non-default placement when Pro is active.
+        $pdf_position = isset($settings['embedpress_pdf_count_position']) ? (string) $settings['embedpress_pdf_count_position'] : 'below';
+        if ($pdf_position !== 'below' && \EmbedPress\Includes\Classes\Helper::is_pro_active()) {
+            $pdf_render_attrs['data-ep-count-position'] = $pdf_position;
+        }
         $this->add_render_attribute('embedpres-pdf-render', $pdf_render_attrs);
         $this->add_render_attribute('embedpress-document', [
             'class' => ['embedpress-document-embed', 'ep-doc-' . md5($id), 'ose-document', $unitoption, $content_locked_class ],

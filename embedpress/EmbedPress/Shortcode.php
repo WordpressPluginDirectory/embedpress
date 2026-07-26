@@ -85,6 +85,113 @@ class Shortcode
         add_shortcode('embedpress_pdf', ['\\EmbedPress\\Shortcode', 'do_shortcode_pdf']);
         add_shortcode('embedpress_doc', ['\\EmbedPress\\Shortcode', 'do_shortcode_doc']);
         add_shortcode('embedpress_pdf_gallery', ['\\EmbedPress\\Shortcode', 'do_shortcode_pdf_gallery']);
+        add_shortcode('embedpress_google_reviews', ['\\EmbedPress\\Shortcode', 'do_shortcode_google_reviews']);
+    }
+
+    /**
+     * Handler for the [embedpress_google_reviews] shortcode. Maps shortcode
+     * attributes to the shared GoogleReviewsRenderer so the block, Elementor
+     * widget, and shortcode emit identical markup.
+     */
+    public static function do_shortcode_google_reviews($attributes = [], $subject = null)
+    {
+        $atts = shortcode_atts([
+            // Free
+            'place_id'   => '',
+            'place_name' => '',
+            'limit'      => 10,
+            'min_rating' => 0,
+            'layout'     => 'list',
+            'show_photo'  => 'true',
+            'show_date'   => 'true',
+            'show_stars'  => 'true',
+            'show_link'   => 'false',
+            'show_images' => 'true',
+            // Structural (free): columns / max width (px) / card gap (px)
+            'columns'    => 3,
+            'max_width'  => 0,
+            'gap'        => 20,
+            // Carousel controls (free). (autoplay already declared below.)
+            'show_arrows'    => 'true',
+            'show_dots'      => 'true',
+            'carousel_loop'  => 'true',
+            'autoplay_speed' => 5,
+            // Header / summary controls (free)
+            'show_summary'        => 'true',
+            'show_summary_name'   => 'true',
+            'show_summary_rating' => 'true',
+            'show_summary_stars'  => 'true',
+            'show_summary_count'  => 'true',
+            'show_write_review'   => 'true',
+            'summary_align'       => 'left',
+            // Pro (ignored by free renderer; consumed by Pro's render filters)
+            'sort'         => 'newest',
+            'keyword'      => '',
+            'hide_empty'   => 'false',
+            'fetch_all'    => 'false',
+            'theme'        => 'light',
+            'accent_color' => '',
+            'autoplay'     => 'false',
+            'schema'       => 'false',
+            'places'       => '',   // comma-separated extra Place IDs
+            'cache_ttl'    => 0,
+            'load_more'    => 'false',
+            'per_page'     => 0, // 0 = use the "limit" count as the page size
+        ], is_array($attributes) ? $attributes : [], 'embedpress_google_reviews');
+
+        $boolish = function ($v) {
+            if (is_bool($v)) return $v;
+            $v = is_string($v) ? strtolower(trim($v)) : $v;
+            return in_array($v, ['true', '1', 1, 'yes', 'on'], true);
+        };
+
+        // `places` is a comma-separated list in shortcode form.
+        $places = [];
+        if (is_string($atts['places']) && trim($atts['places']) !== '') {
+            $places = array_values(array_filter(array_map('trim', explode(',', $atts['places']))));
+        }
+
+        \EmbedPress\Includes\Classes\GoogleReviewsRenderer::enqueue_assets();
+
+        return \EmbedPress\Includes\Classes\GoogleReviewsRenderer::render([
+            'place_id'   => sanitize_text_field($atts['place_id']),
+            'place_name' => sanitize_text_field($atts['place_name']),
+            'limit'      => (int) $atts['limit'],
+            'min_rating' => (int) $atts['min_rating'],
+            'layout'     => sanitize_key($atts['layout']),
+            'show_photo'  => $boolish($atts['show_photo']),
+            'show_date'   => $boolish($atts['show_date']),
+            'show_stars'  => $boolish($atts['show_stars']),
+            'show_link'   => $boolish($atts['show_link']),
+            'show_images' => $boolish($atts['show_images']),
+            'show_arrows'    => $boolish($atts['show_arrows']),
+            'show_dots'      => $boolish($atts['show_dots']),
+            'carousel_loop'  => $boolish($atts['carousel_loop']),
+            'autoplay_speed' => (float) $atts['autoplay_speed'],
+            'show_summary'        => $boolish($atts['show_summary']),
+            'show_summary_name'   => $boolish($atts['show_summary_name']),
+            'show_summary_rating' => $boolish($atts['show_summary_rating']),
+            'show_summary_stars'  => $boolish($atts['show_summary_stars']),
+            'show_summary_count'  => $boolish($atts['show_summary_count']),
+            'show_write_review'   => $boolish($atts['show_write_review']),
+            'summary_align'       => sanitize_key($atts['summary_align']),
+            'columns'    => (int) $atts['columns'],
+            'max_width'  => (int) $atts['max_width'],
+            'gap'        => (int) $atts['gap'],
+            // Pro
+            'sort'         => sanitize_key($atts['sort']),
+            'keyword'      => sanitize_text_field($atts['keyword']),
+            'hide_empty'   => $boolish($atts['hide_empty']),
+            'fetch_all'    => $boolish($atts['fetch_all']),
+            'theme'        => sanitize_key($atts['theme']),
+            'accent_color' => sanitize_hex_color($atts['accent_color']) ?: '',
+            'autoplay'     => $boolish($atts['autoplay']),
+            'schema'       => $boolish($atts['schema']),
+            'places'       => array_map('sanitize_text_field', $places),
+            'cache_ttl'    => (int) $atts['cache_ttl'],
+            'load_more'    => $boolish($atts['load_more']),
+            'per_page'     => (int) $atts['per_page'],
+        ]);
     }
 
     /**
@@ -457,6 +564,14 @@ class Shortcode
             $embedTemplate = '<div ' . implode(' ', $attributesHtml) . $embedTypeAttr . '>{html}</div>';
 
             $parsedContent = self::get_content_from_template($url, $embedTemplate, $serviceProvider);
+            // Embera's ResponsiveEmbeds::addClasses() runs a global
+            // `class="(.+?)"` replace. When an oEmbed payload carries a
+            // wrapper element with a class AND an iframe with an empty
+            // class="" (Sketchfab, Flourish, …), the non-greedy capture
+            // jumps the gap and swallows the iframe's ` src="` opening
+            // quote, leaving `src= <classtokens>"<URL>"`. Restore a proper
+            // quoted src before any later transform can truncate the URL.
+            $parsedContent = self::repair_responsive_class_corruption($parsedContent, $url);
             // Replace all single quotes to double quotes. I.e: foo='joe' -> foo="joe"
             $parsedContent = str_replace("'", '"', $parsedContent);
             $parsedContent = str_replace("{provider_alias}", esc_html($provider_name), $parsedContent);
@@ -1045,6 +1160,46 @@ KAMAL;
         return self::$collection;
     }
 
+    /**
+     * Repairs an iframe whose `src` was corrupted by Embera's responsive
+     * class injection (see ResponsiveEmbeds::addClasses()).
+     *
+     * The corruption signature is a `src=` that is NOT immediately followed
+     * by a quote — instead the responsive-item class tokens leak in:
+     *   src= embera-embed-responsive-item embera-embed-responsive-item-rich"<URL>"
+     * The real URL is still intact between the stray quote and the next
+     * quote, so we drop the leaked tokens and restore a proper quoted src.
+     *
+     * @param string $html The (possibly corrupted) embed markup.
+     * @param string $url  The original embed URL (kept for signature stability).
+     * @return string
+     */
+    protected static function repair_responsive_class_corruption($html, $url)
+    {
+        // Fast bail: only act on the exact corruption signature so we never
+        // touch healthy embeds. The injected tokens always land right after
+        // an unquoted `src=`, i.e.  src= embera-embed-responsive-item …
+        if (strpos($html, 'src= embera-embed-responsive-item') === false) {
+            return $html;
+        }
+
+        // The damage is mechanically reversible from the string itself:
+        // addClasses() consumed the iframe's `src="` opening quote, so the
+        // markup now reads
+        //   src= embera-embed-responsive-item embera-embed-responsive-item-<type>"<URL>"
+        // The real URL is still intact between the stray quote and the next
+        // quote — we just drop the leaked class tokens and restore a proper
+        // quoted `src`. The iframe keeps its own (empty) class="" attribute,
+        // and the responsive-item class already lives on the wrapper <div>,
+        // so nothing else needs re-adding.
+        return preg_replace(
+            '~src=\s+embera-embed-responsive-item\s+embera-embed-responsive-item-[a-z0-9_-]+\s*"([^"]+)"~i',
+            'src="$1"',
+            $html,
+            1
+        );
+    }
+
     protected static function purify_html_content(&$html)
     {
         if (!class_exists('\simple_html_dom')) {
@@ -1341,6 +1496,9 @@ KAMAL;
             'bookmark' => isset($attributes['bookmark'])  ? $attributes['bookmark'] : 'true',
             'sound' => isset($attributes['sound'])  ? $attributes['sound'] : 'true',
             'flipbook_toolbar_position' => !empty($attributes['toolbar_position'])  ? $attributes['toolbar_position'] : 'bottom',
+            'flipbook_rtl' => defined('EMBEDPRESS_SL_ITEM_SLUG') && isset($attributes['flipbook_rtl']) && ($attributes['flipbook_rtl'] === 'true' || $attributes['flipbook_rtl'] === true) ? 'true' : 'false',
+            'flipbook_highlight_links' => isset($attributes['flipbook_highlight_links']) && ($attributes['flipbook_highlight_links'] === 'true' || $attributes['flipbook_highlight_links'] === true) ? 'true' : 'false',
+            'flipbook_highlight_color' => isset($attributes['flipbook_highlight_color']) ? esc_attr($attributes['flipbook_highlight_color']) : '',
             'pageNumber' => isset($attributes['page_number']) ? absint($attributes['page_number']) : 1,
             'watermark_text' => defined('EMBEDPRESS_SL_ITEM_SLUG') && isset($attributes['watermarkText']) ? esc_attr($attributes['watermarkText']) : '',
             'watermark_font_size' => defined('EMBEDPRESS_SL_ITEM_SLUG') && isset($attributes['watermarkFontSize']) ? esc_attr($attributes['watermarkFontSize']) : '48',
@@ -1744,6 +1902,9 @@ KAMAL;
             'zoom_out'          => 'true',
             'fit_view'          => 'true',
             'bookmark'          => 'true',
+            'flipbook_rtl'      => 'false',
+            'flipbook_highlight_links' => 'false',
+            'flipbook_highlight_color' => '',
             'watermark_text'    => '',
             'watermark_font_size' => '48',
             'watermark_color'   => '#000000',
@@ -1900,6 +2061,9 @@ KAMAL;
             'zoom_out' => esc_attr($attributes['zoom_out']),
             'fit_view' => esc_attr($attributes['fit_view']),
             'bookmark' => esc_attr($attributes['bookmark']),
+            'flipbook_rtl' => defined('EMBEDPRESS_SL_ITEM_SLUG') && isset($attributes['flipbook_rtl']) && ($attributes['flipbook_rtl'] === 'true' || $attributes['flipbook_rtl'] === true) ? 'true' : 'false',
+            'flipbook_highlight_links' => isset($attributes['flipbook_highlight_links']) && ($attributes['flipbook_highlight_links'] === 'true' || $attributes['flipbook_highlight_links'] === true) ? 'true' : 'false',
+            'flipbook_highlight_color' => isset($attributes['flipbook_highlight_color']) ? esc_attr($attributes['flipbook_highlight_color']) : '',
             'watermark_text' => defined('EMBEDPRESS_SL_ITEM_SLUG') ? esc_attr($attributes['watermark_text']) : '',
             'watermark_font_size' => defined('EMBEDPRESS_SL_ITEM_SLUG') ? esc_attr($attributes['watermark_font_size']) : '48',
             'watermark_color' => defined('EMBEDPRESS_SL_ITEM_SLUG') ? esc_attr($attributes['watermark_color']) : '#000000',

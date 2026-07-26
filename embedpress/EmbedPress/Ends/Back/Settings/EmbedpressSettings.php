@@ -95,11 +95,14 @@ class EmbedpressSettings {
 					'twitch-block' => 'twitch-block',
 					'wistia-block' => 'wistia-block',
 					'vimeo-block' => 'vimeo-block',
+					'pdf-gallery' => 'pdf-gallery',
+					'google-reviews' => 'google-reviews',
 				],
 				'elementor' => [
 					'embedpress-document' => 'embedpress-document',
 					'embedpress' => 'embedpress',
 					'embedpress-pdf' => 'embedpress-pdf',
+					'embedpress-google-reviews' => 'embedpress-google-reviews',
 				]
 			];
 
@@ -961,11 +964,18 @@ class EmbedpressSettings {
 
 		// Canonical priority by label (lower = earlier).
 		$priority = [
+			// Overview
 			__('Dashboard', 'embedpress')           => 10,
 			__('Analytics', 'embedpress')           => 20,
+			// Feature pages. Google Reviews — our exclusive flagship feature —
+			// caps the feature group (last feature, before the config items) so
+			// it's prominent and easy to find without being buried at the very
+			// bottom by License (QA #4).
 			__('Player & Engagement', 'embedpress') => 30,
 			__('Branding', 'embedpress')            => 40,
 			__('Custom Ads', 'embedpress')          => 50,
+			__('Google Reviews', 'embedpress')      => 55,
+			// Tools / configuration
 			__('Shortcode', 'embedpress')           => 60,
 			__('Settings', 'embedpress')            => 70,
 			__('Setup Wizard', 'embedpress')        => 80,

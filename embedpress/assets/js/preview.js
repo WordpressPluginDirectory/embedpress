@@ -347,7 +347,8 @@
                     url: self.params.baseUrl + 'wp-admin/admin-ajax.php',
                     data: {
                         action: 'embedpress_do_ajax_request',
-                        subject: content
+                        subject: content,
+                        _ajax_nonce: self.params.nonce || ''
                     },
                     success: onsuccess,
                     dataType: 'json',

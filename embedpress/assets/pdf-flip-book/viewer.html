@@ -230,6 +230,59 @@
             template: template,
           };
 
+          // The library reads several behaviours from the BOOK PROPS, not from
+          // top-level FlipBook(options) — FlipBook(options) only forwards a known
+          // key set, so e.g. options.rtl is silently dropped. The one reliable
+          // hook is `propertiesCallback`, which the lib invokes with the fully-built
+          // props right before constructing the Book; the returned object is what
+          // Book receives. Use a single callback for every prop-level override.
+          var wantRtl = params.flipbook_rtl === true || params.flipbook_rtl === "true";
+
+          // Link highlight (fbs-82452). The lib defaults highlightLinks:true and,
+          // when true, injects `.fb3d-link a { background-color: rgba(255,255,0,.1) }`
+          // — a yellow tint the standard PDF.js viewer never shows. It's now a user
+          // choice (default OFF), and we deliberately do NOT fall back to the lib's
+          // yellow: the highlight only appears when the user both enables the toggle
+          // AND picks a color. Toggle on with no color → no highlight (the flipbook
+          // library can't read per-link colors embedded in the PDF, so the single
+          // picked color is the only source — see the embedpress-pdf skill).
+          var wantToggle = params.flipbook_highlight_links === true || params.flipbook_highlight_links === "true";
+          var highlightColor = params.flipbook_highlight_color || "";
+          var wantHighlight = wantToggle && highlightColor !== "";
+
+          flipBookOptions.propertiesCallback = function (props) {
+            // Only let the lib build its link layer when we'll actually colour it;
+            // otherwise leave highlightLinks off so no yellow CSS is injected.
+            props.highlightLinks = wantHighlight;
+
+            // Right-to-left page flipping for right-to-left reading direction —
+            // inverts flip direction, cover placement, and page numbering (fbs-82602).
+            if (wantRtl) {
+              props.rtl = true;
+            }
+            return props;
+          };
+
+          // Apply the chosen colour. The lib exposes no colour prop and injects its
+          // `.fb3d-link a` rule into the page CSS layer, so we override it two ways so
+          // it lands regardless of which scope the layer mounts in:
+          //   1. A CSS custom property `--ep-flipbook-highlight-color` on :root + body.
+          //      ep-black-book-view.css (the template `styles` entry the lib concatenates
+          //      AFTER its own layer CSS) reads it, so it wins on source order.
+          //   2. A direct `<style>` in the document head with !important — covers the
+          //      case where the links render in the main viewer document.
+          if (wantHighlight) {
+            document.documentElement.style.setProperty("--ep-flipbook-highlight-color", highlightColor);
+            if (document.body) {
+              document.body.style.setProperty("--ep-flipbook-highlight-color", highlightColor);
+            }
+            var hlStyle = document.createElement("style");
+            hlStyle.textContent =
+              ".fb3d-link a { background-color: " + highlightColor + " !important; }" +
+              ".fb3d-link a:hover { background-color: " + highlightColor + " !important; }";
+            document.head.appendChild(hlStyle);
+          }
+
           // Set initial page via autoNavigation option
           if (epPageNumber && epPageNumber > 1) {
             flipBookOptions.autoNavigation = {

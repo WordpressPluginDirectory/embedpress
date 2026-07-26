@@ -75,6 +75,12 @@ class BlockManager
             'setting_key' => 'pdf-gallery',
             'supports_save_function' => true
         ],
+        'google-reviews' => [
+            'name' => 'embedpress/google-reviews',
+            'render_callback' => [EmbedPressBlockRenderer::class, 'render_google_reviews'],
+            'setting_key' => 'google-reviews',
+            'supports_save_function' => false
+        ],
     ];
 
     /**
@@ -128,9 +134,23 @@ class BlockManager
         $elements = (array) get_option(EMBEDPRESS_PLG_NAME . ":elements", []);
         $g_blocks = isset($elements['gutenberg']) ? (array) $elements['gutenberg'] : [];
 
-
-        // Ensure embedpress block is enabled by default if no settings exist
-        if (empty($elements) || !isset($elements['gutenberg'])) {
+        // Self-heal: make sure the DEFAULT-ON blocks are enabled. This runs even
+        // when a `gutenberg` key already exists, so blocks added in a later
+        // release (e.g. google-reviews, pdf-gallery) appear on EXISTING installs
+        // after an update — without it, a site whose saved element list predates
+        // the new block never registers it (the block silently never shows in the
+        // inserter). ensure_default_blocks_enabled() is idempotent (adds only
+        // missing keys), so calling it every load is safe + cheap. We re-read +
+        // only persist when something was actually added (see the method).
+        $missing_default = false;
+        foreach ($this->default_enabled_blocks() as $key) {
+            // array_key_exists (not isset): a block the user explicitly disabled
+            // is stored as '' — that's "present", so we must NOT treat it as
+            // missing and re-enable it. Only a key never seen before triggers the
+            // self-heal.
+            if (!array_key_exists($key, $g_blocks)) { $missing_default = true; break; }
+        }
+        if (empty($elements) || !isset($elements['gutenberg']) || $missing_default) {
             $this->ensure_default_blocks_enabled();
             $elements = (array) get_option(EMBEDPRESS_PLG_NAME . ":elements", []);
             $g_blocks = isset($elements['gutenberg']) ? (array) $elements['gutenberg'] : [];
@@ -196,24 +216,61 @@ class BlockManager
                 'render_callback' => $block_config['render_callback'] ?? null,
             ];
 
-            // Add attributes for server-side rendering
-            if ($block_config['name'] === 'embedpress/embedpress') {
-                $block_args['attributes'] = $this->get_embedpress_block_attributes();
-            } else if ($block_config['name'] === 'embedpress/embedpress-pdf') {
-                $block_args['attributes'] = $this->get_embedpress_pdf_attributes();
-            } else if ($block_config['name'] === 'embedpress/document') {
-                $block_args['attributes'] = $this->get_embedpress_doc_attributes();
-            } else if ($block_config['name'] === 'embedpress/youtube-block') {
-                $block_args['attributes'] = $this->get_youtube_block_attributes();
-            } else if ($block_config['name'] === 'embedpress/wistia-block') {
-                $block_args['attributes'] = $this->get_wistia_block_attributes();
-            } else if ($block_config['name'] === 'embedpress/pdf-gallery') {
-                $block_args['attributes'] = $this->get_pdf_gallery_attributes();
+            // Attributes for server-side rendering. PREFER the block's shipped
+            // block.json (assets/blocks/<folder>/block.json — included in the
+            // dist zip): it carries the canonical, complete attribute schema, so
+            // any block — including ones with no hardcoded get_*_attributes()
+            // method, e.g. google-reviews — registers its full schema in
+            // distribution mode automatically. Without this, a dynamic block
+            // whose name has no else-if branch below registered with an EMPTY
+            // attribute set, so its saved/SSR attributes were dropped and the
+            // block broke after build (worked in dev because dev mode reads
+            // block.json directly).
+            if (file_exists($block_json_path)) {
+                $block_json = json_decode((string) file_get_contents($block_json_path), true);
+                if (is_array($block_json) && !empty($block_json['attributes']) && is_array($block_json['attributes'])) {
+                    $block_args['attributes'] = $block_json['attributes'];
+                }
+            }
+
+            // Fallback (and back-compat) — the hardcoded attribute maps for the
+            // older blocks that predate shipping a block.json. Only used when the
+            // block.json above didn't supply attributes.
+            if (empty($block_args['attributes'])) {
+                if ($block_config['name'] === 'embedpress/embedpress') {
+                    $block_args['attributes'] = $this->get_embedpress_block_attributes();
+                } else if ($block_config['name'] === 'embedpress/embedpress-pdf') {
+                    $block_args['attributes'] = $this->get_embedpress_pdf_attributes();
+                } else if ($block_config['name'] === 'embedpress/document') {
+                    $block_args['attributes'] = $this->get_embedpress_doc_attributes();
+                } else if ($block_config['name'] === 'embedpress/youtube-block') {
+                    $block_args['attributes'] = $this->get_youtube_block_attributes();
+                } else if ($block_config['name'] === 'embedpress/wistia-block') {
+                    $block_args['attributes'] = $this->get_wistia_block_attributes();
+                } else if ($block_config['name'] === 'embedpress/pdf-gallery') {
+                    $block_args['attributes'] = $this->get_pdf_gallery_attributes();
+                }
             }
 
             // Only register if not already registered by JavaScript
             if (!\WP_Block_Type_Registry::get_instance()->is_registered($block_config['name'])) {
-                register_block_type($block_config['name'], $block_args);
+                // Register from the block.json PATH (not just the name) when it
+                // ships in the zip. This lets WP auto-derive the attributes
+                // implied by `supports` — most importantly `align` (and
+                // `anchor`) — which are NOT listed under block.json's
+                // `attributes` key. Passing only a manual `attributes` array
+                // (as before) skipped that derivation, so a ServerSideRender
+                // block (e.g. google-reviews) hit the /wp/v2/block-renderer
+                // endpoint with `attributes[align]` and got a 400
+                // "Invalid parameter(s): attributes" — the production-only bug
+                // that didn't reproduce in dev (dev already registers via the
+                // block.json path). $block_args (render_callback + our explicit
+                // attribute schema) is merged on top of the file metadata.
+                if (file_exists($block_json_path)) {
+                    register_block_type($block_json_path, $block_args);
+                } else {
+                    register_block_type($block_config['name'], $block_args);
+                }
             } else {
                 // Block already registered by JavaScript, just update the render callback
                 $block_type = \WP_Block_Type_Registry::get_instance()->get_registered($block_config['name']);
@@ -1901,44 +1958,52 @@ class BlockManager
     }
 
     /**
-     * Ensure default blocks are enabled if no settings exist
+     * The Gutenberg blocks that ship enabled by DEFAULT. Single source of
+     * truth, used both to seed a fresh install AND to self-heal existing
+     * installs when a new default block ships in a later release (see
+     * register_blocks()). Add a new default-on block's setting_key here.
+     */
+    private function default_enabled_blocks()
+    {
+        return [
+            'embedpress',
+            'embedpress-pdf',
+            'youtube-block',
+            'wistia-block',
+            'pdf-gallery',
+            'google-reviews',
+        ];
+    }
+
+    /**
+     * Ensure the default-on blocks are enabled. Idempotent — only adds keys that
+     * are MISSING, never flips a key the user explicitly turned off (an existing
+     * key, even value '', is left untouched). Safe to call on every load; it
+     * only persists when something actually changed. This is what makes a block
+     * added in a later release (google-reviews, pdf-gallery, …) appear on
+     * existing installs after an update instead of staying invisible.
      */
     private function ensure_default_blocks_enabled()
     {
         $elements = (array) get_option(EMBEDPRESS_PLG_NAME . ":elements", []);
 
-        // If no gutenberg settings exist, create default ones
         if (!isset($elements['gutenberg'])) {
             $elements['gutenberg'] = [];
         }
 
-        // Enable embedpress block by default
-        if (!isset($elements['gutenberg']['embedpress'])) {
-            $elements['gutenberg']['embedpress'] = 'embedpress';
+        $changed = false;
+        foreach ($this->default_enabled_blocks() as $key) {
+            // array_key_exists (not isset) so a user-disabled block stored as ''
+            // is respected — we only add a key that was never present at all.
+            if (!array_key_exists($key, $elements['gutenberg'])) {
+                $elements['gutenberg'][$key] = $key;
+                $changed = true;
+            }
         }
 
-        // Enable embedpress-pdf block by default
-        if (!isset($elements['gutenberg']['embedpress-pdf'])) {
-            $elements['gutenberg']['embedpress-pdf'] = 'embedpress-pdf';
+        if ($changed) {
+            update_option(EMBEDPRESS_PLG_NAME . ":elements", $elements);
         }
-
-        // Enable youtube-block by default for legacy support
-        if (!isset($elements['gutenberg']['youtube-block'])) {
-            $elements['gutenberg']['youtube-block'] = 'youtube-block';
-        }
-
-        // Enable wistia-block by default for legacy support
-        if (!isset($elements['gutenberg']['wistia-block'])) {
-            $elements['gutenberg']['wistia-block'] = 'wistia-block';
-        }
-
-        // Enable pdf-gallery block by default
-        if (!isset($elements['gutenberg']['pdf-gallery'])) {
-            $elements['gutenberg']['pdf-gallery'] = 'pdf-gallery';
-        }
-
-        // Update options if any changes were made
-        update_option(EMBEDPRESS_PLG_NAME . ":elements", $elements);
     }
 
     /**

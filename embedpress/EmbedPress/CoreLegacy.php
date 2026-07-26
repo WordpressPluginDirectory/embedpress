@@ -129,6 +129,19 @@ class CoreLegacy
 
         $this->start_plugin_tracking();
 
+        // Google Reviews is editor-agnostic — its admin page, REST controller and
+        // review fetchers must load regardless of which editor is active. These
+        // registrations mirror EmbedPress\Core::initialize(); without them the
+        // Classic Editor code path (this class) leaves the Google Reviews admin
+        // page (admin.php?page=embedpress-google-reviews) and its REST endpoints
+        // unregistered. See FB #83635.
+        add_action('rest_api_init', ['\\EmbedPress\\Includes\\Classes\\GoogleReviewsRestController', 'register']);
+        add_action('enqueue_block_editor_assets', ['\\EmbedPress\\Includes\\Classes\\GoogleReviewsRenderer', 'enqueue_editor_assets']);
+        add_action('elementor/preview/enqueue_styles', ['\\EmbedPress\\Includes\\Classes\\GoogleReviewsRenderer', 'enqueue_editor_assets']);
+        \EmbedPress\Includes\Classes\GoogleReviewsAdminPage::register();
+        new \EmbedPress\Includes\Classes\GoogleReviewsApify();
+        new \EmbedPress\Includes\Classes\GoogleReviewsManaged();
+
         if (is_admin()) {
             new EmbedpressSettings();
             $plgSettings = self::getSettings();
@@ -150,9 +163,11 @@ class CoreLegacy
             }
 
             $onAjaxCallbackName = "doShortcodeReceivedViaAjax";
+            // Only logged-in users may resolve an arbitrary URL server-side via this
+            // handler. The nopriv registration is intentionally dropped: it exposed
+            // oEmbed discovery to unauthenticated callers (SSRF). The callback also
+            // enforces a capability + nonce check.
             $this->loaderInstance->add_action('wp_ajax_embedpress_do_ajax_request', $plgHandlerAdminInstance,
-                $onAjaxCallbackName);
-            $this->loaderInstance->add_action('wp_ajax_nopriv_embedpress_do_ajax_request', $plgHandlerAdminInstance,
                 $onAjaxCallbackName);
 
             $this->loaderInstance->add_action('wp_ajax_embedpress_get_embed_url_info', $plgHandlerAdminInstance,

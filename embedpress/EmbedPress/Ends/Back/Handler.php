@@ -436,8 +436,20 @@ class Handler extends EndHandlerAbstract
      */
     public function doShortcodeReceivedViaAjax()
     {
-        $subject = isset($_POST['subject']) ? $_POST['subject'] : "";
+        // This handler resolves an arbitrary user-supplied URL server-side
+        // (oEmbed discovery), so it must never be reachable unauthenticated.
+        // Only logged-in editors may call it; the nopriv registration was removed.
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(['message' => 'Forbidden'], 403);
+        }
 
+        // CSRF protection: verify the nonce localized into the preview script.
+        check_ajax_referer('embedpress_do_ajax_request');
+
+        $subject = isset($_POST['subject']) ? trim(wp_unslash($_POST['subject'])) : "";
+
+        // Internal-host SSRF (link-local/CGNAT/benchmark) is rejected globally by
+        // the http_request_host_is_external filter, so parseContent can run as-is.
         $response = [
             'data' => Shortcode::parseContent($subject, true),
         ];

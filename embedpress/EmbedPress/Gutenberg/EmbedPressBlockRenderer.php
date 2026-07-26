@@ -916,6 +916,9 @@ class EmbedPressBlockRenderer
             'fit_view' => !empty($attributes['fitView']) ? 'true' : 'false',
             'bookmark' => !empty($attributes['bookmark']) ? 'true' : 'false',
             'flipbook_toolbar_position' => !empty($attributes['flipbook_toolbar_position']) ? $attributes['flipbook_toolbar_position'] : 'bottom',
+            'flipbook_rtl' => defined('EMBEDPRESS_SL_ITEM_SLUG') && !empty($attributes['flipbookPageFlipRTL']) ? 'true' : 'false',
+            'flipbook_highlight_links' => !empty($attributes['flipbookHighlightLinks']) ? 'true' : 'false',
+            'flipbook_highlight_color' => isset($attributes['flipbookHighlightColor']) ? esc_attr($attributes['flipbookHighlightColor']) : '',
             'selection_tool' => isset($attributes['selection_tool']) ? esc_attr($attributes['selection_tool']) : '0',
             'scrolling' => isset($attributes['scrolling']) ? esc_attr($attributes['scrolling']) : '-1',
             'spreads' => isset($attributes['spreads']) ? esc_attr($attributes['spreads']) : '-1',
@@ -953,6 +956,9 @@ class EmbedPressBlockRenderer
             'fit_view' => !empty($attributes['fitView']) ? 'true' : 'false',
             'bookmark' => !empty($attributes['bookmark']) ? 'true' : 'false',
             'flipbook_toolbar_position' => !empty($attributes['flipbook_toolbar_position']) ? $attributes['flipbook_toolbar_position'] : 'bottom',
+            'flipbook_rtl' => defined('EMBEDPRESS_SL_ITEM_SLUG') && !empty($attributes['flipbookPageFlipRTL']) ? 'true' : 'false',
+            'flipbook_highlight_links' => !empty($attributes['flipbookHighlightLinks']) ? 'true' : 'false',
+            'flipbook_highlight_color' => isset($attributes['flipbookHighlightColor']) ? esc_attr($attributes['flipbookHighlightColor']) : '',
             'selection_tool' => isset($attributes['selection_tool']) ? esc_attr($attributes['selection_tool']) : '0',
             'scrolling' => isset($attributes['scrolling']) ? esc_attr($attributes['scrolling']) : '-1',
             'spreads' => isset($attributes['spreads']) ? esc_attr($attributes['spreads']) : '-1',
@@ -2075,6 +2081,9 @@ class EmbedPressBlockRenderer
             'toolbar' => !empty($attributes['toolbar']) ? 'true' : 'false',
             'position' => isset($attributes['position']) ? esc_attr($attributes['position']) : 'top',
             'flipbook_toolbar_position' => isset($attributes['flipbook_toolbar_position']) ? esc_attr($attributes['flipbook_toolbar_position']) : 'bottom',
+            'flipbook_rtl' => defined('EMBEDPRESS_SL_ITEM_SLUG') && !empty($attributes['flipbookPageFlipRTL']) ? 'true' : 'false',
+            'flipbook_highlight_links' => !empty($attributes['flipbookHighlightLinks']) ? 'true' : 'false',
+            'flipbook_highlight_color' => isset($attributes['flipbookHighlightColor']) ? esc_attr($attributes['flipbookHighlightColor']) : '',
             'presentation' => !empty($attributes['presentation']) ? 'true' : 'false',
             'download' => !empty($attributes['download']) ? 'true' : 'false',
             'copy_text' => !empty($attributes['copy_text']) ? 'true' : 'false',
@@ -2104,6 +2113,87 @@ class EmbedPressBlockRenderer
         }
 
         return base64_encode($query_string);
+    }
+
+    /**
+     * Render the Google Reviews block. Maps the JS camelCase attributes to the
+     * shared GoogleReviewsRenderer args (snake_case) so block + Elementor +
+     * shortcode all emit identical markup.
+     */
+    public static function render_google_reviews($attributes, $content = '', $block = null)
+    {
+        \EmbedPress\Includes\Classes\GoogleReviewsRenderer::enqueue_assets();
+        return \EmbedPress\Includes\Classes\GoogleReviewsRenderer::render([
+            'place_id'   => isset($attributes['placeId']) ? sanitize_text_field($attributes['placeId']) : '',
+            'place_name' => isset($attributes['placeName']) ? sanitize_text_field($attributes['placeName']) : '',
+            'limit'      => isset($attributes['limit']) ? (int) $attributes['limit'] : 5,
+            'min_rating' => isset($attributes['minRating']) ? (int) $attributes['minRating'] : 0,
+            'layout'     => isset($attributes['layout']) ? sanitize_key($attributes['layout']) : 'list',
+            'show_photo' => isset($attributes['showPhoto']) ? (bool) $attributes['showPhoto'] : true,
+            'show_stars' => isset($attributes['showStars']) ? (bool) $attributes['showStars'] : true,
+            'show_date'  => isset($attributes['showDate']) ? (bool) $attributes['showDate'] : true,
+            'show_link'   => isset($attributes['showLink']) ? (bool) $attributes['showLink'] : false,
+            'show_images' => isset($attributes['showImages']) ? (bool) $attributes['showImages'] : true,
+            'columns'    => isset($attributes['columns']) ? (int) $attributes['columns'] : 3,
+            'max_width'  => isset($attributes['maxWidth']) ? (int) $attributes['maxWidth'] : 0,
+            'gap'        => isset($attributes['gap']) ? (int) $attributes['gap'] : 32,
+            'show_arrows'    => isset($attributes['showArrows']) ? (bool) $attributes['showArrows'] : true,
+            'show_dots'      => isset($attributes['showDots']) ? (bool) $attributes['showDots'] : true,
+            'carousel_loop'  => isset($attributes['carouselLoop']) ? (bool) $attributes['carouselLoop'] : true,
+            'autoplay_speed' => isset($attributes['autoplaySpeed']) ? (float) $attributes['autoplaySpeed'] : 5,
+            'show_summary'        => isset($attributes['showSummary']) ? (bool) $attributes['showSummary'] : true,
+            'show_summary_name'   => isset($attributes['showSummaryName']) ? (bool) $attributes['showSummaryName'] : true,
+            'show_summary_rating' => isset($attributes['showSummaryRating']) ? (bool) $attributes['showSummaryRating'] : true,
+            'show_summary_stars'  => isset($attributes['showSummaryStars']) ? (bool) $attributes['showSummaryStars'] : true,
+            'show_summary_count'  => isset($attributes['showSummaryCount']) ? (bool) $attributes['showSummaryCount'] : true,
+            'show_write_review'   => isset($attributes['showWriteReview']) ? (bool) $attributes['showWriteReview'] : true,
+            'summary_align'       => isset($attributes['summaryAlign']) ? sanitize_key($attributes['summaryAlign']) : 'left',
+            // Pro-extended attributes. Free's renderer ignores them; Pro's
+            // render filters read them off the args. Sanitized here so the
+            // contract holds regardless of which plugin consumes them.
+            'sort'         => isset($attributes['sort']) ? sanitize_key($attributes['sort']) : 'newest',
+            'keyword'      => isset($attributes['keyword']) ? sanitize_text_field($attributes['keyword']) : '',
+            'hide_empty'   => isset($attributes['hideEmpty']) ? (bool) $attributes['hideEmpty'] : false,
+            'fetch_all'    => isset($attributes['fetchAll']) ? (bool) $attributes['fetchAll'] : false,
+            'theme'        => isset($attributes['theme']) ? sanitize_key($attributes['theme']) : 'light',
+            'accent_color' => isset($attributes['accentColor']) ? sanitize_hex_color($attributes['accentColor']) : '',
+            'autoplay'     => isset($attributes['autoplay']) ? (bool) $attributes['autoplay'] : false,
+            'schema'       => isset($attributes['schema']) ? (bool) $attributes['schema'] : false,
+            'places'       => isset($attributes['places']) && is_array($attributes['places']) ? array_map('sanitize_text_field', $attributes['places']) : [],
+            'cache_ttl'    => isset($attributes['cacheTtl']) ? (int) $attributes['cacheTtl'] : 0,
+            'load_more'    => isset($attributes['loadMore']) ? (bool) $attributes['loadMore'] : false,
+            // No separate per-page control anymore: 0 means "use the count
+            // control (limit) as the page size" (see Pro page_size()).
+            'per_page'     => isset($attributes['perPage']) ? (int) $attributes['perPage'] : 0,
+            // EDITOR PREVIEW flag. The Gutenberg block previews via the
+            // /wp/v2/block-renderer REST route (REST_REQUEST + context=edit). In
+            // that case the renderer caps sliding layouts (carousel/marquee/
+            // spotlight) to a handful of cards instead of rendering up to 200 —
+            // a 200-card preview is ~1.3MB per request, and ServerSideRender
+            // re-fires on every attribute change, so rapid layout switches piled
+            // up huge in-flight requests and FROZE the editor. The frontend is
+            // unaffected (full set still renders there).
+            'is_editor_preview' => self::is_block_editor_preview_request(),
+        ]);
+    }
+
+    /**
+     * True when the current render is a Gutenberg block-editor SSR preview
+     * (the /wp/v2/block-renderer REST request with context=edit), so the
+     * renderer can serve a lightweight preview instead of the full frontend set.
+     */
+    private static function is_block_editor_preview_request(): bool
+    {
+        if (!defined('REST_REQUEST') || !REST_REQUEST) {
+            return false;
+        }
+        $route = isset($GLOBALS['wp']->query_vars['rest_route']) ? (string) $GLOBALS['wp']->query_vars['rest_route'] : '';
+        if (strpos($route, 'block-renderer') !== false) {
+            return true;
+        }
+        // Fallback: the block-renderer route also arrives via REQUEST_URI.
+        $uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+        return strpos($uri, 'block-renderer') !== false;
     }
 }
 ?>

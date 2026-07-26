@@ -25,6 +25,8 @@ class Data_Collector
 
     private static $view_count_cache = [];
 
+    private static $visitor_view_count_cache = [];
+
     private static $download_count_cache = [];
 
     public function __construct()
@@ -58,6 +60,44 @@ class Data_Collector
         ));
 
         self::$view_count_cache[$content_id] = $count;
+        return $count;
+    }
+
+    /**
+     * Public read helper: view count for the VISITOR-FACING badge only.
+     *
+     * The badge writes its own rows tagged `interaction_data.source =
+     * 'visitor_view_count'` (one per page-load, per embed instance). The
+     * analytics tracker ALSO writes `interaction_type='view'` rows for the
+     * same content_id and re-fires them on scroll / viewport re-entry — so
+     * the unfiltered get_view_count_by_content_id() would let those tracker
+     * rows inflate the badge as the visitor scrolls. Counting only the
+     * badge's own rows keeps the badge at one-view-per-page-load regardless
+     * of whether the dashboard tracker is active. Memoized per-request.
+     */
+    public function get_visitor_view_count_by_content_id($content_id)
+    {
+        $content_id = sanitize_text_field((string) $content_id);
+        if ($content_id === '') {
+            return 0;
+        }
+        if (isset(self::$visitor_view_count_cache[$content_id])) {
+            return self::$visitor_view_count_cache[$content_id];
+        }
+
+        global $wpdb;
+        $table = $wpdb->prefix . 'embedpress_analytics_views';
+        $count = (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM $table
+             WHERE content_id = %s
+               AND interaction_type = %s
+               AND JSON_UNQUOTE(JSON_EXTRACT(interaction_data, '$.source')) = %s",
+            $content_id,
+            'view',
+            'visitor_view_count'
+        ));
+
+        self::$visitor_view_count_cache[$content_id] = $count;
         return $count;
     }
 

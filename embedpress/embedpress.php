@@ -6,7 +6,7 @@
  * Description: EmbedPress lets you embed videos, images, posts, audio, maps and upload PDF, DOC, PPT & all other types of content into your WordPress site with one-click and showcase it beautifully for the visitors. 250+ sources supported.
  * Author: WPDeveloper
  * Author URI: https://wpdeveloper.com
- * Version: 4.5.5
+ * Version: 4.6.2
  * Text Domain: embedpress
  * Domain Path: /languages
  *
@@ -61,7 +61,7 @@ if (!defined('EMBEDPRESS_PLUGIN_VERSION')) {
     if (defined('EMBEDPRESS_DEV_MODE') && EMBEDPRESS_DEV_MODE) {
         define('EMBEDPRESS_PLUGIN_VERSION', time());
     } else {
-        define('EMBEDPRESS_PLUGIN_VERSION', '4.5.1');
+        define('EMBEDPRESS_PLUGIN_VERSION', '4.6.2');
     }
 }
 
@@ -129,6 +129,14 @@ if (isset($_GET['classic-editor']) || isset($_POST['action']) && $_POST['action'
 //     $embedPressPlugin->initialize_minimal();
 // }
 $embedPressPlugin->initialize();
+
+// SSRF hardening: WP core's wp_http_validate_url() blocks loopback + RFC1918 but
+// leaves link-local (169.254/16, incl. the 169.254.169.254 cloud-metadata IP),
+// CGNAT (100.64/10) and benchmark (198.18/15) reachable, and its
+// http_request_host_is_external filter only fires for IPs core already suspects.
+// pre_http_request fires for every outbound request, so hook it once here to
+// cover every wp_remote/wp_safe_remote fetch on every path (Core + CoreLegacy).
+add_filter('pre_http_request', ['\\EmbedPress\\Includes\\Classes\\Helper', 'block_internal_http_requests'], 10, 3);
 
 new Feature_Enhancer();
 new Extend_Elementor_Controls();

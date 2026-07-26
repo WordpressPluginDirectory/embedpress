@@ -169,6 +169,28 @@ $enablePluginInFront = isset( $settings['enablePluginInFront'] ) ? $settings['en
                     <span></span>
                 </label>
             </div>
+            <div class="element__item">
+                <h5><?php esc_html_e( "PDF Gallery", "embedpress" ); ?></h5>
+                <a href="https://embedpress.com/docs/" class="has__question" target="_blank">
+                    <i class="ep-icon ep-question"></i>
+                    <span class="element__tooltip"><?php esc_html_e( "Documentation","embedpress" ); ?></span>
+                </a>
+                <label class="input__switch element_switch">
+                    <input class="element-check" type="checkbox" value="yes" data-name="pdf-gallery" data-type="gutenberg" <?php echo isset( $g_blocks['pdf-gallery']) ? 'checked': '';  ?> >
+                    <span></span>
+                </label>
+            </div>
+            <div class="element__item">
+                <h5><?php esc_html_e( "Google Reviews", "embedpress" ); ?></h5>
+                <a href="https://embedpress.com/docs/" class="has__question" target="_blank">
+                    <i class="ep-icon ep-question"></i>
+                    <span class="element__tooltip"><?php esc_html_e( "Documentation","embedpress" ); ?></span>
+                </a>
+                <label class="input__switch element_switch">
+                    <input class="element-check" type="checkbox" value="yes" data-name="google-reviews" data-type="gutenberg" <?php echo isset( $g_blocks['google-reviews']) ? 'checked': '';  ?> >
+                    <span></span>
+                </label>
+            </div>
         </div>
     </div>
 </div>
@@ -223,6 +245,19 @@ $enablePluginInFront = isset( $settings['enablePluginInFront'] ) ? $settings['en
                 </a>
                 <label class="input__switch element_switch">
                     <input class="element-check" type="checkbox" value="yes" data-name="embedpress-calendar" data-type="elementor" <?php echo isset( $e_blocks['embedpress-calendar']) ? 'checked': '';  ?> >
+                    <span></span>
+                </label>
+
+            </div>
+
+            <div class="element__item">
+                <h5><?php esc_html_e( "EmbedPress Google Reviews", "embedpress" ); ?></h5>
+                <a href="https://embedpress.com/docs/" class="has__question" target="_blank">
+                    <i class="ep-icon ep-question"></i>
+                    <span class="element__tooltip"><?php esc_html_e( "Documentation","embedpress" ); ?></span>
+                </a>
+                <label class="input__switch element_switch">
+                    <input class="element-check" type="checkbox" value="yes" data-name="embedpress-google-reviews" data-type="elementor" <?php echo isset( $e_blocks['embedpress-google-reviews']) ? 'checked': '';  ?> >
                     <span></span>
                 </label>
 
