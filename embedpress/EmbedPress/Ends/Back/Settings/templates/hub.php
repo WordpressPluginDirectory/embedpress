@@ -30,6 +30,61 @@ if ($stored_version !== $current_version) {
     $is_popup_dismissed = get_option('embedpress_hub_popup_dismissed', false);
 }
 
+// First-visit delay for the Pro upgrade popup — fresh installs only.
+//
+// A brand-new user completes the 3-step onboarding and is redirected to this
+// Hub dashboard; showing the upgrade popup on that very first load stacks it
+// right on top of the onboarding and feels pushy. So for a genuine fresh
+// install we arm a 2-day timer on the first dashboard render *after onboarding
+// is finished* and show nothing — the popup only becomes eligible on a later
+// dashboard visit once that window has elapsed. Existing users (updating from
+// an older version) are unaffected and keep the current behaviour.
+// 'embedpress_install_type' is set to 'fresh' vs 'existing' by
+// EmbedpressSettings on the first load after (re)activation.
+//
+// Two conditions deliberately bypass the delay:
+//
+// 1. Onboarding not finished yet. The window must start from the moment the
+//    user lands on the Hub post-onboarding, NOT from an earlier stray visit to
+//    the menu — otherwise the 2 days can elapse while the user is still in the
+//    wizard, and the popup greets them on the very screen this delay exists to
+//    keep clean.
+// 2. The plugin version actually changed. The block above resets
+//    $is_popup_dismissed on a version bump so the popup re-appears for every
+//    user; a still-live delay window must not silently swallow that re-show.
+//    Note this means a *real* bump: an empty $stored_version is the
+//    never-stamped initial state of a fresh install (the option is only
+//    written when the popup is dismissed), not an upgrade — treating it as a
+//    version change would disable the delay entirely.
+$version_changed = ($stored_version !== '' && $stored_version !== $current_version);
+
+$is_popup_delayed = false;
+if (
+    get_option('embedpress_install_type', false) === 'fresh'
+    && ! $version_changed
+) {
+    if (! get_option('embedpress_onboarding_complete', false)) {
+        // Still in the wizard — suppress, but do NOT start the countdown yet.
+        $is_popup_delayed = true;
+    } else {
+        $popup_delay_until = get_option('embedpress_hub_popup_delay_until', false);
+        if ($popup_delay_until === false) {
+            // First dashboard render after onboarding — start the 2-day
+            // countdown and suppress the popup for this visit.
+            update_option('embedpress_hub_popup_delay_until', time() + (2 * DAY_IN_SECONDS));
+            $is_popup_delayed = true;
+        } else {
+            // Still within the delay window? Keep it hidden until it passes.
+            $is_popup_delayed = time() < (int) $popup_delay_until;
+
+            // Window has passed — drop the now-meaningless autoloaded option.
+            if (! $is_popup_delayed) {
+                delete_option('embedpress_hub_popup_delay_until');
+            }
+        }
+    }
+}
+
 // Check if Black Friday banner should be shown (until December 5, 2025)
 $show_bfriday_banner = (time() < strtotime('2025-12-04 23:59:59'));
 
@@ -335,7 +390,7 @@ $username = $current_user->display_name ? $current_user->display_name : $current
     </div>
 
 
-    <?php if (!$is_popup_dismissed && !$is_pro_active): ?>
+    <?php if (!$is_popup_dismissed && !$is_pro_active && !$is_popup_delayed): ?>
         <div class="embedpress-pop-up">
             <div class="embedpress-flex  embedpress-pop-up-content">
                 <div class="pop-up-left-content">

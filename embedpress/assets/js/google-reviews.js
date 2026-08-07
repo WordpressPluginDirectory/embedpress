@@ -59,15 +59,24 @@
      * Frontend "still fetching" self-refresh. A freshly-added place whose reviews
      * aren't fetched yet renders the .ep-google-reviews--loading placeholder
      * (see GoogleReviewsRenderer::render_loading) carrying the place_id + the
-     * public status endpoint URL. We poll that endpoint; the moment the
-     * background job is done WITH reviews, we reload the page once so the server
-     * re-renders the real review cards in place — no manual refresh. On
-     * failed / done-empty we simply stop polling (the placeholder stays as-is;
-     * for visitors a failed fetch renders nothing at all server-side).
+     * public status endpoint URL. The moment the background job finishes WITH
+     * reviews, we reload the page once so the server re-renders the real cards
+     * in place — no manual refresh.
      *
-     * The poll endpoint ALSO advances the job server-side (WP-cron is unreliable
-     * on quiet pages), so polling is what actually drives the fetch to completion
-     * for the first visitor who lands on the page.
+     * COMPLETION IS NOT CLOCK-BASED. Results are delivered by a push webhook
+     * (api.embedpress.com POSTs straight into the store the instant the scrape
+     * ends), so this poller's real job is just to notice that the data landed
+     * and swap it in — it does NOT have to out-wait the scrape. We therefore
+     * removed the old 10-minute "give up quietly" deadline that surfaced as a
+     * stuck placeholder / perceived failure when a slow scrape outran it.
+     *
+     * Instead: poll with gentle exponential backoff (so a slow job doesn't get
+     * hammered), pause entirely while the tab is hidden (Page Visibility) and
+     * resume on focus — a backgrounded tab burns nothing. A finished-but-empty
+     * or failed job stops the poll (nothing to show); anything still running
+     * keeps checking for as long as the visitor is actually looking at the page.
+     * The endpoint also advances the job server-side as a fallback for sites the
+     * webhook can't reach.
      */
     function initPoller(root) {
         if (root.dataset.epGrPollInit === '1') return;
@@ -76,33 +85,58 @@
         if (!placeId || !url) return;
         root.dataset.epGrPollInit = '1';
 
-        var interval = parseInt(root.getAttribute('data-ep-gr-poll-interval'), 10) || 5000;
-        // Stop after a generous ceiling so a wedged job can't poll forever
-        // (a big place can scrape for a few minutes; 10 min is a safe cap).
-        var deadline = Date.now() + 10 * 60 * 1000;
+        var base = parseInt(root.getAttribute('data-ep-gr-poll-interval'), 10) || 5000;
+        // Backoff band: start at the configured interval, grow gently up to 30s
+        // so a long scrape is checked patiently rather than every 5s forever.
+        var MAX_INTERVAL = 30000;
+        var interval = base;
+        var stopped = false;
+        var timer = null;
+
+        function schedule() {
+            if (stopped) return;
+            timer = window.setTimeout(tick, interval);
+            // Grow the interval toward the ceiling for the next round.
+            interval = Math.min(MAX_INTERVAL, Math.round(interval * 1.5));
+        }
 
         function tick() {
-            if (Date.now() > deadline) return; // give up quietly
+            timer = null;
+            if (stopped) return;
+            // Don't poll a hidden tab — parking here (timer=null) lets the
+            // visibilitychange handler restart the loop when the tab returns.
+            if (document.hidden) { return; }
             var u = url + (url.indexOf('?') === -1 ? '?' : '&') + 'place_id=' + encodeURIComponent(placeId);
             fetch(u, { headers: { Accept: 'application/json' } })
                 .then(function (r) { return r.json(); })
                 .then(function (res) {
-                    if (!res) { window.setTimeout(tick, interval); return; }
+                    if (stopped) return;
+                    if (!res) { schedule(); return; }
                     if (res.ready) {
-                        // Done (or failed). Reload only when reviews actually
-                        // landed, so the server renders them in place. On
-                        // failed / 0-reviews, stop — nothing to show.
+                        // Terminal. Reload only when reviews actually landed so
+                        // the server renders them in place; on failed/0-reviews
+                        // stop — there's nothing to show.
+                        stopped = true;
                         if ((res.review_count || 0) > 0) {
                             window.location.reload();
                         }
-                        return; // stop polling either way
+                        return;
                     }
-                    window.setTimeout(tick, interval); // still running/queued
+                    schedule(); // still running/queued — keep watching
                 })
-                .catch(function () { window.setTimeout(tick, interval); });
+                .catch(function () { if (!stopped) schedule(); });
         }
 
-        window.setTimeout(tick, interval);
+        // Resume promptly when the visitor returns to the tab (reset the backoff
+        // so a returning user gets a fast first check).
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden && !stopped && timer === null) {
+                interval = base;
+                tick();
+            }
+        });
+
+        schedule();
     }
 
     /**

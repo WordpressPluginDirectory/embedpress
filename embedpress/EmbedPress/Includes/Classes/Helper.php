@@ -115,20 +115,97 @@ class Helper
 
 		return $result;
 	}
+	/**
+	 * URL of the PDF.js ("modern") viewer document.
+	 *
+	 * Same defect and same fix as get_flipbook_renderer() below — the viewer
+	 * is a static HTML file, but routing it through admin-ajax.php paid a full
+	 * WordPress bootstrap on every embed (measured 111ms vs 0ms served
+	 * directly, on an idle install; far worse under load). This is the DEFAULT
+	 * viewer style, so it affects more embeds than the flipbook does.
+	 * See FB #84166.
+	 *
+	 * The viewer's asset references are relative to its own directory
+	 * (viewer.css, viewer.js, locale/, and a ../build/ hop), so they resolve
+	 * natively from here without the <base href> rewrite admin-ajax injected.
+	 *
+	 * The admin-ajax actions stay registered as a fallback for hosts that
+	 * block direct .html access under wp-content; filter
+	 * `embedpress_pdf_use_ajax_renderer` to true to force the old path.
+	 *
+	 * @return string
+	 */
 	public static function get_pdf_renderer()
 	{
-		// $renderer = EMBEDPRESS_URL_ASSETS. 'pdf/web/viewer.html';
+		if (apply_filters('embedpress_pdf_use_ajax_renderer', false)) {
+			return admin_url('admin-ajax.php?action=get_viewer');
+		}
 
-		$renderer = admin_url('admin-ajax.php?action=get_viewer');
+		// Trailing '?' is REQUIRED, not cosmetic. The admin-ajax URL this
+		// replaces always carried a query string, and callers append their
+		// params with a bare '&file=...' — several of them (the lightbox and
+		// PDF-gallery front-end scripts) with no "is there a ? yet" check at
+		// all. Returning a bare .html URL makes those produce
+		// "viewer.html&file=..." which Apache serves as 404. Ending on '?'
+		// keeps every existing caller correct without touching them.
+		$renderer = EMBEDPRESS_URL_ASSETS . 'pdf/web/viewer.html?';
 
-		// @TODO; apply settings query args here
-		return $renderer;
+		// EMBEDPRESS_URL_ASSETS is built once at load time and can carry a
+		// stale http:// scheme on a site now served over https; an http://
+		// iframe inside an https page is blocked as mixed content.
+		if (is_ssl() && 0 === strpos($renderer, 'http://')) {
+			$renderer = set_url_scheme($renderer, 'https');
+		}
+
+		return apply_filters('embedpress_pdf_renderer_url', $renderer);
 	}
 
+	/**
+	 * URL of the 3D flipbook viewer document.
+	 *
+	 * The viewer is a plain static HTML file. Serving it through
+	 * admin-ajax.php pays a full WordPress bootstrap for every embed, and the
+	 * viewer then has to fetch its template through a *second* admin-ajax
+	 * request that the browser cannot even discover until the first one
+	 * returns. Measured on an idle install that is ~120ms warm per request;
+	 * on a loaded production site it has been reported at 1.98s + 2.27s,
+	 * serialized in front of ~2.2MB of viewer JS. See FB #84166.
+	 *
+	 * Serving the file directly removes both round-trips. The viewer's own
+	 * asset references (js/, css/, templates/, and the ../../../../../
+	 * hop to wp-includes for jQuery) are written relative to its real
+	 * directory, so they resolve natively from here without the <base href>
+	 * rewrite the admin-ajax path had to inject.
+	 *
+	 * The admin-ajax actions remain registered as a fallback for hosts that
+	 * block direct .html access under wp-content; filter
+	 * `embedpress_flipbook_use_ajax_renderer` to true to force the old path.
+	 *
+	 * @return string
+	 */
 	public static function get_flipbook_renderer()
 	{
-		$renderer = admin_url('admin-ajax.php?action=get_flipbook_viewer');
-		return $renderer;
+		if (apply_filters('embedpress_flipbook_use_ajax_renderer', false)) {
+			return admin_url('admin-ajax.php?action=get_flipbook_viewer');
+		}
+
+		// Trailing '?' is REQUIRED — see the note in get_pdf_renderer().
+		// static/js/ep-pdf-lightbox.js and static/js/pdf-gallery.js append a
+		// bare '&file=' with no separator check, so a URL without a query
+		// string yields "viewer.html&file=..." → 404.
+		$renderer = EMBEDPRESS_URL_ASSETS . 'pdf-flip-book/viewer.html?';
+
+		// EMBEDPRESS_URL_ASSETS is built once at load time and can carry a
+		// stale http:// scheme on a site that is now served over https (it is
+		// http:// on our own test install). An http:// iframe inside an https
+		// page is blocked outright as mixed content, so realign the scheme
+		// with the site's. set_url_scheme() alone is not enough here — it
+		// keys off the current request context, not the site's own scheme.
+		if (is_ssl() && 0 === strpos($renderer, 'http://')) {
+			$renderer = set_url_scheme($renderer, 'https');
+		}
+
+		return apply_filters('embedpress_flipbook_renderer_url', $renderer);
 	}
 
 	public static  function get_extension_from_file_url($url)
@@ -142,6 +219,83 @@ class Helper
 		return strtolower($ext);
 	}
 
+	/**
+	 * Poster image for a PDF, resolved server-side.
+	 *
+	 * Without this the lightbox/trigger markup ships a bare
+	 * <canvas data-pdf-url> and static/js/ep-pdf-lightbox.js renders page 1
+	 * with PDF.js in the visitor's browser on EVERY page load — no cache.
+	 * Measured on an 18.1MB/29-page PDF that cost 18 requests, 19.16MB
+	 * transferred and ~7s before the preview appeared, for every visitor.
+	 * See FB #84167.
+	 *
+	 * WordPress already rasterises page 1 to JPEG at upload time for PDFs in
+	 * the media library (the same previews the media grid shows), so in the
+	 * common case this is a metadata lookup and costs nothing to generate.
+	 * The 'large' preview of that same file is 161KB — ~119x smaller than
+	 * making each visitor download the document.
+	 *
+	 * Returns '' when the PDF is not a library attachment (external URL) or
+	 * has no generated preview; callers then fall back to the canvas path.
+	 *
+	 * @param string $url Absolute URL of the PDF.
+	 * @param string $size Registered image size to prefer.
+	 * @return string Image URL, or '' when none is available.
+	 */
+	public static function get_pdf_poster_url($url, $size = 'large')
+	{
+		if (empty($url)) {
+			return '';
+		}
+
+		$attachment_id = attachment_url_to_postid($url);
+		if (!$attachment_id) {
+			return '';
+		}
+
+		if ('application/pdf' !== get_post_mime_type($attachment_id)) {
+			return '';
+		}
+
+		// A thumbnail previously generated by Pdf_Thumbnail_Handler (Imagick
+		// fallback path) is stored as a separate attachment; prefer it, since
+		// its existence means WP's own preview was missing at the time.
+		$cached_id = get_post_meta($attachment_id, '_ep_pdf_thumbnail_id', true);
+		if ($cached_id) {
+			$cached_url = wp_get_attachment_url($cached_id);
+			if ($cached_url) {
+				return apply_filters('embedpress_pdf_poster_url', $cached_url, $url, $attachment_id);
+			}
+			// Stale pointer — the thumbnail attachment is gone.
+			delete_post_meta($attachment_id, '_ep_pdf_thumbnail_id');
+		}
+
+		// WP's upload-time preview. Falls back through progressively smaller
+		// sizes; a PDF uploaded before the size was registered may only have
+		// some of them.
+		foreach ([$size, 'large', 'medium', 'thumbnail', 'full'] as $candidate) {
+			$src = wp_get_attachment_image_src($attachment_id, $candidate);
+			if ($src && !empty($src[0])) {
+				return apply_filters('embedpress_pdf_poster_url', $src[0], $url, $attachment_id);
+			}
+		}
+
+		// Nothing exists yet: this PDF predates upload-time poster generation,
+		// or its upload ran before the feature shipped. Generate once now so
+		// the render surfaces stop falling back to the in-browser <canvas>
+		// renderer, which tears/flips the preview on large documents
+		// (FB #83295). Rate-limited internally, so a host that cannot
+		// rasterise PDFs pays for this at most once a week per attachment.
+		$generated_id = Pdf_Thumbnail_Handler::get_or_create_poster($attachment_id);
+		if ($generated_id) {
+			$generated_url = wp_get_attachment_url($generated_id);
+			if ($generated_url) {
+				return apply_filters('embedpress_pdf_poster_url', $generated_url, $url, $attachment_id);
+			}
+		}
+
+		return apply_filters('embedpress_pdf_poster_url', '', $url, $attachment_id);
+	}
 
 	public static function is_instagram_feed($url)
 	{

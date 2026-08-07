@@ -656,6 +656,38 @@ class GoogleReviewsRenderer
             [GoogleReviewsStore::STATUS_RUNNING, GoogleReviewsStore::STATUS_QUEUED],
             true
         );
+
+        // SELF-HEAL for sites the push webhook can't reach. Results normally
+        // arrive via the webhook (api.embedpress.com POSTs straight into the
+        // store the instant the scrape ends). But on localhost / firewalled /
+        // basic-auth sites the API can't POST in — so a job could sit "running"
+        // here forever with the reviews stranded on the proxy. If a job has been
+        // active longer than the grace window (the webhook should have landed by
+        // now), do ONE inline status.php pull to backfill. This is recovery, not
+        // a timeout: it NEVER flips the place to "failed" — poll_job() either
+        // finalizes with the proxy's reviews or leaves it running for next time.
+        if ($job_active && class_exists('\\EmbedPress\\Includes\\Classes\\GoogleReviewsManaged')) {
+            // updated_at is stored in SITE-LOCAL time (current_time('mysql')), so
+            // compare against a site-local "now" to avoid a timezone-offset skew.
+            $updated = isset($row['updated_at']) ? strtotime((string) $row['updated_at']) : 0;
+            $now_local = (int) current_time('timestamp');
+            $grace   = (int) apply_filters('embedpress/google_reviews/webhook_grace_seconds', 45, $place_id);
+            if ($updated > 0 && ($now_local - $updated) >= $grace) {
+                try {
+                    (new GoogleReviewsManaged())->poll_job($place_id);
+                    $row = GoogleReviewsStore::get($place_id);
+                    $job_active = $row && in_array(
+                        $row['fetch_status'] ?? '',
+                        [GoogleReviewsStore::STATUS_RUNNING, GoogleReviewsStore::STATUS_QUEUED],
+                        true
+                    );
+                } catch (\Throwable $e) {
+                    // Recovery is best-effort — a pull error must never break the
+                    // render; fall through and show whatever the store has.
+                }
+            }
+        }
+
         if (!$job_active && (!$row || empty($row['last_fetched_at']))) {
             // First render of a freshly-selected place: do a CHEAP, BOUNDED
             // preview fetch (≤5) only. The expensive "fetch all" (Apify run /
@@ -1972,6 +2004,66 @@ class GoogleReviewsRenderer
             ];
         }
         return $predictions;
+    }
+
+    /**
+     * Rating + review count for a set of place IDs.
+     *
+     * The picker's suggestion list comes from Google Autocomplete, which
+     * returns names only — no Places API tier includes a rating inside a
+     * prediction. So the list renders first and this fills in the ★/reviews
+     * line for the ids it showed. Kept off the search path on purpose: a slow
+     * count lookup must never hold up the suggestions themselves.
+     *
+     * @param string[] $place_ids
+     * @return array<string, array{rating: float|null, review_count: int|null}>|\WP_Error
+     */
+    public static function managed_place_counts(array $place_ids)
+    {
+        $place_ids = array_values(array_filter(array_map('trim', $place_ids)));
+        if (!$place_ids) {
+            return [];
+        }
+
+        $endpoint = (string) apply_filters(
+            'embedpress/google_reviews/managed_search_endpoint',
+            'https://api.embedpress.com/google-places.php'
+        );
+        $url = add_query_arg([
+            'action'    => 'counts',
+            'place_ids' => implode(',', $place_ids),
+        ], $endpoint);
+
+        $response = wp_remote_get($url, [
+            'timeout' => (int) apply_filters('embedpress/google_reviews/place_counts_timeout', 8),
+            'headers' => [
+                'Accept'            => 'application/json',
+                'X-EmbedPress-Site' => home_url(),
+            ],
+        ]);
+
+        if (is_wp_error($response)) {
+            return new \WP_Error('embedpress_gr_place_counts', $response->get_error_message(), ['status' => 502]);
+        }
+
+        $code = (int) wp_remote_retrieve_response_code($response);
+        $body = json_decode((string) wp_remote_retrieve_body($response), true);
+        if ($code < 200 || $code >= 300 || !is_array($body)) {
+            return new \WP_Error('embedpress_gr_place_counts', __('Could not load review counts.', 'embedpress'), ['status' => 502]);
+        }
+
+        $counts = [];
+        foreach (($body['counts'] ?? []) as $id => $entry) {
+            if (!is_array($entry)) {
+                continue;
+            }
+            $counts[(string) $id] = [
+                'rating'       => isset($entry['rating']) ? (float) $entry['rating'] : null,
+                'review_count' => isset($entry['review_count']) ? (int) $entry['review_count'] : null,
+            ];
+        }
+
+        return $counts;
     }
 
     /**

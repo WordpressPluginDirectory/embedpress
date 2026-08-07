@@ -288,6 +288,33 @@ class GoogleReviewsManaged
     }
 
     /**
+     * The inbound webhook URL the API POSTs completed results to. This is our
+     * own public REST route; the API signs each POST with the per-job secret so
+     * the route can verify it. Filterable so a site behind a reverse proxy or
+     * with a non-default REST base can advertise the externally-reachable URL.
+     *
+     * Returns '' when the site clearly isn't reachable from the public internet
+     * (http://localhost, *.local, an IP-literal host) — there's no point asking
+     * the API to POST somewhere it can never reach, so we cleanly fall back to
+     * polling + the lazy self-heal pull instead.
+     */
+    public static function webhook_url(): string
+    {
+        $url = rest_url(GoogleReviewsRestController::NS . '/google-reviews/webhook');
+        $host = (string) wp_parse_url($url, PHP_URL_HOST);
+        $unreachable = $host === ''
+            || $host === 'localhost'
+            || $host === '127.0.0.1'
+            || substr($host, -6) === '.local'
+            || substr($host, -8) === '.localhost'
+            || filter_var($host, FILTER_VALIDATE_IP) !== false; // bare IP → usually LAN/dev
+        if ($unreachable) {
+            $url = '';
+        }
+        return (string) apply_filters('embedpress/google_reviews/webhook_url', $url, $host);
+    }
+
+    /**
      * Surface a 401/403 from the proxy as a single "Disconnected — please
      * reconnect" status string. Caller passes the parsed body + HTTP code;
      * returns the message to write into the store, or '' if the response
@@ -395,6 +422,34 @@ class GoogleReviewsManaged
         if ($force_refresh) {
             $payload['refresh'] = true;
         }
+        // Forward the place's known review total from Google Places search
+        // (userRatingCount). When it's an explicit 0 the API skips the Cloud Run
+        // scrape entirely and returns done(0) — saving a full Chrome execution
+        // on a place we already know is empty. Only send a KNOWN, non-negative
+        // count; -1 (unknown, e.g. a manually pasted Place ID) is omitted so the
+        // API scrapes as before.
+        if (isset($args['review_count']) && (int) $args['review_count'] >= 0) {
+            $payload['review_count'] = (int) $args['review_count'];
+        }
+
+        // PUSH-WEBHOOK opt-in. Generate a per-job secret and hand the API our
+        // inbound webhook URL. On completion the API POSTs the reviews straight
+        // to us (signed with this secret) so we NEVER poll for completion — this
+        // is what removes the clock-based "failed" that used to fire when polling
+        // timed out before a slow scrape finished. The secret is keyed to the
+        // job_id once the 202 comes back (below). If the API can't reach us
+        // (localhost/firewalled), the poll + lazy self-heal still backfill — the
+        // webhook is purely additive, so sending it is always safe.
+        $callback_secret = '';
+        $callback_url    = self::webhook_url();
+        if ($callback_url !== '') {
+            // 32 random bytes as hex; re-stored under the real job_id after 202.
+            $callback_secret = function_exists('wp_generate_password')
+                ? wp_generate_password(64, false, false)
+                : bin2hex(random_bytes(32));
+            $payload['callback_url']    = $callback_url;
+            $payload['callback_secret'] = $callback_secret;
+        }
 
         $response = wp_remote_post(self::endpoint() . '/enqueue.php', [
             'timeout' => (int) apply_filters('embedpress/google_reviews/managed_enqueue_timeout', 10, $place_id, $args),
@@ -441,6 +496,11 @@ class GoogleReviewsManaged
 
         // 202 + job_id → queued. Save run_id + start polling.
         if ($code === 202 && is_array($body) && !empty($body['job_id'])) {
+            // Bind the webhook secret to the real job_id so the inbound webhook
+            // route can verify the HMAC when the API POSTs the result back.
+            if ($callback_secret !== '') {
+                GoogleReviewsStore::store_webhook_secret((string) $body['job_id'], $callback_secret);
+            }
             // DO NOT reset_reviews here. Wiping the stored set upfront made the
             // count drop to 0 and "climb back up" during a refetch (570 → 0 →
             // 430…), and if the new scrape got fewer reviews or failed midway we
@@ -607,8 +667,27 @@ class GoogleReviewsManaged
                 return;
 
             case 'failed':
+                // GATE-RETRY GUARD. Cloud Run retries share one job_id: an early
+                // attempt can hit Google's sign-in gate and report 'failed' while
+                // a LATER attempt is still actively scraping. The proxy surfaces
+                // that as status='failed' but with a live "Fetched N reviews so
+                // far…" message + a rising fetched_count. That is NOT a terminal
+                // failure — the scrape is still climbing — so keep polling and
+                // hold the place in 'running' (the proxy's own progress branch
+                // revives the job; we just mustn't latch 'failed' in the meantime).
+                $prox_msg = (string) ($body['message'] ?? '');
+                $prox_n   = isset($body['fetched_count']) ? (int) $body['fetched_count'] : 0;
+                $still_scraping = $prox_n > 0 && stripos($prox_msg, 'fetched') !== false;
+                if ($still_scraping) {
+                    GoogleReviewsStore::set_job($place_id, GoogleReviewsStore::STATUS_RUNNING, [
+                        'message' => $prox_msg,
+                        'so_far'  => $prox_n,
+                    ]);
+                    self::schedule_poll($place_id, 3);
+                    return;
+                }
                 GoogleReviewsStore::set_job($place_id, GoogleReviewsStore::STATUS_FAILED, [
-                    'message' => !empty($body['message']) ? (string) $body['message'] : __('Couldn’t fetch reviews this time. Please try Refetch again in a moment.', 'embedpress'),
+                    'message' => $prox_msg !== '' ? $prox_msg : __('Couldn’t fetch reviews this time. Please try Refetch again in a moment.', 'embedpress'),
                     'run_id'  => null,
                 ]);
                 return;

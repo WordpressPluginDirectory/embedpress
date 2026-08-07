@@ -140,7 +140,7 @@ KAMAL;
 	    case 'document':
 	        $pdf_url = EMBEDPRESS_URL_ASSETS . 'embedpress.pdf';
 		    $renderer = Helper::get_pdf_renderer();
-		    $src = $renderer . ((strpos($renderer, '?') == false) ? '?' : '&') . 'file=' . urlencode($pdf_url);
+		    $src = $renderer . ((strpos($renderer, '?') === false) ? '?' : '&') . 'file=' . urlencode($pdf_url);
 	        ob_start(); ?>
             <iframe class="embedpress-embed-document-pdf ep-pdf-sample" style="width:500px; max-width:100%; height: 300px; display: inline-block"  src="<?php echo esc_url(  $src); ?>" ></iframe>
         <?php

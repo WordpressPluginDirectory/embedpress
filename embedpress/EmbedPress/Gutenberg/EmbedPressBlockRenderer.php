@@ -435,7 +435,7 @@ class EmbedPressBlockRenderer
         $id = $attributes['id'] ?? 'embedpress-pdf-' . rand(100, 10000);
         $renderer = Helper::get_pdf_renderer();
 
-        $src = $renderer . ((strpos($renderer, '?') == false) ? '?' : '&') . 'file=' . urlencode($href) . self::generate_pdf_params($attributes);
+        $src = $renderer . ((strpos($renderer, '?') === false) ? '?' : '&') . 'file=' . urlencode($href) . self::generate_pdf_params($attributes);
         
         $iframe_title = self::get_iframe_title_from_url($href);
 
@@ -445,7 +445,7 @@ class EmbedPressBlockRenderer
         if (isset($attributes['viewerStyle']) && $attributes['viewerStyle'] === 'flip-book') {
             $src = urlencode($href) . self::generate_pdf_params($attributes);
             $renderer = Helper::get_flipbook_renderer();
-            $src_url = $renderer . ((strpos($renderer, '?') == false) ? '?' : '&') . 'file=' . $src;
+            $src_url = $renderer . ((strpos($renderer, '?') === false) ? '?' : '&') . 'file=' . $src;
             $embed_code = '<iframe title="' . esc_attr(Helper::get_file_title($href)) . '" class="embedpress-embed-document-pdf ' . esc_attr($id) . '" style="' . esc_attr($legacy_config['dimension']) . '; max-width:100%; display: inline-block" src="' . esc_url($src_url) . '" frameborder="0" oncontextmenu="return false;"></iframe> ';
         }
 
@@ -542,6 +542,60 @@ class EmbedPressBlockRenderer
         echo '</div>';
     }
 
+    /**
+     * Replace a saved lightbox thumbnail <canvas> with a server-resolved poster.
+     *
+     * The PDF/Document blocks save their markup statically, so posts created
+     * before (or without) a poster carry a
+     * `<canvas class="ep-pdf-thumbnail-canvas" data-pdf-url="…">`. The frontend
+     * then rasterises page 1 with PDF.js in the visitor's browser on every page
+     * load — for an 18MB PDF that is ~20 requests and the whole file downloaded,
+     * every view, uncached. See FB #84167.
+     *
+     * Rewriting the saved HTML at render time fixes existing posts without
+     * touching the block's save() output, so no `deprecated[]` entry is needed
+     * and no post shows the "unexpected or invalid content" recovery prompt.
+     *
+     * No-ops when there is no canvas, when the PDF has no poster (external URL,
+     * or a host where WordPress generated no preview), or when a custom
+     * thumbnail is already in use — in every one of those cases $content is
+     * returned byte-identical.
+     *
+     * @param string $content Saved block HTML.
+     * @param string $href    PDF URL for this block.
+     * @return string Content with the canvas swapped for an <img>, or unchanged.
+     */
+    private static function swap_thumbnail_canvas_for_poster($content, $href)
+    {
+        if (empty($href) || false === strpos($content, 'ep-pdf-thumbnail-canvas')) {
+            return $content;
+        }
+
+        $poster = Helper::get_pdf_poster_url($href);
+        if (empty($poster)) {
+            return $content;
+        }
+
+        $title = Helper::get_file_title($href);
+
+        // Swap the whole <canvas …></canvas> element. The canvas carries no
+        // child nodes, so a non-greedy match to the first closing tag is safe.
+        $replaced = preg_replace(
+            '~<canvas[^>]*class="[^"]*ep-pdf-thumbnail-canvas[^"]*"[^>]*>.*?</canvas>~is',
+            sprintf(
+                '<img class="ep-pdf-thumbnail-custom" src="%s" alt="%s" loading="lazy" style="width:100%%;height:100%%;object-fit:cover;" />',
+                esc_url($poster),
+                esc_attr($title)
+            ),
+            $content,
+            1
+        );
+
+        // preg_replace returns null on failure (e.g. backtrack limit on very
+        // large content) — never hand null back to the block renderer.
+        return (null === $replaced) ? $content : $replaced;
+    }
+
     public static function render_embedpress_pdf($attributes, $content = '', $block = null)
     {
         // Per-post dynamic source — rewrite the editor-preview URL inside the
@@ -566,8 +620,9 @@ class EmbedPressBlockRenderer
 
 
         // For PDF blocks, if we have saved content and should display it, return the content
+        // (with any saved thumbnail canvas swapped for the cached poster).
         if (!empty($content) && $should_display_content && !$isAdManager) {
-            return $content;
+            return self::swap_thumbnail_canvas_for_poster($content, $href);
         }
 
         // If no href is provided, return empty
@@ -608,8 +663,9 @@ class EmbedPressBlockRenderer
         $isAdManager = !empty($attributes['adManager']) ? true : false;
 
         // For PDF blocks, if we have saved content and should display it, return the content
+        // (with any saved thumbnail canvas swapped for the cached poster).
         if (!empty($content) && $should_display_content && !$isAdManager) {
-            return $content;
+            return self::swap_thumbnail_canvas_for_poster($content, $href);
         }
 
         // If no href is provided, return empty
@@ -776,6 +832,13 @@ class EmbedPressBlockRenderer
         $width = !empty($attributes['width']) ? $attributes['width'] . $unitoption : '600px';
         $powered_by = !empty($attributes['powered_by']);
         $lightboxThumbnail = $attributes['lightboxThumbnail'] ?? '';
+
+        // No custom thumbnail picked — fall back to the poster WordPress
+        // already generated for this PDF at upload time, so the browser does
+        // not have to download the whole document to draw a preview (FB #84167).
+        if (empty($lightboxThumbnail)) {
+            $lightboxThumbnail = Helper::get_pdf_poster_url($href);
+        }
         $lightboxAlign = $attributes['lightboxAlign'] ?? 'left';
 
         $alignStyle = '';

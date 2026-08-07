@@ -6,7 +6,7 @@ Tags: embed, embed YouTube, embed PDF, Google Docs, Social Feeds
 Requires at least: 4.6
 Tested up to: 7.0
 Requires PHP: 5.6
-Stable tag: 4.6.2
+Stable tag: 4.6.3
 License: GPLv3 or later
 License URI: https://opensource.org/licenses/GPL-3.0
 
@@ -361,6 +361,16 @@ With EmbedPress you can easily create PDF flipbooks. First, upload PDF into your
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+
+= [4.6.3] – 2026-08-06 =
+- Fixed: PDF preview flipping or appearing broken in Thumbnail + Lightbox display mode.
+- Fixed: PDF content rendering issues for documents using CID-encoded fonts.
+- Fixed: Google Reviews not fetching reviews for places added via Place ID.
+- Improved: Google Reviews now uses push-based fetching for faster results and better reliability.
+- Improved: Added real-time fetch progress for Google Reviews instead of a stuck loading state.
+- Improved: Google Reviews place search and suggestions with better matching, ratings, and review counts.
+- Improved: PDF preview images are now generated for all documents, including existing media library files.
+- Few minor bug fixes and improvements.
 
 = [4.6.2] – 2026-07-26 =
 - Fixed: "What's New" modal appearing on brand-new installations.

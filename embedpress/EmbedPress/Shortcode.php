@@ -1689,6 +1689,9 @@ KAMAL;
                 $max_width .= 'px';
             }
             $pdf_title = Helper::get_file_title($url);
+            // Server-resolved poster: avoids making every visitor download the
+            // whole PDF just to render a preview canvas (FB #84167).
+            $pdf_poster = Helper::get_pdf_poster_url($url);
             ?>
             <div class="embedpress-document-embed ep-doc-<?php echo esc_attr(md5($id)); ?>" style="max-width: <?php echo esc_attr($max_width); ?>;">
                 <div class="ep-pdf-thumbnail-card">
@@ -1697,7 +1700,11 @@ KAMAL;
                          data-viewer-style="<?php echo esc_attr($viewer_style); ?>"
                          data-viewer-params="<?php echo esc_attr($viewer_params); ?>">
                         <div class="ep-pdf-thumbnail-inner">
-                            <canvas class="ep-pdf-thumbnail-canvas" data-pdf-url="<?php echo esc_url($url); ?>" data-loading="true"></canvas>
+                            <?php if (!empty($pdf_poster)): ?>
+                                <img class="ep-pdf-thumbnail-custom" src="<?php echo esc_url($pdf_poster); ?>" alt="<?php echo esc_attr($pdf_title); ?>" loading="lazy" />
+                            <?php else: ?>
+                                <canvas class="ep-pdf-thumbnail-canvas" data-pdf-url="<?php echo esc_url($url); ?>" data-loading="true"></canvas>
+                            <?php endif; ?>
                             <div class="ep-pdf-thumbnail-overlay">
                                 <div class="ep-pdf-thumbnail-icon-circle">
                                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>
@@ -1723,7 +1730,7 @@ KAMAL;
                 if (self::is_pdf($url) && !self::is_external_url($url)) {
                     $renderer = Helper::get_pdf_renderer();
 
-                    $src = $renderer . ((strpos($renderer, '?') == false) ? '?' : '&') . 'file=' . urlencode($url) . self::getParamData($attributes);
+                    $src = $renderer . ((strpos($renderer, '?') === false) ? '?' : '&') . 'file=' . urlencode($url) . self::getParamData($attributes);
 
 
                     if (isset($attributes['viewer_style']) && $attributes['viewer_style'] === 'flip-book') {

@@ -29,6 +29,20 @@ class GoogleReviewsRestController
             ],
         ]);
 
+        // Second stage of the place picker. Autocomplete carries names only —
+        // no Places API tier returns a rating inside a prediction — so the
+        // suggestion list renders immediately and the ★/reviews line is filled
+        // in by this route afterwards. Kept separate from /search so a slow or
+        // failed count lookup can never delay the results themselves.
+        register_rest_route(self::NS, '/google-reviews/place-counts', [
+            'methods'             => 'GET',
+            'callback'            => [__CLASS__, 'place_counts'],
+            'permission_callback' => [__CLASS__, 'can_edit'],
+            'args'                => [
+                'place_ids' => ['type' => 'string', 'required' => true],
+            ],
+        ]);
+
         register_rest_route(self::NS, '/google-reviews/preview', [
             'methods'             => 'GET',
             'callback'            => [__CLASS__, 'preview'],
@@ -181,6 +195,19 @@ class GoogleReviewsRestController
             ],
         ]);
 
+        // PUSH-WEBHOOK inbound sink. api.embedpress.com POSTs a completed scrape
+        // here so the site never has to poll for completion (which is what used
+        // to fail on a clock when a slow scrape outran the poll deadline). Public
+        // permission_callback because the request comes from the API, not a
+        // logged-in user — authentication is the HMAC signature verified inside
+        // the handler against the per-job secret we issued at enqueue. Without a
+        // valid signature the handler 401s and writes nothing.
+        register_rest_route(self::NS, '/google-reviews/webhook', [
+            'methods'             => 'POST',
+            'callback'            => [__CLASS__, 'receive_webhook'],
+            'permission_callback' => '__return_true',
+        ]);
+
         register_rest_route(self::NS, '/google-reviews/places', [
             [
                 'methods'             => 'GET',
@@ -198,8 +225,16 @@ class GoogleReviewsRestController
                     'place_address' => ['type' => 'string'], // location description (saved with the place)
                     // Search-result seed: the place's real total review count +
                     // rating, so the row shows them immediately on add (before the
-                    // background fetch finishes). 0 = not provided.
-                    'total'      => ['type' => 'integer', 'default' => 0],
+                    // background fetch finishes).
+                    //
+                    // 'total' deliberately has NO default. WP copies every arg's
+                    // default into the request's defaults bucket during dispatch,
+                    // and has_param()/get_param() both read that bucket — so a
+                    // default of 0 makes an omitted count indistinguishable from
+                    // a search result of "0 reviews". That difference decides
+                    // whether the API skips the scrape, so absence must stay
+                    // detectable via get_param() === null.
+                    'total'      => ['type' => 'integer'],
                     'rating'     => ['type' => 'number',  'default' => 0],
                     'fetch_max'  => ['type' => 'integer', 'default' => 0], // 0 = all up to ceiling
                     'limit'      => ['type' => 'integer', 'default' => 100],
@@ -226,6 +261,34 @@ class GoogleReviewsRestController
     /**
      * Proxy Google Places Autocomplete so the API key stays server-side.
      */
+    /**
+     * Rating + review count for the place IDs a search just returned.
+     *
+     * Split out from search() so the suggestion list is never blocked on these
+     * lookups: Autocomplete gives names only, so the picker renders results
+     * first and calls this to fill in ★/reviews. Always returns 200 with
+     * whatever resolved — a failed lookup leaves those rows without a count
+     * rather than surfacing an error over a list that rendered fine.
+     */
+    public static function place_counts(WP_REST_Request $request)
+    {
+        $ids = array_filter(array_map('trim', explode(',', (string) $request->get_param('place_ids'))));
+        if (!$ids) {
+            return new WP_REST_Response(['counts' => (object) []], 200);
+        }
+
+        // Autocomplete returns at most 5; cap so this can't be used to fan out
+        // arbitrary paid lookups.
+        $ids = array_slice(array_values($ids), 0, 10);
+
+        $counts = GoogleReviewsRenderer::managed_place_counts($ids);
+        if (is_wp_error($counts)) {
+            return new WP_REST_Response(['counts' => (object) []], 200);
+        }
+
+        return new WP_REST_Response(['counts' => (object) $counts], 200);
+    }
+
     public static function search(WP_REST_Request $request)
     {
         $q = trim((string) $request->get_param('q'));
@@ -633,6 +696,87 @@ class GoogleReviewsRestController
      * Per-place fetch status — polled by the block editor for its progress bar.
      * Returns the live counters without the full reviews payload.
      */
+    /**
+     * PUSH-WEBHOOK sink — api.embedpress.com POSTs a completed scrape here.
+     *
+     * This is the piece that makes completion PUSH-based: instead of the site
+     * polling status.php and racing a clock (the old "timed out → failed" bug),
+     * the API delivers the finished reviews the moment the scrape ends and we
+     * write them straight into the store, flipping fetch_status to done.
+     *
+     * Auth is the HMAC signature, NOT a WP capability — the caller is a server,
+     * not a logged-in user. We recompute sha256_hmac(rawBody, per-job-secret)
+     * and constant-time compare against X-EP-GR-Signature. The secret was issued
+     * at enqueue and is known only to us and the API, so a leaked webhook URL
+     * alone can't forge reviews. Unknown/expired job → 401, write nothing.
+     */
+    public static function receive_webhook(WP_REST_Request $request)
+    {
+        $raw = (string) $request->get_body();
+        $body = json_decode($raw, true);
+        if (!is_array($body)) {
+            return new WP_REST_Response(['ok' => false, 'error' => 'bad_json'], 400);
+        }
+
+        $job_id   = trim((string) ($body['job_id'] ?? ''));
+        $place_id = trim((string) ($body['place_id'] ?? ''));
+        if ($job_id === '' || $place_id === '') {
+            return new WP_REST_Response(['ok' => false, 'error' => 'missing_ids'], 400);
+        }
+
+        // Verify the signature against the per-job secret we stashed at enqueue.
+        $secret = GoogleReviewsStore::get_webhook_secret($job_id);
+        if ($secret === '') {
+            // No secret on file: job unknown here, already consumed, or expired.
+            // Reject rather than trust an unsigned/foreign POST.
+            return new WP_REST_Response(['ok' => false, 'error' => 'unknown_job'], 401);
+        }
+        $header = (string) $request->get_header('x_ep_gr_signature');
+        $got    = (stripos($header, 'sha256=') === 0) ? substr($header, 7) : $header;
+        $expected = hash_hmac('sha256', $raw, $secret);
+        if ($got === '' || !hash_equals($expected, $got)) {
+            return new WP_REST_Response(['ok' => false, 'error' => 'bad_signature'], 401);
+        }
+
+        // Signature good — this is a genuine result from the API. Guard against a
+        // place_id that doesn't match a job we actually issued: only write if the
+        // place exists in our store (the enqueue always adds it first).
+        if (!GoogleReviewsStore::exists($place_id)) {
+            // Nothing to attach to — accept (2xx so the API marks it delivered)
+            // but don't create phantom rows from a webhook alone.
+            GoogleReviewsStore::clear_webhook_secret($job_id);
+            return new WP_REST_Response(['ok' => true, 'stored' => false], 200);
+        }
+
+        $status  = (string) ($body['status'] ?? 'done');
+        $reviews = is_array($body['reviews'] ?? null) ? $body['reviews'] : [];
+        $meta    = is_array($body['meta'] ?? null) ? $body['meta'] : [];
+
+        if ($status === 'failed' && empty($reviews)) {
+            // A genuine failure with no salvage set. Mark failed but DON'T wipe
+            // any reviews we already have (append_reviews never shrinks; here we
+            // only touch job state) — matches the store's never-lose contract.
+            GoogleReviewsStore::set_job($place_id, GoogleReviewsStore::STATUS_FAILED, [
+                'message' => (string) ($meta['message'] ?? __('The review fetch could not be completed.', 'embedpress')),
+                'run_id'  => null,
+            ]);
+        } else {
+            // done (with or without reviews) → merge in + finalize. Same write the
+            // poll 'done' path does, so behaviour is identical whether the result
+            // arrived by push or by poll.
+            GoogleReviewsStore::append_reviews($place_id, $reviews, $meta, 'managed', true);
+            GoogleReviewsStore::set_job($place_id, GoogleReviewsStore::STATUS_DONE, [
+                'message' => null,
+                'run_id'  => null,
+            ]);
+        }
+
+        // One-shot secret: consume it so a replayed POST can't rewrite the row.
+        GoogleReviewsStore::clear_webhook_secret($job_id);
+
+        return new WP_REST_Response(['ok' => true, 'stored' => true, 'status' => $status], 200);
+    }
+
     public static function get_status(WP_REST_Request $request)
     {
         $place_id = trim((string) $request->get_param('place_id'));
@@ -774,7 +918,19 @@ class GoogleReviewsRestController
                 // the place meta so the row shows the actual numbers right away,
                 // before the background fetch completes. Only seed when missing
                 // (don't clobber a fetched/refreshed value).
-                $seed_total  = (int) $request->get_param('total');
+                // Distinguish "search reported 0 reviews" (an explicit 0 we can
+                // act on — skip the scrape) from "no count was sent" (unknown →
+                // scrape normally).
+                //
+                // has_param() cannot make this call: WP populates the request's
+                // defaults bucket for every registered arg during dispatch, and
+                // has_param() counts that bucket, so it returns true even when
+                // the client sent nothing. 'total' is therefore registered
+                // without a default, leaving get_param() to return null when —
+                // and only when — the count is genuinely absent.
+                $raw_total   = $request->get_param('total');
+                $count_known = (null !== $raw_total);
+                $seed_total  = (int) $raw_total;
                 $seed_rating = (float) $request->get_param('rating');
                 if ($seed_total > 0 || $seed_rating > 0) {
                     GoogleReviewsStore::seed_meta($place_id, [
@@ -799,10 +955,18 @@ class GoogleReviewsRestController
                 //      the "scrape on add, not Places API" contract.
                 if ($is_new) {
                     $job_args = [
-                        'fetch_all' => true,   // worker pulls up to the ceiling
-                        'fetch_max' => 0,      // 0 = all up to MAX_REVIEWS_PER_JOB
-                        'sort'      => 'newest',
-                        'places'    => [],
+                        'fetch_all'    => true,   // worker pulls up to the ceiling
+                        'fetch_max'    => 0,      // 0 = all up to MAX_REVIEWS_PER_JOB
+                        'sort'         => 'newest',
+                        'places'       => [],
+                        // Google Places SEARCH already told us how many reviews
+                        // this place has (userRatingCount). Pass it to the worker
+                        // enqueue so the API can skip a full Chrome scrape when the
+                        // count is 0 — no point spending ~90s on a Cloud Run
+                        // instance to confirm a place we already know is empty.
+                        // Only forward a KNOWN count (search sent 'total'); -1 =
+                        // unknown (e.g. a manually pasted Place ID) → scrape.
+                        'review_count' => $count_known ? $seed_total : -1,
                     ];
                     $started = (bool) apply_filters('embedpress/google_reviews/start_fetch_job', false, $place_id, $job_args);
 

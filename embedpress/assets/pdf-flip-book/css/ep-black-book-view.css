@@ -133,13 +133,21 @@
   margin-bottom: 10px;
 }
 
+/* Spinner is drawn in pure CSS rather than loaded as a background GIF.
+   A GIF reference here depends on the stylesheet's URL resolving correctly;
+   any host, CDN or optimizer that rewrites asset paths 404s it and the user
+   is left staring at a blank frame with no indication anything is loading —
+   the exact symptom reported in FB #84166. Borders cannot 404. */
 .flip-book .loading-progress .progress::after {
   content: ' ';
   display: block;
   width: 100%;
   height: 100%;
-  background-size: contain;
-  background-image: url('../images/light-loader.gif');
+  box-sizing: border-box;
+  border: 3px solid rgba(255, 255, 255, 0.25);
+  border-top-color: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  animation: ep-flipbook-spin 0.9s linear infinite;
 }
 
 .flip-book .page-loading {
@@ -161,8 +169,25 @@
   display: block;
   width: 100%;
   height: 100%;
-  background-size: contain;
-  background-image: url('../images/light-loader.gif');
+  box-sizing: border-box;
+  border: 3px solid rgba(255, 255, 255, 0.25);
+  border-top-color: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  animation: ep-flipbook-spin 0.9s linear infinite;
+}
+
+@keyframes ep-flipbook-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Respect users who have asked the OS to reduce motion. */
+@media (prefers-reduced-motion: reduce) {
+  .flip-book .loading-progress .progress::after,
+  .flip-book .page-loading::after {
+    animation-duration: 2.4s;
+  }
 }
 
 .flip-book .loading-progress .caption {
@@ -648,6 +673,10 @@
   position: relative;
 }
 
+/* Pure-CSS spinner — see the note on .loading-progress above (FB #84166).
+   The centering transform and the rotation would overwrite each other on a
+   single element, so the margin offset does the centering and `transform`
+   is left free to animate. */
 .ctrl .thumbnails .loading::after {
   content: ' ';
   position: absolute;
@@ -655,9 +684,12 @@
   height: 40px;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%);
-  background-size: contain;
-  background-image: url('../images/light-loader.gif');
+  margin: -20px 0 0 -20px;
+  box-sizing: border-box;
+  border: 3px solid rgba(255, 255, 255, 0.25);
+  border-top-color: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  animation: ep-flipbook-spin 0.9s linear infinite;
 }
 
 .ctrl .thumbnails .item {

@@ -304,6 +304,61 @@ class GoogleReviewsStore
     }
 
     /**
+     * Per-job push-webhook secret store.
+     *
+     * When a managed scrape is enqueued we generate a random secret, send it to
+     * the API, and stash it here keyed by job_id. When the API POSTs the result
+     * back to our inbound webhook, the route recomputes the HMAC with this secret
+     * and constant-time compares — so a leaked callback URL alone can't forge
+     * reviews into the store.
+     *
+     * Held in a transient (not a table column) because it's short-lived: it only
+     * needs to survive from enqueue until the webhook fires. 6h TTL comfortably
+     * covers the worst-case scrape (30-min job wall) plus retries, then expires.
+     */
+    const WEBHOOK_SECRET_TTL = 6 * HOUR_IN_SECONDS;
+
+    private static function webhook_secret_key(string $job_id): string
+    {
+        return 'ep_gr_cb_' . md5($job_id);
+    }
+
+    /**
+     * Persist an already-generated secret under a job_id. Managed generates the
+     * secret BEFORE the job_id exists (it must go in the enqueue request), then
+     * calls this once the API returns the job_id.
+     */
+    public static function store_webhook_secret(string $job_id, string $secret): void
+    {
+        $job_id = trim($job_id);
+        $secret = trim($secret);
+        if ($job_id === '' || $secret === '') {
+            return;
+        }
+        set_transient(self::webhook_secret_key($job_id), $secret, self::WEBHOOK_SECRET_TTL);
+    }
+
+    /** Look up the secret for a job_id (empty string if unknown/expired). */
+    public static function get_webhook_secret(string $job_id): string
+    {
+        $job_id = trim($job_id);
+        if ($job_id === '') {
+            return '';
+        }
+        $v = get_transient(self::webhook_secret_key($job_id));
+        return is_string($v) ? $v : '';
+    }
+
+    /** Drop a job's secret once the webhook has been consumed. */
+    public static function clear_webhook_secret(string $job_id): void
+    {
+        $job_id = trim($job_id);
+        if ($job_id !== '') {
+            delete_transient(self::webhook_secret_key($job_id));
+        }
+    }
+
+    /**
      * Mark a place's background fetch job state (status + optional run id /
      * message / progress count). Used by the Pro batch-fetch service + cron.
      */

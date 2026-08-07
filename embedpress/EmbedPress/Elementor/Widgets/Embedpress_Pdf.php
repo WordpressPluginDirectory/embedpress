@@ -1145,6 +1145,12 @@ class Embedpress_Pdf extends Widget_Base
         $viewerStyle = $settings['embedpress_pdf_viewer_style'] ?? 'modern';
         $maxWidth = $settings['embedpress_elementor_document_width']['size'] . $settings['embedpress_elementor_document_width']['unit'];
         $customThumb = !empty($settings['embedpress_pdf_lightbox_thumbnail']['url']) ? $settings['embedpress_pdf_lightbox_thumbnail']['url'] : '';
+
+        // Fall back to WP's upload-time PDF poster so the browser does not have
+        // to fetch the whole document to draw a preview (FB #84167).
+        if (empty($customThumb)) {
+            $customThumb = Helper::get_pdf_poster_url($url);
+        }
         $align = $settings['embedpress_pdf_lightbox_align'] ?? 'left';
 
         $alignStyle = '';

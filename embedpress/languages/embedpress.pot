@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the EmbedPress plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: EmbedPress 4.6.2\n"
+"Project-Id-Version: EmbedPress 4.6.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/embedpress\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-26T06:30:18+00:00\n"
+"POT-Creation-Date: 2026-08-06T12:31:44+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: embedpress\n"
@@ -158,7 +158,7 @@ msgstr ""
 msgid "Analytics"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Core.php:976
+#: dist/embedpress/EmbedPress/Core.php:999
 #: dist/embedpress/EmbedPress/CoreLegacy.php:337
 #: dist/embedpress/EmbedPress/Plugins/Plugin.php:158
 #: EmbedPress/Core.php:999
@@ -167,7 +167,7 @@ msgstr ""
 msgid "Open settings page"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Core.php:979
+#: dist/embedpress/EmbedPress/Core.php:1002
 #: dist/embedpress/EmbedPress/CoreLegacy.php:338
 #: dist/embedpress/EmbedPress/Ends/Back/Settings/EmbedpressSettings.php:246
 #: dist/embedpress/EmbedPress/Ends/Back/Settings/EmbedpressSettings.php:980
@@ -190,7 +190,7 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Core.php:983
+#: dist/embedpress/EmbedPress/Core.php:1006
 #: dist/embedpress/EmbedPress/CoreLegacy.php:342
 #: dist/embedpress/EmbedPress/Elementor/Embedpress_Elementor_Integration.php:215
 #: dist/embedpress/EmbedPress/Plugins/Plugin.php:163
@@ -198,8 +198,8 @@ msgstr ""
 #: EmbedPress/CoreLegacy.php:342
 #: EmbedPress/Elementor/Embedpress_Elementor_Integration.php:215
 #: EmbedPress/Plugins/Plugin.php:163
-#: src/AdminUI/GoogleReviews.jsx:1848
-#: src/Blocks/google-reviews/src/edit.js:444
+#: src/AdminUI/GoogleReviews.jsx:1941
+#: src/Blocks/google-reviews/src/edit.js:567
 msgid "Go Pro"
 msgstr ""
 
@@ -207,7 +207,7 @@ msgstr ""
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsAdminPage.php:150
 #: EmbedPress/Elementor/Controls/Place_Picker.php:33
 #: EmbedPress/Includes/Classes/GoogleReviewsAdminPage.php:150
-#: src/Blocks/google-reviews/src/edit.js:397
+#: src/Blocks/google-reviews/src/edit.js:520
 msgid "e.g. Sydney Opera House"
 msgstr ""
 
@@ -220,7 +220,7 @@ msgstr ""
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsAdminPage.php:158
 #: EmbedPress/Elementor/Controls/Place_Picker.php:64
 #: EmbedPress/Includes/Classes/GoogleReviewsAdminPage.php:158
-#: src/Blocks/google-reviews/src/edit.js:350
+#: src/Blocks/google-reviews/src/edit.js:473
 msgid "Change"
 msgstr ""
 
@@ -236,25 +236,25 @@ msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Controls/Place_Picker.php:101
 #: EmbedPress/Elementor/Controls/Place_Picker.php:101
-#: src/Blocks/google-reviews/src/edit.js:501
+#: src/Blocks/google-reviews/src/edit.js:624
 msgid "Have a Place ID? Enter manually"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Controls/Place_Picker.php:111
 #: EmbedPress/Elementor/Controls/Place_Picker.php:111
-#: src/Blocks/google-reviews/src/edit.js:513
+#: src/Blocks/google-reviews/src/edit.js:636
 msgid "Use"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Embedpress_Elementor_Integration.php:207
 #: EmbedPress/Elementor/Embedpress_Elementor_Integration.php:207
-#: src/Blocks/google-reviews/src/edit.js:453
+#: src/Blocks/google-reviews/src/edit.js:576
 msgid "No matches. Try a different spelling or include the city."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Embedpress_Elementor_Integration.php:208
 #: EmbedPress/Elementor/Embedpress_Elementor_Integration.php:208
-#: src/Blocks/google-reviews/src/edit.js:291
+#: src/Blocks/google-reviews/src/edit.js:400
 msgid "Search failed."
 msgstr ""
 
@@ -270,59 +270,59 @@ msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Embedpress_Elementor_Integration.php:211
 #: EmbedPress/Elementor/Embedpress_Elementor_Integration.php:211
-#: src/Blocks/google-reviews/src/edit.js:432
+#: src/Blocks/google-reviews/src/edit.js:555
 msgid "Select"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Embedpress_Elementor_Integration.php:212
 #: EmbedPress/Elementor/Embedpress_Elementor_Integration.php:212
-#: src/AdminUI/GoogleReviews.jsx:1829
-#: src/Blocks/google-reviews/src/edit.js:426
+#: src/AdminUI/GoogleReviews.jsx:1922
+#: src/Blocks/google-reviews/src/edit.js:549
 msgid "already added"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Embedpress_Elementor_Integration.php:213
 #: EmbedPress/Elementor/Embedpress_Elementor_Integration.php:213
-#: src/AdminUI/GoogleReviews.jsx:1832
-#: src/Blocks/google-reviews/src/edit.js:381
-#: src/Blocks/google-reviews/src/edit.js:429
+#: src/AdminUI/GoogleReviews.jsx:1925
+#: src/Blocks/google-reviews/src/edit.js:504
+#: src/Blocks/google-reviews/src/edit.js:552
 msgid "Upgrade to add"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Embedpress_Elementor_Integration.php:214
 #: EmbedPress/Elementor/Embedpress_Elementor_Integration.php:214
-#: src/AdminUI/GoogleReviews.jsx:1846
-#: src/Blocks/google-reviews/src/edit.js:442
+#: src/AdminUI/GoogleReviews.jsx:1939
+#: src/Blocks/google-reviews/src/edit.js:565
 msgid "You’ve added your 1 free place."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Embedpress_Elementor_Integration.php:216
 #: EmbedPress/Elementor/Embedpress_Elementor_Integration.php:216
-#: src/AdminUI/GoogleReviews.jsx:1850
-#: src/Blocks/google-reviews/src/edit.js:446
+#: src/AdminUI/GoogleReviews.jsx:1943
+#: src/Blocks/google-reviews/src/edit.js:569
 msgid "to show reviews from multiple businesses at once."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Embedpress_Elementor_Integration.php:217
 #: EmbedPress/Elementor/Embedpress_Elementor_Integration.php:217
-#: src/Blocks/google-reviews/src/edit.js:368
-#: src/Blocks/google-reviews/src/edit.js:414
+#: src/Blocks/google-reviews/src/edit.js:491
+#: src/Blocks/google-reviews/src/edit.js:537
 msgid "Showing more than one place needs EmbedPress Pro — click to upgrade."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Embedpress_Elementor_Integration.php:218
 #: EmbedPress/Elementor/Embedpress_Elementor_Integration.php:218
-#: src/AdminUI/GoogleReviews.jsx:620
-#: src/Blocks/google-reviews/src/edit.js:143
+#: src/AdminUI/GoogleReviews.jsx:692
+#: src/Blocks/google-reviews/src/edit.js:176
 msgid "review"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Embedpress_Elementor_Integration.php:219
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:333
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:358
 #: EmbedPress/Elementor/Embedpress_Elementor_Integration.php:219
-#: EmbedPress/Includes/Classes/FeatureNotices.php:333
-#: src/AdminUI/GoogleReviews.jsx:620
-#: src/Blocks/google-reviews/src/edit.js:143
+#: EmbedPress/Includes/Classes/FeatureNotices.php:358
+#: src/AdminUI/GoogleReviews.jsx:692
+#: src/Blocks/google-reviews/src/edit.js:176
 #: src/Blocks/google-reviews/src/index.js:47
 msgid "reviews"
 msgstr ""
@@ -344,9 +344,9 @@ msgstr ""
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf_Gallery.php:101
 #: EmbedPress/Ends/Back/Settings/templates/custom-logo.php:158
 #: EmbedPress/Ends/Back/Settings/templates/settings.php:163
-#: src/AdminUI/GoogleReviews.jsx:637
-#: src/AdminUI/GoogleReviews.jsx:669
-#: src/Blocks/google-reviews/src/edit.js:579
+#: src/AdminUI/GoogleReviews.jsx:709
+#: src/AdminUI/GoogleReviews.jsx:741
+#: src/Blocks/google-reviews/src/edit.js:702
 msgid "Pro"
 msgstr ""
 
@@ -443,7 +443,7 @@ msgstr ""
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:593
 #: EmbedPress/Includes/Classes/Extend_Elementor_Controls.php:447
 #: src/Blocks/EmbedPress/src/components/InspectorControl/spreaker.js:221
-#: src/Blocks/google-reviews/src/edit.js:1115
+#: src/Blocks/google-reviews/src/edit.js:1238
 msgid "Left"
 msgstr ""
 
@@ -459,7 +459,7 @@ msgstr ""
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:232
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:373
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:597
-#: src/Blocks/google-reviews/src/edit.js:1116
+#: src/Blocks/google-reviews/src/edit.js:1239
 msgid "Center"
 msgstr ""
 
@@ -480,7 +480,7 @@ msgstr ""
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:601
 #: EmbedPress/Includes/Classes/Extend_Elementor_Controls.php:445
 #: src/Blocks/EmbedPress/src/components/InspectorControl/spreaker.js:220
-#: src/Blocks/google-reviews/src/edit.js:1117
+#: src/Blocks/google-reviews/src/edit.js:1240
 msgid "Right"
 msgstr ""
 
@@ -1043,27 +1043,27 @@ msgstr ""
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Calendar.php:335
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Document.php:745
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Document.php:868
-#: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:1495
-#: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:1503
+#: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:1501
+#: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:1509
 #: dist/embedpress/EmbedPress/Ends/Back/Settings/templates/ads.php:354
 #: dist/embedpress/EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:460
-#: dist/embedpress/EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:827
-#: dist/embedpress/EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:1859
-#: dist/embedpress/EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:1888
-#: dist/embedpress/EmbedPress/Shortcode.php:1712
-#: dist/embedpress/EmbedPress/Shortcode.php:1750
+#: dist/embedpress/EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:890
+#: dist/embedpress/EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:1922
+#: dist/embedpress/EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:1951
+#: dist/embedpress/EmbedPress/Shortcode.php:1719
+#: dist/embedpress/EmbedPress/Shortcode.php:1757
 #: EmbedPress/Elementor/Widgets/Embedpress_Calendar.php:335
 #: EmbedPress/Elementor/Widgets/Embedpress_Document.php:745
 #: EmbedPress/Elementor/Widgets/Embedpress_Document.php:868
-#: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:1495
-#: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:1503
+#: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:1501
+#: EmbedPress/Elementor/Widgets/Embedpress_Pdf.php:1509
 #: EmbedPress/Ends/Back/Settings/templates/ads.php:354
 #: EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:460
-#: EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:827
-#: EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:1859
-#: EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:1888
-#: EmbedPress/Shortcode.php:1712
-#: EmbedPress/Shortcode.php:1750
+#: EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:890
+#: EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:1922
+#: EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:1951
+#: EmbedPress/Shortcode.php:1719
+#: EmbedPress/Shortcode.php:1757
 #: src/AdminUI/Onboarding.js:248
 #: src/AdminUI/Onboarding.js:429
 msgid "Powered By EmbedPress"
@@ -1327,7 +1327,7 @@ msgstr ""
 #: EmbedPress/Ends/Back/Settings/templates/youtube.php:255
 #: src/Blocks/EmbedPress/src/components/InspectorControl/spreaker.js:158
 #: src/Blocks/EmbedPress/src/components/InspectorControl/twitch.js:107
-#: src/Blocks/google-reviews/src/edit.js:1131
+#: src/Blocks/google-reviews/src/edit.js:1254
 #: src/Blocks/twitch/src/components/inspector.js:112
 msgid "Theme"
 msgstr ""
@@ -1362,7 +1362,7 @@ msgstr ""
 #: EmbedPress/Ends/Back/Settings/templates/youtube.php:261
 #: src/Blocks/EmbedPress/src/components/InspectorControl/spreaker.js:162
 #: src/Blocks/EmbedPress/src/components/InspectorControl/twitch.js:110
-#: src/Blocks/google-reviews/src/edit.js:1135
+#: src/Blocks/google-reviews/src/edit.js:1258
 #: src/Blocks/pdf-gallery/src/inspector.js:340
 #: src/Blocks/twitch/src/components/inspector.js:115
 msgid "Dark"
@@ -1384,7 +1384,7 @@ msgstr ""
 #: EmbedPress/Ends/Back/Settings/templates/twitch.php:73
 #: src/Blocks/EmbedPress/src/components/InspectorControl/spreaker.js:161
 #: src/Blocks/EmbedPress/src/components/InspectorControl/twitch.js:111
-#: src/Blocks/google-reviews/src/edit.js:1134
+#: src/Blocks/google-reviews/src/edit.js:1257
 #: src/Blocks/pdf-gallery/src/inspector.js:341
 #: src/Blocks/twitch/src/components/inspector.js:116
 msgid "Light"
@@ -1611,7 +1611,7 @@ msgstr ""
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1176
 #: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:250
 #: EmbedPress/Ends/Back/Settings/templates/instagram.php:56
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1144
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1176
 #: src/Blocks/EmbedPress/src/components/InspectorControl/instafeed.js:244
 msgid "Business"
 msgstr ""
@@ -2338,7 +2338,7 @@ msgstr ""
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1336
 #: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:1418
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:320
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1304
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1336
 #: src/Blocks/EmbedPress/src/components/InspectorControl/youtube.js:375
 msgid "Spotlight"
 msgstr ""
@@ -2416,7 +2416,7 @@ msgstr ""
 #: EmbedPress/Ends/Back/Settings/templates/instagram.php:219
 #: src/Blocks/EmbedPress/src/components/InspectorControl/instafeed.js:362
 #: src/Blocks/EmbedPress/src/components/InspectorControl/youtube.js:430
-#: src/Blocks/google-reviews/src/edit.js:695
+#: src/Blocks/google-reviews/src/edit.js:818
 msgid "Columns"
 msgstr ""
 
@@ -2662,7 +2662,7 @@ msgstr ""
 #: src/Blocks/EmbedPress/src/components/InspectorControl/customplayer.js:56
 #: src/Blocks/EmbedPress/src/components/InspectorControl/google-photos.js:150
 #: src/Blocks/EmbedPress/src/components/InspectorControl/instafeed.js:397
-#: src/Blocks/google-reviews/src/edit.js:1028
+#: src/Blocks/google-reviews/src/edit.js:1151
 #: src/Blocks/pdf-gallery/src/inspector.js:291
 msgid "Autoplay"
 msgstr ""
@@ -2846,7 +2846,7 @@ msgstr ""
 #: EmbedPress/Elementor/Widgets/Embedpress_Elementor.php:2609
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:435
 #: EmbedPress/Ends/Back/Settings/templates/opensea.php:46
-#: src/Blocks/google-reviews/src/edit.js:853
+#: src/Blocks/google-reviews/src/edit.js:976
 msgid "Newest"
 msgstr ""
 
@@ -2888,7 +2888,7 @@ msgstr ""
 #: src/Blocks/EmbedPress/src/components/InspectorControl/opensea.js:387
 #: src/Blocks/EmbedPress/src/components/InspectorControl/opensea.js:390
 #: src/Blocks/EmbedPress/src/components/InspectorControl/youtube.js:363
-#: src/Blocks/google-reviews/src/edit.js:782
+#: src/Blocks/google-reviews/src/edit.js:905
 #: src/Blocks/pdf-gallery/src/inspector.js:104
 msgid "Layout"
 msgstr ""
@@ -3148,7 +3148,7 @@ msgstr ""
 #: src/Blocks/EmbedPress/src/components/InspectorControl/instafeed.js:480
 #: src/Blocks/EmbedPress/src/components/InspectorControl/opensea.js:352
 #: src/Blocks/EmbedPress/src/components/InspectorControl/opensea.js:540
-#: src/Blocks/google-reviews/src/edit.js:890
+#: src/Blocks/google-reviews/src/edit.js:1013
 msgid "Load More"
 msgstr ""
 
@@ -3627,7 +3627,7 @@ msgstr ""
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:318
 #: EmbedPress/Elementor/Widgets/Embedpress_Pdf_Gallery.php:187
 #: EmbedPress/Ends/Back/Settings/templates/instagram.php:213
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1302
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1334
 #: src/Blocks/pdf-gallery/src/inspector.js:110
 msgid "Masonry"
 msgstr ""
@@ -3692,7 +3692,7 @@ msgstr ""
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:250
 #: EmbedPress/Includes/Classes/GoogleReviewsAdminPage.php:189
 #: src/Blocks/EmbedPress/src/components/InspectorControl/meetup.js:114
-#: src/Blocks/google-reviews/src/edit.js:915
+#: src/Blocks/google-reviews/src/edit.js:1038
 msgid "Date"
 msgstr ""
 
@@ -3936,35 +3936,35 @@ msgstr ""
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:32
 #: EmbedPress/Ends/Back/Settings/templates/elements.php:254
 #: EmbedPress/Includes/Classes/GoogleReviewsAdminPage.php:41
-#: src/Blocks/google-reviews/src/edit.js:1220
+#: src/Blocks/google-reviews/src/edit.js:1343
 msgid "EmbedPress Google Reviews"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:153
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:153
-#: src/Blocks/google-reviews/src/edit.js:746
+#: src/Blocks/google-reviews/src/edit.js:869
 msgid "Place"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:157
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:315
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:340
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsAdminPage.php:149
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:157
-#: EmbedPress/Includes/Classes/FeatureNotices.php:315
+#: EmbedPress/Includes/Classes/FeatureNotices.php:340
 #: EmbedPress/Includes/Classes/GoogleReviewsAdminPage.php:149
-#: src/Blocks/google-reviews/src/edit.js:394
+#: src/Blocks/google-reviews/src/edit.js:517
 msgid "Search for a place"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:170
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:170
-#: src/Blocks/google-reviews/src/edit.js:753
+#: src/Blocks/google-reviews/src/edit.js:876
 msgid "Quick preview — 5 reviews."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:172
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:172
-#: src/Blocks/google-reviews/src/edit.js:755
+#: src/Blocks/google-reviews/src/edit.js:878
 msgid "Fetch more"
 msgstr ""
 
@@ -3972,13 +3972,13 @@ msgstr ""
 #: dist/embedpress/EmbedPress/Includes/Classes/Extend_Elementor_Controls.php:363
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:195
 #: EmbedPress/Includes/Classes/Extend_Elementor_Controls.php:363
-#: src/Blocks/google-reviews/src/edit.js:1065
+#: src/Blocks/google-reviews/src/edit.js:1188
 msgid "Header"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:200
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:200
-#: src/Blocks/google-reviews/src/edit.js:1068
+#: src/Blocks/google-reviews/src/edit.js:1191
 msgid "Show header"
 msgstr ""
 
@@ -4014,13 +4014,13 @@ msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:209
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:209
-#: src/Blocks/google-reviews/src/edit.js:1080
+#: src/Blocks/google-reviews/src/edit.js:1203
 msgid "Business name"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:210
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:210
-#: src/Blocks/google-reviews/src/edit.js:1086
+#: src/Blocks/google-reviews/src/edit.js:1209
 msgid "Rating score"
 msgstr ""
 
@@ -4031,37 +4031,37 @@ msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:212
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:212
-#: src/Blocks/google-reviews/src/edit.js:1098
+#: src/Blocks/google-reviews/src/edit.js:1221
 msgid "Review count"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:227
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:227
-#: src/Blocks/google-reviews/src/edit.js:1112
+#: src/Blocks/google-reviews/src/edit.js:1235
 msgid "Header alignment"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:243
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:243
-#: src/Blocks/google-reviews/src/edit.js:901
+#: src/Blocks/google-reviews/src/edit.js:1024
 msgid "Review Elements"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:248
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:248
-#: src/Blocks/google-reviews/src/edit.js:903
+#: src/Blocks/google-reviews/src/edit.js:1026
 msgid "Reviewer photo"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:249
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:249
-#: src/Blocks/google-reviews/src/edit.js:909
+#: src/Blocks/google-reviews/src/edit.js:1032
 msgid "Star rating"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:251
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:251
-#: src/Blocks/google-reviews/src/edit.js:926
+#: src/Blocks/google-reviews/src/edit.js:1049
 msgid "Review images"
 msgstr ""
 
@@ -4069,13 +4069,13 @@ msgstr ""
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsAdminPage.php:190
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:252
 #: EmbedPress/Includes/Classes/GoogleReviewsAdminPage.php:190
-#: src/Blocks/google-reviews/src/edit.js:935
+#: src/Blocks/google-reviews/src/edit.js:1058
 msgid "\"View on Google\" link"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:292
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:292
-#: src/Blocks/google-reviews/src/edit.js:774
+#: src/Blocks/google-reviews/src/edit.js:897
 msgid "Layout & Display"
 msgstr ""
 
@@ -4087,14 +4087,14 @@ msgstr ""
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:319
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1335
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:319
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1303
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1335
 msgid "Compact badge"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:321
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1337
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:321
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1305
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1337
 msgid "Knowledge panel"
 msgstr ""
 
@@ -4106,19 +4106,19 @@ msgstr ""
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:323
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1339
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:323
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1307
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1339
 msgid "Bubble"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:346
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:346
-#: src/Blocks/google-reviews/src/edit.js:961
+#: src/Blocks/google-reviews/src/edit.js:1084
 msgid "Number of columns. Collapses on smaller screens."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:350
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:350
-#: src/Blocks/google-reviews/src/edit.js:695
+#: src/Blocks/google-reviews/src/edit.js:818
 msgid "Slides per view"
 msgstr ""
 
@@ -4129,25 +4129,25 @@ msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:360
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:360
-#: src/Blocks/google-reviews/src/edit.js:967
+#: src/Blocks/google-reviews/src/edit.js:1090
 msgid "Gap (px)"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:371
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:371
-#: src/Blocks/google-reviews/src/edit.js:978
+#: src/Blocks/google-reviews/src/edit.js:1101
 msgid "Max width (px)"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:376
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:376
-#: src/Blocks/google-reviews/src/edit.js:984
+#: src/Blocks/google-reviews/src/edit.js:1107
 msgid "Cap the block width and center it. 0 = full width."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:391
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:391
-#: src/Blocks/google-reviews/src/edit.js:810
+#: src/Blocks/google-reviews/src/edit.js:933
 msgid "Reviews & Filtering"
 msgstr ""
 
@@ -4155,13 +4155,13 @@ msgstr ""
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsAdminPage.php:169
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:404
 #: EmbedPress/Includes/Classes/GoogleReviewsAdminPage.php:169
-#: src/Blocks/google-reviews/src/edit.js:821
+#: src/Blocks/google-reviews/src/edit.js:944
 msgid "Minimum rating"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:408
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:408
-#: src/Blocks/google-reviews/src/edit.js:830
+#: src/Blocks/google-reviews/src/edit.js:953
 msgid "Filter: only reviews at or above this rating are eligible to show."
 msgstr ""
 
@@ -4169,79 +4169,79 @@ msgstr ""
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsAdminPage.php:171
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:410
 #: EmbedPress/Includes/Classes/GoogleReviewsAdminPage.php:171
-#: src/Blocks/google-reviews/src/edit.js:824
+#: src/Blocks/google-reviews/src/edit.js:947
 msgid "Any"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:417
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:417
-#: src/Blocks/google-reviews/src/edit.js:835
+#: src/Blocks/google-reviews/src/edit.js:958
 msgid "Keyword filter"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:419
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:419
-#: src/Blocks/google-reviews/src/edit.js:838
+#: src/Blocks/google-reviews/src/edit.js:961
 msgid "e.g. service, staff, clean"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:420
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:420
-#: src/Blocks/google-reviews/src/edit.js:839
+#: src/Blocks/google-reviews/src/edit.js:962
 msgid "Filter: only reviews whose text contains this word."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:423
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:423
-#: src/Blocks/google-reviews/src/edit.js:843
+#: src/Blocks/google-reviews/src/edit.js:966
 msgid "Hide reviews with no text"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:430
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:430
-#: src/Blocks/google-reviews/src/edit.js:850
+#: src/Blocks/google-reviews/src/edit.js:973
 msgid "Sort by"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:433
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:433
-#: src/Blocks/google-reviews/src/edit.js:859
+#: src/Blocks/google-reviews/src/edit.js:982
 msgid "Order of the filtered reviews (applied after the filters above)."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:436
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:436
-#: src/Blocks/google-reviews/src/edit.js:854
+#: src/Blocks/google-reviews/src/edit.js:977
 msgid "Highest rated"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:437
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:437
-#: src/Blocks/google-reviews/src/edit.js:855
+#: src/Blocks/google-reviews/src/edit.js:978
 msgid "Lowest rated"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:438
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:438
-#: src/Blocks/google-reviews/src/edit.js:856
+#: src/Blocks/google-reviews/src/edit.js:979
 msgid "Most relevant"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:447
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:447
-#: src/Blocks/google-reviews/src/edit.js:869
+#: src/Blocks/google-reviews/src/edit.js:992
 msgid "Reviews per page"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:453
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:453
-#: src/Blocks/google-reviews/src/edit.js:878
+#: src/Blocks/google-reviews/src/edit.js:1001
 msgid "How many of the filtered, sorted reviews to show (the page size when “Load more” is on)."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:454
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:454
-#: src/Blocks/google-reviews/src/edit.js:879
+#: src/Blocks/google-reviews/src/edit.js:1002
 msgid "Show up to 10 reviews per place. Connect the EmbedPress API in EmbedPress → Google Reviews to show more."
 msgstr ""
 
@@ -4252,7 +4252,7 @@ msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:489
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:489
-#: src/Blocks/google-reviews/src/edit.js:999
+#: src/Blocks/google-reviews/src/edit.js:1122
 msgid "Motion"
 msgstr ""
 
@@ -4260,79 +4260,79 @@ msgstr ""
 #: dist/embedpress/EmbedPress/Ends/Back/Settings/templates/instagram.php:246
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:494
 #: EmbedPress/Ends/Back/Settings/templates/instagram.php:246
-#: src/Blocks/google-reviews/src/edit.js:1003
+#: src/Blocks/google-reviews/src/edit.js:1126
 msgid "Show arrows"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:501
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:501
-#: src/Blocks/google-reviews/src/edit.js:1009
+#: src/Blocks/google-reviews/src/edit.js:1132
 msgid "Show dots"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:508
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:508
-#: src/Blocks/google-reviews/src/edit.js:1015
+#: src/Blocks/google-reviews/src/edit.js:1138
 msgid "Infinite loop"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:512
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:512
-#: src/Blocks/google-reviews/src/edit.js:1018
+#: src/Blocks/google-reviews/src/edit.js:1141
 msgid "Slide seamlessly from the last review back to the first."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:523
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:523
-#: src/Blocks/google-reviews/src/edit.js:1036
+#: src/Blocks/google-reviews/src/edit.js:1159
 msgid "Autoplay speed (seconds)"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:535
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:535
-#: src/Blocks/google-reviews/src/edit.js:1048
+#: src/Blocks/google-reviews/src/edit.js:1171
 msgid "Scroll speed"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:539
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:539
-#: src/Blocks/google-reviews/src/edit.js:1053
+#: src/Blocks/google-reviews/src/edit.js:1176
 msgid "Marquee scroll speed, from 1 (slowest) to 10 (fastest)."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:547
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:547
-#: src/Blocks/google-reviews/src/edit.js:1129
+#: src/Blocks/google-reviews/src/edit.js:1252
 msgid "Colors & Theme"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:555
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:555
-#: src/Blocks/google-reviews/src/edit.js:1140
+#: src/Blocks/google-reviews/src/edit.js:1263
 msgid "Accent color"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:561
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:561
-#: src/Blocks/google-reviews/src/edit.js:1152
+#: src/Blocks/google-reviews/src/edit.js:1275
 msgid "SEO / Rich Snippets"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:564
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:564
-#: src/Blocks/google-reviews/src/edit.js:1154
+#: src/Blocks/google-reviews/src/edit.js:1277
 msgid "Output review schema (JSON-LD)"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:567
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:567
-#: src/Blocks/google-reviews/src/edit.js:1157
+#: src/Blocks/google-reviews/src/edit.js:1280
 msgid "Adds AggregateRating + Review structured data so search engines can show star ratings."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:572
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:572
-#: src/Blocks/google-reviews/src/edit.js:1164
+#: src/Blocks/google-reviews/src/edit.js:1287
 msgid "Sources & Caching"
 msgstr ""
 
@@ -4353,13 +4353,13 @@ msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:593
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:593
-#: src/Blocks/google-reviews/src/edit.js:1179
+#: src/Blocks/google-reviews/src/edit.js:1302
 msgid "Additional places"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:599
 #: EmbedPress/Elementor/Widgets/Embedpress_Google_Reviews.php:599
-#: src/Blocks/google-reviews/src/edit.js:1180
+#: src/Blocks/google-reviews/src/edit.js:1303
 msgid "Merge reviews from more than one Google place (by Place ID)."
 msgstr ""
 
@@ -5858,7 +5858,7 @@ msgstr ""
 #: EmbedPress/Ends/Back/Settings/templates/general.php:154
 #: EmbedPress/Ends/Back/Settings/templates/settings.php:179
 #: EmbedPress/Ends/Back/Settings/templates/shortcode.php:43
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1324
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1356
 #: src/Blocks/GlobalCoponents/dynamic-source.js:55
 msgid "Upgrade to Pro"
 msgstr ""
@@ -6098,13 +6098,13 @@ msgid "License Key Icon"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Ends/Back/Settings/templates/hub.php:137
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1345
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1348
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1392
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1499
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1502
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1546
 #: EmbedPress/Ends/Back/Settings/templates/hub.php:137
-#: EmbedPress/Includes/Classes/Helper.php:1345
-#: EmbedPress/Includes/Classes/Helper.php:1348
-#: EmbedPress/Includes/Classes/Helper.php:1392
+#: EmbedPress/Includes/Classes/Helper.php:1499
+#: EmbedPress/Includes/Classes/Helper.php:1502
+#: EmbedPress/Includes/Classes/Helper.php:1546
 msgid "Activate License"
 msgstr ""
 
@@ -6146,7 +6146,7 @@ msgstr ""
 #: EmbedPress/Ends/Back/Settings/templates/hub.php:172
 #: EmbedPress/Ends/Back/Settings/templates/hub.php:250
 #: EmbedPress/Ends/Back/Settings/templates/hub.php:326
-#: src/Blocks/google-reviews/src/edit.js:1200
+#: src/Blocks/google-reviews/src/edit.js:1323
 #: src/Blocks/pdf-gallery/src/components/edit.js:476
 msgid "Remove"
 msgstr ""
@@ -7318,8 +7318,8 @@ msgstr ""
 msgid "Show Subscriber Count"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:1871
-#: EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:1871
+#: dist/embedpress/EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:1934
+#: EmbedPress/Gutenberg/EmbedPressBlockRenderer.php:1934
 msgid "Invalid Calendar Link"
 msgstr ""
 
@@ -7937,108 +7937,108 @@ msgstr ""
 msgid "LinkedIn"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:186
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:199
-#: EmbedPress/Includes/Classes/FeatureNotices.php:186
-#: EmbedPress/Includes/Classes/FeatureNotices.php:199
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:206
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:219
+#: EmbedPress/Includes/Classes/FeatureNotices.php:206
+#: EmbedPress/Includes/Classes/FeatureNotices.php:219
 #, php-format
 msgid "New in %s"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:187
-#: EmbedPress/Includes/Classes/FeatureNotices.php:187
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:207
+#: EmbedPress/Includes/Classes/FeatureNotices.php:207
 msgid "Embed Google Business reviews"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:188
-#: EmbedPress/Includes/Classes/FeatureNotices.php:188
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:208
+#: EmbedPress/Includes/Classes/FeatureNotices.php:208
 msgid "Showcase your Google reviews anywhere — Gutenberg block, Elementor widget, or shortcode. Pick a place, choose a layout, and you’re live. No Google API keys required."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:194
-#: EmbedPress/Includes/Classes/FeatureNotices.php:194
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:214
+#: EmbedPress/Includes/Classes/FeatureNotices.php:214
 msgid "Set up Google Reviews →"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:200
-#: EmbedPress/Includes/Classes/FeatureNotices.php:200
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:220
+#: EmbedPress/Includes/Classes/FeatureNotices.php:220
 msgid "Highlight links in 3D PDF Flipbooks"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:201
-#: EmbedPress/Includes/Classes/FeatureNotices.php:201
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:221
+#: EmbedPress/Includes/Classes/FeatureNotices.php:221
 msgid "Make hyperlinks inside your PDF 3D Flipbooks stand out, so readers never miss a clickable link."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:211
-#: EmbedPress/Includes/Classes/FeatureNotices.php:211
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:231
+#: EmbedPress/Includes/Classes/FeatureNotices.php:231
 msgid "View documentation →"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:269
-#: EmbedPress/Includes/Classes/FeatureNotices.php:269
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:294
+#: EmbedPress/Includes/Classes/FeatureNotices.php:294
 msgid "Display Rules"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:270
-#: EmbedPress/Includes/Classes/FeatureNotices.php:270
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:295
+#: EmbedPress/Includes/Classes/FeatureNotices.php:295
 msgid "User role"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:270
-#: EmbedPress/Includes/Classes/FeatureNotices.php:270
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:295
+#: EmbedPress/Includes/Classes/FeatureNotices.php:295
 msgid "Members"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:271
-#: EmbedPress/Includes/Classes/FeatureNotices.php:271
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:296
+#: EmbedPress/Includes/Classes/FeatureNotices.php:296
 msgid "Logged-in only"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:272
-#: EmbedPress/Includes/Classes/FeatureNotices.php:272
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:297
+#: EmbedPress/Includes/Classes/FeatureNotices.php:297
 msgid "Schedule by date"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:318
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:324
-#: EmbedPress/Includes/Classes/FeatureNotices.php:318
-#: EmbedPress/Includes/Classes/FeatureNotices.php:324
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:343
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:349
+#: EmbedPress/Includes/Classes/FeatureNotices.php:343
+#: EmbedPress/Includes/Classes/FeatureNotices.php:349
 msgid "Sydney Opera House"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:325
-#: EmbedPress/Includes/Classes/FeatureNotices.php:325
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:350
+#: EmbedPress/Includes/Classes/FeatureNotices.php:350
 msgid "Bennelong Point, Sydney NSW, Australia"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:334
-#: EmbedPress/Includes/Classes/FeatureNotices.php:334
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:359
+#: EmbedPress/Includes/Classes/FeatureNotices.php:359
 msgid "Aisha K."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:334
-#: EmbedPress/Includes/Classes/FeatureNotices.php:334
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:359
+#: EmbedPress/Includes/Classes/FeatureNotices.php:359
 msgid "Breathtaking venue and a flawless experience — the guided tour was the trip highlight."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:335
-#: EmbedPress/Includes/Classes/FeatureNotices.php:335
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:360
+#: EmbedPress/Includes/Classes/FeatureNotices.php:360
 msgid "Marco T."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:335
-#: EmbedPress/Includes/Classes/FeatureNotices.php:335
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:360
+#: EmbedPress/Includes/Classes/FeatureNotices.php:360
 msgid "A must-see. The architecture is stunning from every angle, day or night."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:336
-#: EmbedPress/Includes/Classes/FeatureNotices.php:336
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:361
+#: EmbedPress/Includes/Classes/FeatureNotices.php:361
 msgid "Liam P."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:336
-#: EmbedPress/Includes/Classes/FeatureNotices.php:336
+#: dist/embedpress/EmbedPress/Includes/Classes/FeatureNotices.php:361
+#: EmbedPress/Includes/Classes/FeatureNotices.php:361
 msgid "Incredible acoustics and a stunning harbour view — booked tickets for the evening show."
 msgstr ""
 
@@ -8251,9 +8251,9 @@ msgid "Checking for new reviews…"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsApify.php:194
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsManaged.php:506
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsManaged.php:515
 #: EmbedPress/Includes/Classes/GoogleReviewsApify.php:194
-#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:455
+#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:515
 msgid "Starting…"
 msgstr ""
 
@@ -8333,12 +8333,12 @@ msgid "Connect failed (HTTP %d)."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsManaged.php:330
-#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:303
+#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:330
 msgid "This site’s connection has expired. Reconnect to EmbedPress API to continue."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsManaged.php:334
-#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:307
+#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:334
 msgid "Not connected to EmbedPress API. Open EmbedPress → Google Reviews and click Connect."
 msgstr ""
 
@@ -8346,45 +8346,45 @@ msgstr ""
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:644
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:733
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1428
-#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:364
+#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:391
 #: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:644
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:701
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1396
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:733
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1428
 msgid "No place selected."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsManaged.php:403
-#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:376
+#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:403
 msgid "Not connected to EmbedPress API. Click Connect in the Google Reviews settings to start fetching reviews."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsManaged.php:472
-#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:426
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsManaged.php:481
+#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:481
 msgid "EmbedPress API is busy. Please try again in a minute."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsManaged.php:519
-#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:468
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsManaged.php:528
+#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:528
 msgid "We couldn’t reach EmbedPress API. Please try again."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsManaged.php:583
-#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:532
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsManaged.php:592
+#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:592
 msgid "Something went wrong. Please click Refetch to try again."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsManaged.php:622
-#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:571
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsManaged.php:631
+#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:631
 msgid "That fetch attempt timed out. Please click Refetch to try again."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsManaged.php:638
-#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:587
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsManaged.php:647
+#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:647
 msgid "Fetching reviews…"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsManaged.php:681
-#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:611
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsManaged.php:690
+#: EmbedPress/Includes/Classes/GoogleReviewsManaged.php:690
 msgid "Couldn’t fetch reviews this time. Please try Refetch again in a moment."
 msgstr ""
 
@@ -8399,13 +8399,13 @@ msgid "Load more reviews"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:903
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:871
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:903
 msgid "Write a review"
 msgstr ""
 
 #. translators: %s: average star rating out of 5
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:912
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:880
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:912
 #, php-format
 msgid "%s out of 5 stars"
 msgstr ""
@@ -8414,8 +8414,8 @@ msgstr ""
 #. translators: %s: number of reviews the reviewer has written
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:919
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:977
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:887
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:945
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:919
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:977
 #, php-format
 msgid "%s review"
 msgid_plural "%s reviews"
@@ -8424,173 +8424,173 @@ msgstr[1] ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:934
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1155
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:902
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1123
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:934
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1155
 msgid "Anonymous"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:969
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:937
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:969
 msgid "Local Guide"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:985
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:953
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:985
 msgid "Posted on Google"
 msgstr ""
 
 #. translators: %d: star rating out of 5
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:993
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:961
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:993
 #, php-format
 msgid "%d out of 5 stars"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1010
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:978
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1010
 msgid "Read more"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1011
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:979
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1011
 msgid "Show less"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1039
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1007
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1039
 msgid "Response from the owner"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1047
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1015
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1047
 msgid "Helpful"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1249
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1217
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1249
 msgid "No reviews to display yet."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1289
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1257
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1289
 msgid "Loading Google reviews…"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1290
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1258
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1290
 msgid "Fetching the latest reviews for this place. This can take a little while the first time — they’ll appear here automatically when ready, no need to refresh."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1313
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1281
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1313
 msgid "Couldn’t load this place’s reviews."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1314
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1282
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1314
 msgid "The last attempt to fetch reviews for this place didn’t finish. Open EmbedPress → Google Reviews and use “Refetch” to try again."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1315
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1283
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1315
 msgid "Open Google Reviews settings →"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1316
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1284
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1316
 msgid "Only you (an editor) can see this message — visitors see nothing."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1338
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1306
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1338
 msgid "Marquee"
 msgstr ""
 
 #. translators: %s: layout name
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1353
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1321
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1353
 #, php-format
 msgid "“%s” is a Pro layout"
 msgstr ""
 
 #. translators: %s: layout name
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1354
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1322
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1354
 msgid "Upgrade to EmbedPress Pro to use this layout, or pick a free one (List, Grid, Card, Carousel)."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1357
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1325
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1357
 msgid "Visitors see the List layout until you upgrade or switch."
 msgstr ""
 
 #. translators: %s: error message from Google API
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1367
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1335
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1367
 #, php-format
 msgid "Google Reviews error: %s"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1392
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1360
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1392
 msgid "Choose a Google Business to show its reviews"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1393
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1361
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1393
 msgid "Search for a place in the panel, or paste a Place ID, to display its reviews here."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1431
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1399
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1431
 msgid "Invalid place identifier."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1440
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1408
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1440
 msgid "Could not load reviews. Open EmbedPress → Google Reviews and use “Refetch” for this place."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1441
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1492
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1409
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1460
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1441
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1492
 msgid "Not connected to the EmbedPress API. Open EmbedPress → Google Reviews and click “Connect to EmbedPress API” to start fetching reviews."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1491
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1459
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1491
 msgid "No places matched that search. Try a more specific name (including the city), or paste the Place ID directly using “Have a Place ID? Enter manually”."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1509
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:526
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1477
-#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:513
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:576
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1509
+#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:576
 msgid "No key provided."
 msgstr ""
 
 #. translators: %d: HTTP status code
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1653
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1865
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1621
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1833
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1653
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1865
 #, php-format
 msgid "Google Places returned HTTP %d."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1692
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1868
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1660
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1836
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1692
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1868
 msgid "Invalid response from Google Places."
 msgstr ""
 
 #. translators: 1: Google API error status, 2: Google API error message
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1698
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1859
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1666
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1827
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1698
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1859
 #, php-format
 msgid "Google Places error: %1$s — %2$s"
 msgstr ""
@@ -8598,199 +8598,205 @@ msgstr ""
 #. translators: %s: Google API error status
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1699
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1860
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1667
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1828
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1699
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1860
 #, php-format
 msgid "Google Places error: %s"
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1720
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1688
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1720
 msgid "Enable billing for your project in the Google Cloud Console — the Places API requires an active billing account."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1731
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1699
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1731
 msgid "Enable \"Places API (New)\" for your project in the Google Cloud Console (APIs & Services → Library), then wait a few minutes for it to take effect."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1737
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1705
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1737
 msgid "Check that \"Places API (New)\" is enabled for your project and that your API key is not restricted from calling it (APIs & Services → Credentials → your key → API restrictions). Server-side calls also require the key to allow application restriction \"None\" or your server IP."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1742
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1710
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1742
 msgid "Your Google Places API quota has been exceeded. Check your usage and quotas in the Google Cloud Console."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1747
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1715
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1747
 msgid "Your Google Places API key appears to be invalid. Re-copy it from the Google Cloud Console (APIs & Services → Credentials)."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1983
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1951
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1983
 msgid "Search is busy right now — please try again in a moment."
 msgstr ""
 
 #: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1988
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1956
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1988
 msgid "Search service unavailable."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2025
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:1993
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2052
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2052
+msgid "Could not load review counts."
+msgstr ""
+
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2085
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2085
 msgid "Place search isn’t available right now. Paste the Place ID directly using “Have a Place ID? Enter manually”."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2066
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2034
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2126
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2126
 msgid "Place search took too long to respond. Try searching again, or paste the Place ID directly using “Have a Place ID? Enter manually”."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2082
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2050
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2142
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2142
 msgid "Place search is temporarily unavailable. Try again, or paste the Place ID directly using “Have a Place ID? Enter manually”."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2084
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2052
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2144
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2144
 msgid "Place search is temporarily unavailable. Paste the Place ID directly using “Have a Place ID? Enter manually”."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2091
-#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2059
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2151
+#: EmbedPress/Includes/Classes/GoogleReviewsRenderer.php:2151
 msgid "Place search returned an unexpected response. Try again, or paste the Place ID directly using “Have a Place ID? Enter manually”."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:267
-#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:254
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:317
+#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:317
 msgid "Connect to the EmbedPress API to search for places."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:344
-#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:331
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:394
+#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:394
 msgid "Couldn’t reach the place-search service right now. Please check your connection and try again in a moment."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:538
-#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:525
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:588
+#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:588
 #, php-format
 msgid "Verified (Apify user: %s)."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:538
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:549
-#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:525
-#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:536
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:588
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:599
+#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:588
+#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:599
 msgid "Verified."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:540
-#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:527
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:590
+#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:590
 msgid "Apify rejected this token. Check it in your Apify account → Integrations."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:569
-#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:556
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:619
+#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:619
 msgid "Connect failed."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:710
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:760
+#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:760
 msgid "The review fetch could not be completed."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:834
-#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:740
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:884
+#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:884
 msgid "place_id is required."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:857
-#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:763
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:907
+#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:907
 msgid "The free plan supports one place. Upgrade to EmbedPress Pro to add unlimited places."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:974
-#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:880
+#: dist/embedpress/EmbedPress/Includes/Classes/GoogleReviewsRestController.php:1044
+#: EmbedPress/Includes/Classes/GoogleReviewsRestController.php:1044
 msgid "Unknown action."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:207
-#: EmbedPress/Includes/Classes/Helper.php:207
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:361
+#: EmbedPress/Includes/Classes/Helper.php:361
 msgid "Requests to internal hosts are not allowed."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1327
-#: EmbedPress/Includes/Classes/Helper.php:1327
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1481
+#: EmbedPress/Includes/Classes/Helper.php:1481
 msgid "EmbedPress Pro Required"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1328
-#: EmbedPress/Includes/Classes/Helper.php:1328
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1482
+#: EmbedPress/Includes/Classes/Helper.php:1482
 msgid "This feature requires EmbedPress Pro. Please install and activate EmbedPress Pro to access this feature."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1339
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1392
-#: EmbedPress/Includes/Classes/Helper.php:1339
-#: EmbedPress/Includes/Classes/Helper.php:1392
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1493
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1546
+#: EmbedPress/Includes/Classes/Helper.php:1493
+#: EmbedPress/Includes/Classes/Helper.php:1546
 msgid "Renew License"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1353
-#: EmbedPress/Includes/Classes/Helper.php:1353
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1507
+#: EmbedPress/Includes/Classes/Helper.php:1507
 msgid "Pro Features Disabled"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1395
-#: EmbedPress/Includes/Classes/Helper.php:1395
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1549
+#: EmbedPress/Includes/Classes/Helper.php:1549
 msgid "EmbedPress Pro Features Disabled"
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1446
-#: EmbedPress/Includes/Classes/Helper.php:1446
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1600
+#: EmbedPress/Includes/Classes/Helper.php:1600
 msgid "EmbedPress Pro is not installed or activated."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1451
-#: EmbedPress/Includes/Classes/Helper.php:1451
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1605
+#: EmbedPress/Includes/Classes/Helper.php:1605
 msgid "Your license is active and valid."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1453
-#: EmbedPress/Includes/Classes/Helper.php:1453
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1607
+#: EmbedPress/Includes/Classes/Helper.php:1607
 msgid "Your license has expired. Please renew to continue receiving updates and support."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1456
-#: EmbedPress/Includes/Classes/Helper.php:1456
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1610
+#: EmbedPress/Includes/Classes/Helper.php:1610
 msgid "Your license is not active for this URL. Please activate your license."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1459
-#: EmbedPress/Includes/Classes/Helper.php:1459
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1613
+#: EmbedPress/Includes/Classes/Helper.php:1613
 msgid "Your license key has been disabled or revoked."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1461
-#: EmbedPress/Includes/Classes/Helper.php:1461
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1615
+#: EmbedPress/Includes/Classes/Helper.php:1615
 msgid "License key is missing. Please enter your license key."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1463
-#: EmbedPress/Includes/Classes/Helper.php:1463
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1617
+#: EmbedPress/Includes/Classes/Helper.php:1617
 msgid "Unable to verify license due to connection issues. Please try again later."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1467
-#: EmbedPress/Includes/Classes/Helper.php:1467
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1621
+#: EmbedPress/Includes/Classes/Helper.php:1621
 msgid "Please activate your license key to enable EmbedPress Pro features."
 msgstr ""
 
-#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1679
+#: dist/embedpress/EmbedPress/Includes/Classes/Helper.php:1833
 #: dist/embedpress/EmbedPress/Providers/Youtube.php:1358
-#: EmbedPress/Includes/Classes/Helper.php:1679
+#: EmbedPress/Includes/Classes/Helper.php:1833
 #: EmbedPress/Providers/Youtube.php:1358
 msgid "EmbedPress: "
 msgstr ""
@@ -9340,32 +9346,47 @@ msgstr ""
 msgid "Unlock Pro"
 msgstr ""
 
-#: src/AdminUI/GoogleReviews.jsx:633
+#: src/AdminUI/GoogleReviews.jsx:673
+#: src/Blocks/google-reviews/src/edit.js:155
+msgid "Reviews unavailable"
+msgstr ""
+
+#: src/AdminUI/GoogleReviews.jsx:691
+#: src/Blocks/google-reviews/src/edit.js:175
+msgid "No reviews yet"
+msgstr ""
+
+#: src/AdminUI/GoogleReviews.jsx:705
 msgid "This is a Pro feature — click to upgrade."
 msgstr ""
 
-#: src/AdminUI/GoogleReviews.jsx:1808
+#: src/AdminUI/GoogleReviews.jsx:1513
+#, js-format
+msgid "Fetching reviews… %d"
+msgstr ""
+
+#: src/AdminUI/GoogleReviews.jsx:1901
 msgid "Adding more places needs EmbedPress Pro — click to upgrade."
 msgstr ""
 
-#: src/AdminUI/GoogleReviews.jsx:1826
+#: src/AdminUI/GoogleReviews.jsx:1919
 msgid "Adding…"
 msgstr ""
 
-#: src/AdminUI/GoogleReviews.jsx:1835
+#: src/AdminUI/GoogleReviews.jsx:1928
 msgid "Add"
 msgstr ""
 
-#: src/AdminUI/GoogleReviews.jsx:1954
+#: src/AdminUI/GoogleReviews.jsx:2047
 msgid "Place ID copied"
 msgstr ""
 
-#: src/AdminUI/GoogleReviews.jsx:1954
-#: src/AdminUI/GoogleReviews.jsx:1955
+#: src/AdminUI/GoogleReviews.jsx:2047
+#: src/AdminUI/GoogleReviews.jsx:2048
 msgid "Copy Place ID"
 msgstr ""
 
-#: src/AdminUI/GoogleReviews.jsx:1955
+#: src/AdminUI/GoogleReviews.jsx:2048
 msgid "Place ID copied!"
 msgstr ""
 
@@ -10197,7 +10218,7 @@ msgstr ""
 
 #: src/Blocks/embedpress-pdf/src/inspector.js:317
 #: src/Blocks/embedpress-pdf/src/inspector.js:617
-#: src/Blocks/google-reviews/src/edit.js:556
+#: src/Blocks/google-reviews/src/edit.js:679
 #: src/Blocks/pdf-gallery/src/inspector.js:560
 msgid "pro"
 msgstr ""
@@ -10607,113 +10628,113 @@ msgstr ""
 msgid "location"
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:287
+#: src/Blocks/google-reviews/src/edit.js:396
 msgid "Connect to the EmbedPress API to search. Open the EmbedPress → Google Reviews settings to connect."
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:311
+#: src/Blocks/google-reviews/src/edit.js:434
 msgid "Paste a Google Place ID or a Google Maps link for the place."
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:337
+#: src/Blocks/google-reviews/src/edit.js:460
 msgid "Selected place"
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:400
+#: src/Blocks/google-reviews/src/edit.js:523
 msgid "Searching…"
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:462
+#: src/Blocks/google-reviews/src/edit.js:585
 msgid "Connect now →"
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:467
+#: src/Blocks/google-reviews/src/edit.js:590
 msgid "Search failed:"
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:476
+#: src/Blocks/google-reviews/src/edit.js:599
 msgid "Open settings to add your API key →"
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:489
+#: src/Blocks/google-reviews/src/edit.js:612
 msgid "Saved places"
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:508
+#: src/Blocks/google-reviews/src/edit.js:631
 msgid "ChIJ… or https://maps.google.com/…"
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:509
+#: src/Blocks/google-reviews/src/edit.js:632
 msgid "Useful for new or unverified businesses that don’t show in search yet."
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:739
+#: src/Blocks/google-reviews/src/edit.js:862
 msgid "Change place"
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:893
+#: src/Blocks/google-reviews/src/edit.js:1016
 msgid "Reveals reviews a page at a time (no extra API calls). Page size = the “Reviews per page” count above."
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:929
+#: src/Blocks/google-reviews/src/edit.js:1052
 msgid "Photos attached to reviews."
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:948
+#: src/Blocks/google-reviews/src/edit.js:1071
 msgid "Size & Spacing"
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:960
+#: src/Blocks/google-reviews/src/edit.js:1083
 msgid "How many review cards are shown at once. Collapses on smaller screens."
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:972
+#: src/Blocks/google-reviews/src/edit.js:1095
 msgid "Space between review cards."
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:1031
+#: src/Blocks/google-reviews/src/edit.js:1154
 msgid "Advance through reviews automatically."
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:1092
+#: src/Blocks/google-reviews/src/edit.js:1215
 msgid "Rating stars"
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:1105
+#: src/Blocks/google-reviews/src/edit.js:1228
 msgid "\"Write a review\" button"
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:1167
+#: src/Blocks/google-reviews/src/edit.js:1290
 msgid "Cache duration (minutes)"
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:1173
+#: src/Blocks/google-reviews/src/edit.js:1296
 msgid "0 = use the global default. Overrides cache time for this block."
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:1205
+#: src/Blocks/google-reviews/src/edit.js:1328
 msgid "+ Add place"
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:1221
+#: src/Blocks/google-reviews/src/edit.js:1344
 msgid "Search for a Google Business to embed its reviews. Open the block sidebar to pick a place."
 msgstr ""
 
 #. translators: %d: number of reviews fetched so far
-#: src/Blocks/google-reviews/src/edit.js:1239
+#: src/Blocks/google-reviews/src/edit.js:1362
 #, js-format
 msgid "Fetching all reviews… %d so far"
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:1242
-msgid "Fetching all reviews…"
+#: src/Blocks/google-reviews/src/edit.js:1372
+msgid "Starting the review fetcher… this can take a moment."
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:1249
+#: src/Blocks/google-reviews/src/edit.js:1379
 msgid "Showing the first reviews now — the rest are loading in the background. You can keep editing."
 msgstr ""
 
-#: src/Blocks/google-reviews/src/edit.js:1271
+#: src/Blocks/google-reviews/src/edit.js:1401
 msgid "No preview yet. Verify your API key and place selection."
 msgstr ""
 

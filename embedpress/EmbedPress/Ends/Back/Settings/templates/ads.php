@@ -348,7 +348,7 @@ if(!$pro_active){
                                     <?php
                                     $pdf_url = EMBEDPRESS_URL_ASSETS . 'embedpress.pdf';
                                     $renderer = Helper::get_pdf_renderer();
-                                    $src = $renderer . ((strpos($renderer, '?') == false) ? '?' : '&') . 'file=' . urlencode($pdf_url);
+                                    $src = $renderer . ((strpos($renderer, '?') === false) ? '?' : '&') . 'file=' . urlencode($pdf_url);
                                     ?>
                                     <iframe title="sample" class="embedpress-embed-document-pdf embedpress-pdf-1701320841615" style="width:550px;height:320px; max-width:100%; display: inline-block" src="<?php echo esc_url($src); ?>" frameborder="0" oncontextmenu="return false;"></iframe>
                                     <!-- <p class="embedpress-el-powered"><?php echo esc_html__('Powered By EmbedPress', 'embedpress'); ?></p> -->
